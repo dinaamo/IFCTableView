@@ -1,0 +1,311 @@
+﻿<Window
+    x:Class="IFC_Table_View.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cmnd="clr-namespace:IFC_Table_View.Infracrucrure.Commands"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+    x:Name="MainWindowIFC"
+    Title="{Binding Title, Mode=OneWay, TargetNullValue=IFC Table View, UpdateSourceTrigger=PropertyChanged}"
+    Width="1027"
+    Height="552"
+    Icon="{StaticResource ResourceKey=RZDP_Image}"
+    mc:Ignorable="d" Loaded="MainWindowIFC_Loaded">
+
+
+
+
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" >
+            <MenuItem Header="Файл">
+                <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть" />
+                <MenuItem Command="{Binding SaveFileCommand}" Header="Сохранить" />
+                <MenuItem Command="{Binding SaveAsFileCommand}" Header="Сохранить как" />
+                <!--<MenuItem Command="{Binding SaveAsIFCXMLFileCommand}" Header="Сохранить как(.ifcxml)"/>-->
+                <MenuItem Header="Выход">
+                    <MenuItem.Command>
+                        <cmnd:CloseApplicationCommand />
+                    </MenuItem.Command>
+                </MenuItem>
+            </MenuItem> 
+            <MenuItem Header="Таблицы">
+                <MenuItem Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу"  />
+                <MenuItem Command="{Binding DeleteTableCommand}" CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}" Header="Удалить таблицу" />
+            </MenuItem>
+            <MenuItem Header="Ссылки">
+                <MenuItem Command="{Binding AddReferenceToTheTable}" Header="Задать ссылку на таблицу" CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}" />
+            </MenuItem>
+            <MenuItem Header="Справка">
+                <MenuItem Header="О программе" />
+            </MenuItem>
+        </Menu>
+
+
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StackPanel>
+                <TextBlock Text="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvStatusGuid}, StringFormat=GUID:  \{0\}}" />
+                <TextBlock Text="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvStatusName}, StringFormat=Имя:  \{0\}}" />
+                <TextBlock Text="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvStatusClassIFC}, StringFormat=Класс IFC:  \{0\}}" />
+            </StackPanel>
+        </StatusBar>
+
+
+        <Grid Margin="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="firstColumn" Width="249*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="102*" />
+                <ColumnDefinition Width="442*" />
+            </Grid.ColumnDefinitions>
+            <GridSplitter
+                Grid.Column="1"
+                Width="6"
+                HorizontalAlignment="Center" />
+
+
+            <GroupBox
+                x:Name="grBox"
+                Grid.Column="0"
+                Margin="5"
+                Header="Элементы модели">
+
+                <TreeView x:Name="treeViewIFC" />
+            </GroupBox>
+
+            <TabControl
+                Grid.Column="1"
+                Grid.ColumnSpan="3"
+                Margin="6,0,0,6">
+                <TabItem x:Name="PropertyItem">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome
+                            Height="15"
+                            Margin="0,0,3,0"
+                            Foreground="DarkOrange"
+                            Icon="FileOutline" />
+                            <TextBlock Text="Сведения" />
+                        </StackPanel>
+                    </TabItem.Header>
+
+                    <DockPanel>
+                        <ListBox
+                                Visibility="Hidden"
+                                DockPanel.Dock="Top"
+                                Margin="0,0,25,0"
+                                Name="PrIt">
+                        </ListBox>
+                        <ListView
+                                 Name="PropertItemyListBox"
+                                 Background="Transparent" 
+                                 BorderThickness="0"
+                                 Margin="0,0,0,0"
+                                 DockPanel.Dock="Bottom"
+                                 ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvItemIFC}}"
+         >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Expander MaxHeight="500">
+                                        <Expander.Header >
+                                            <TextBlock Text="{Binding Path=Key}" />
+                                        </Expander.Header>
+
+                                        <ListBox
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 ItemsSource="{Binding Path=Value}"  Width="{Binding ElementName=PrIt, Path=ActualWidth}">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding}"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Expander>
+
+
+
+                                </DataTemplate>
+
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                    </DockPanel>
+
+                </TabItem>
+
+
+
+                <TabItem x:Name="PropertyElementTabItem">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome
+                                Height="15"
+                                Margin="0,0,3,0"
+                                Foreground="DarkOrange"
+                                Icon="ListUl" />
+                            <TextBlock Text="Характеристики" />
+                        </StackPanel>
+                    </TabItem.Header>
+
+                    <TabItem.Style>
+                        <Style>
+                            <Setter Property="TabItem.Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=treeViewIFC, 
+                                                Path=SelectedItem, 
+                                                Converter={StaticResource ConvIFCType}}"
+                                                Value="ModelItemIFCObject">
+                                    <Setter Property="TabItem.Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TabItem.Style>
+
+
+                    <DockPanel >
+                        <ListBox
+                            Visibility="Hidden"
+                            DockPanel.Dock="Top"
+                            Margin="30,0,30,0"
+                            Name="PrSet">
+                        </ListBox>
+                        <Grid DockPanel.Dock="Top" Width="{Binding ElementName=PrSet, Path=ActualWidth}" Margin="0,0,30,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Наименование" Grid.Column="0" HorizontalAlignment="Center"/>
+                            <GridSplitter Grid.Column="1" Width="2" IsEnabled="False"/>
+                            <TextBlock Text="Значение" Grid.Column="2" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <ListView
+                                    Name="PropertyListBox"
+                                    Background="Transparent"
+                                    Margin="0"
+                                    BorderThickness="0"
+                                    DockPanel.Dock="Bottom"
+                                    ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvPropSet}}"
+                            >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Expander>
+                                        <Expander.Header>
+                                            <TextBlock Text="{Binding Path=Name}" />
+                                        </Expander.Header>
+
+                                        <ListBox
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    ItemsSource="{Binding Converter={StaticResource ConvProperties}}">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Width="{Binding ElementName=PrSet, Path=ActualWidth}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                            <GridSplitter
+                                                                Grid.Column="0"
+                                                                Width="20"
+                                                                IsEnabled="False"
+                                                                Visibility="Hidden" />
+                                                            <TextBlock
+                                                                Grid.Column="0"
+                                                                HorizontalAlignment="Left"
+                                                                Text="{Binding Path=Key}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                            <GridSplitter
+                                                                    Grid.Column="1"
+                                                                    Width="20"
+                                                                    IsEnabled="False"
+                                                                    Visibility="Hidden" />
+                                                            <TextBlock 
+                                                                    Grid.Column="1"
+                                                                    HorizontalAlignment="Right"
+                                                                    Text="{Binding Path=Value, Converter={StaticResource ConvIFCValue}}" MouseDown="TextBlock_MouseDown"/>
+
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Expander>
+                                </DataTemplate>
+
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+
+
+
+                <TabItem  x:Name="TableTabItem">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome
+                                Height="15"
+                                Margin="0,0,3,0"
+                                Foreground="DarkOrange"
+                                Icon="Table" />
+                            <TextBlock Text="Таблица" />
+                        </StackPanel>
+                    </TabItem.Header>
+
+                    <TabItem.Style>
+                        <Style>
+                            <Setter Property="TabItem.Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=treeViewIFC, 
+                                                Path=SelectedItem, 
+                                                Converter={StaticResource ConvIFCType}}"
+                                                Value="ModelItemIFCTable">
+                                    <Setter Property="TabItem.Visibility" Value="Visible"/>
+                                </DataTrigger>
+
+                            </Style.Triggers>
+                        </Style>
+                    </TabItem.Style>
+
+
+                    <DataGrid   Name="dgTable" 
+                                ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvIFCTable}}"
+                                VerticalGridLinesBrush="#FFC9C9C9" 
+                                HorizontalGridLinesBrush="#FFC8C8C8"
+                                AutoGenerateColumns="True" 
+                                Margin="0" IsReadOnly="True" 
+                                ColumnWidth="auto" SelectionMode="Extended" 
+                                SelectionUnit="FullRow"
+                                VerticalAlignment="Top"
+                                CanUserSortColumns="False"
+                                >
+
+
+
+
+                    </DataGrid>
+                </TabItem>
+
+            </TabControl>
+
+
+
+
+        </Grid>
+
+
+    </DockPanel>
+</Window>
+

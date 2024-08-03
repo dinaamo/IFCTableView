@@ -1,0 +1,23 @@
+﻿<Window x:Class="IFC_Table_View.View.Windows.WindowLoad"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IFC_Table_View.View.Windows"
+        mc:Ignorable="d"
+        Title="WindowLoad" Height="400" Width="400" 
+        WindowStyle="None" 
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Grid>
+        <DockPanel>
+            <TextBlock Text="Загрузка" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Center"
+                       FontSize="50" 
+                       Foreground="OrangeRed"
+                       FontWeight="Bold"/>
+        </DockPanel>
+        
+    </Grid>
+</Window>

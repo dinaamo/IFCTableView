@@ -1,0 +1,138 @@
+﻿<Window x:Class="Edit_PropertyIFC4.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        MinWidth="1500" 
+        MinHeight="700" Height="auto"
+        Loaded="Window_Loaded"  Name="WindowIFC"
+        >
+
+
+
+    <Grid UseLayoutRounding="True" >
+        <Grid.RowDefinitions>
+            <RowDefinition Name="row1" Height="20"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions >
+            <ColumnDefinition Width="200" MinWidth="200" MaxWidth="700"/>
+            <ColumnDefinition Width="34"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="250" MinWidth="180" MaxWidth="600"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="250" MinWidth="180" MaxWidth="600"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <GridSplitter Grid.Column="2" Grid.RowSpan="3" ShowsPreview="False" Width="5"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+        <GridSplitter Grid.Column="4" Grid.RowSpan="3" ShowsPreview="False" Width="5"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+        <GridSplitter Grid.Column="6" Grid.RowSpan="3" ShowsPreview="False" Width="5"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+        <TextBlock 
+            Name="TextBoxFileName" 
+            Margin="10,30,0,10" Width="auto" MaxWidth="{Binding Width, ElementName=Window}"
+            Height="20"  
+            HorizontalAlignment="Left"
+            Grid.Row="0" 
+            />
+        
+        <TreeView  Name="treeView" Grid.Row="2" Margin="0" SelectedItemChanged="treeView_SelectedItemChanged" Grid.ColumnSpan="2" >
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=ModelItems}">
+                    <TextBlock Text="{Binding ItemTreeView}" ToolTip="{Binding GUID}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+
+        <!--<TreeView  Name="treeViewPrSet" Grid.Column="3" Grid.Row="2"
+                   VirtualizingStackPanel.IsVirtualizing="True"
+                    VirtualizingStackPanel.VirtualizationMode="Recycling"
+                   >
+            <GridView>
+                <GridViewColumn Header="Name" />
+                <GridViewColumn Header="Files"/>
+            </GridView>
+        </TreeView>
+
+        <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=CollectionPropertySet}">
+                    <TextBlock Text="{Binding Name}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>-->
+        
+        
+        <DataGrid Name="dgPropertySet" Grid.Column="3" Grid.Row="2" 
+                  Margin="0" AutoGenerateColumns="False" 
+                  VerticalGridLinesBrush="#FFC9C9C9" 
+                  HorizontalGridLinesBrush="#FFC8C8C8" 
+                  IsReadOnly="True"
+                  SelectedCellsChanged="dg_SelectedItemChanged"
+                  CanUserSortColumns="False">
+            <DataGrid.Columns >
+                <DataGridTextColumn Header="Наименование набора характеристик" 
+                                        Binding="{Binding Path=Name}" Width="*"/>
+
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        
+
+        <DataGrid Name="dgProperty" Grid.Column="5" Grid.Row="2" 
+                  Margin="0" AutoGenerateColumns="False" 
+                  VerticalGridLinesBrush="#FFC9C9C9" 
+                  HorizontalGridLinesBrush="#FFC8C8C8" 
+                  IsReadOnly="True"
+                  ColumnWidth="*"
+                  CanUserSortColumns="False">
+            <DataGrid.Columns >
+                <DataGridTextColumn Header="Параметр" 
+                                    Binding="{Binding Path=Name, TargetNullValue=''}" Width="*"/>
+                <DataGridTextColumn Header="Значение"
+                                     Binding="{Binding Path=NominalValue.Value, TargetNullValue=''}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+
+        <TextBlock Name="tableName"  Grid.Row="1" Grid.Column="7" Margin="0" >
+            
+        </TextBlock>
+        <DataGrid Name="dgTable" Grid.Column="7" Grid.Row="2" 
+                  VerticalGridLinesBrush="#FFC9C9C9" 
+                  HorizontalGridLinesBrush="#FFC8C8C8"
+                  AutoGenerateColumns="True" 
+                  Margin="0" IsReadOnly="True" 
+                  ColumnWidth="*" SelectionMode="Extended" 
+                  SelectionUnit="FullRow" ItemsSource="{Binding}"
+                  VerticalAlignment="Top"
+                  CanUserSortColumns="False"
+                  >
+        </DataGrid>
+        
+
+        <Menu Height="{Binding Width, ElementName=row1}" Grid.ColumnSpan="7">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Открыть" Click="Open_File_Click"/>
+                <MenuItem Header="Сохранить" Click="MenuItem_Save_Click" />
+                <MenuItem Header="Сохранить как" Click="MenuItem_SaveAs_Click"/>
+            </MenuItem>
+            <MenuItem Header="Таблицы" >
+                <MenuItem Header="Добавить таблицу в текущий файл" 
+                          Click="Add_Table_Click" 
+                          IsEnabled="false"
+                          Name ="Add_Table1"/>
+                <MenuItem Header="Удалить таблицу" 
+                          Click="Delete_Table_Click" 
+                          IsEnabled="false"
+                          Name ="Delete_Table" />
+<!--Visibility="Collapsed"-->
+            </MenuItem>
+        </Menu>
+
+    </Grid>
+</Window>

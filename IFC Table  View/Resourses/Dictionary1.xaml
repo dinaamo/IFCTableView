@@ -1,0 +1,138 @@
+﻿<ResourceDictionary 
+                    x:Class="IFC_Table_View.Resourses.OpenTable"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:cnv="clr-namespace:IFC_Table_View.Infracrucrure.Converter"
+                    xmlns:vm="clr-namespace:IFC_Table_View.ViewModels"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/"
+                    xmlns:mi="clr-namespace:IFC_Table_View.IFC.ModelItem"
+                    >
+
+    <cnv:ConvertItemTreeName x:Key="ConvTreeItem" />
+    <cnv:ConvertItemStatusGUID x:Key="ConvStatusGuid" />
+    <cnv:ConvertItemStatusName x:Key="ConvStatusName" />
+    <cnv:ConvertItemStatusClassIFC x:Key="ConvStatusClassIFC" />
+    <cnv:ConvertItemPropSetIFC x:Key="ConvPropSet" />
+    <cnv:ConvertItemProperiesIFC x:Key="ConvProperties" />
+    <cnv:ConvertItemIFCValue x:Key="ConvIFCValue" /> 
+    <cnv:ConvertItemTable x:Key="ConvIFCTable" />
+    <cnv:ConvertItemTypeClassIFC x:Key="ConvIFCType" />
+    <cnv:ConvertItemIFC x:Key="ConvItemIFC" />
+
+
+    <Style TargetType="DataGridColumnHeader">
+
+    </Style>
+
+
+    <HierarchicalDataTemplate 
+                                        DataType="{x:Type mi:ModelItemIFCFile}"
+                                        ItemsSource="{Binding Path=ModelItems}" >
+        <StackPanel Orientation="Horizontal">
+            <fa:ImageAwesome
+                                    Height="10"
+                                    Margin="0,0,3,0"
+                                    Foreground="DarkOrange"
+                                    Icon="File" />
+            <TextBlock Text="{Binding ItemTreeView}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue"/>
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
+    </HierarchicalDataTemplate>
+         
+    <HierarchicalDataTemplate 
+                                        DataType="{x:Type mi:ModelItemIFCObject}"
+                                        ItemsSource="{Binding Path=ModelItems}">
+
+        <StackPanel Orientation="Horizontal">
+            <fa:ImageAwesome        
+                                    x:Name="img" 
+                                    Height="8"
+                                    Margin="0,0,3,0"
+                                    Icon="Circle"
+                                    Foreground="{Binding Path=BrushImageForeground}">
+
+            </fa:ImageAwesome>
+            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue"/>
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
+    </HierarchicalDataTemplate>
+
+
+
+    <DataTemplate DataType="{x:Type mi:ModelItemIFCTable}">
+        <StackPanel Orientation="Horizontal">
+            <fa:ImageAwesome
+                                        Height="10"
+                                        Margin="0,0,3,0"
+                                        Foreground="OrangeRed"
+                                        Icon="Table" />
+            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" MouseDown="TextBlock_MouseDown">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue"/>
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
+    </DataTemplate>
+
+
+    <Style TargetType="TabControl">
+        <Style.Triggers>
+            
+            <DataTrigger Binding="{Binding ElementName=treeViewIFC, 
+                                    Path=SelectedItem, 
+                                    Converter={StaticResource ConvIFCType}}"
+                             Value="ModelItemIFCFile">
+                <Setter Property="SelectedIndex" Value="0" />
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding ElementName=treeViewIFC, 
+                                                Path=SelectedItem, 
+                                                Converter={StaticResource ConvIFCType}}"
+                                         Value="ModelItemIFCObject">
+                <Setter Property="SelectedIndex" Value="1" />
+            </DataTrigger>
+            
+            <DataTrigger Binding="{Binding ElementName=treeViewIFC, 
+                                                Path=SelectedItem, 
+                                                Converter={StaticResource ConvIFCType}}"
+                                        Value="ModelItemIFCTable">
+                <Setter Property="SelectedIndex" Value="2" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+
+    <BitmapImage x:Key="RZDP_Image" UriSource="..\Images\RZDP_Image.png"></BitmapImage>
+
+</ResourceDictionary>
