@@ -11,12 +11,37 @@
         Background="Transparent">
     <Grid>
         <DockPanel>
-            <TextBlock Text="Загрузка" 
+            <TextBlock  DockPanel.Dock="Left"
+                       x:Name="txtStateRunning"
+                       Text="   Загрузка" 
                        VerticalAlignment="Center" 
-                       HorizontalAlignment="Center"
+                       HorizontalAlignment="Left"
                        FontSize="50" 
-                       Foreground="OrangeRed"
-                       FontWeight="Bold"/>
+                       Foreground="DarkBlue"
+                       FontWeight="Bold">
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="textAnimation">
+                                    <StringAnimationUsingKeyFrames  Storyboard.TargetName="txtStateRunning" 
+                                                                    Storyboard.TargetProperty="(TextBlock.Text)" 
+                                                                    RepeatBehavior="Forever" 
+                                                                    AutoReverse="False"
+                                                                    FillBehavior="Stop"
+                                                                    Duration="0:0:3">
+                                        <DiscreteStringKeyFrame Value="   Загрузка."   KeyTime="0:0:0.5" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка.."  KeyTime="0:0:1" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка..." KeyTime="0:0:1.5" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка...." KeyTime="0:0:2" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка....."  KeyTime="0:0:2.5" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка......" KeyTime="0:0:3" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка......" KeyTime="0:0:3" />
+                                </StringAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+            </TextBlock>
         </DockPanel>
         
     </Grid>

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -64,14 +65,22 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        void LoadModel(string path)
-        {
+        WindowLoad windowLoad;
 
-            WindowLoad windowLoad = new WindowLoad();
-            windowLoad.Left =  mainWindow.Left + (mainWindow.Width/2) - (windowLoad.Width/2);
-            windowLoad.Top = mainWindow.Top + (mainWindow.Height/2) - (windowLoad.Height/2);
+        //Загрузка модели с анимацией
+        async void LoadModelAsync(string path)
+        {
+            windowLoad = new WindowLoad();
+            windowLoad.Left = mainWindow.Left + (mainWindow.Width / 2) - (windowLoad.Width / 2);
+            windowLoad.Top = mainWindow.Top + (mainWindow.Height / 2) - (windowLoad.Height / 2);
+
+            ModelIFC TempModel = new ModelIFC();
             windowLoad.Show();
-            ModelIFC TempModel = new ModelIFC().Load(path);
+            await Task.Run(() =>
+            {
+                TempModel.Load(path);
+            });
+
             windowLoad.Hide();
 
             if (TempModel == null)
@@ -84,6 +93,7 @@ namespace IFC_Table_View.ViewModels
             }
         }
 
+
         #region Комманды
 
 
@@ -92,8 +102,8 @@ namespace IFC_Table_View.ViewModels
 
         private void OnLoadApplicationCommandExecuted(object o)
         {
-            
-            LoadModel(HelperFileIFC.OpenIFC_File());
+
+            LoadModelAsync(HelperFileIFC.OpenIFC_File());
             
         }
 
@@ -312,7 +322,7 @@ namespace IFC_Table_View.ViewModels
             if (strArray.Length > 1)
             {
                 //MessageBox.Show(strArray[1]);
-                LoadModel(Environment.GetCommandLineArgs()[1]);
+                LoadModelAsync(Environment.GetCommandLineArgs()[1]);
             }
 
             #region Комманды
