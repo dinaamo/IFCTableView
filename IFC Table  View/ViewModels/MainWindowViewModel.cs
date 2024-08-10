@@ -19,6 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace IFC_Table_View.ViewModels
 {
@@ -65,29 +66,32 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        WindowLoad windowLoad;
+        
 
         //Загрузка модели с анимацией
-        async void LoadModelAsync(string path)
+        void LoadModelAsync(string path)
         {
-            windowLoad = new WindowLoad();
+            mainWindow.IsEnabled = false;
+
+            WindowLoad windowLoad = new WindowLoad();
             windowLoad.Left = mainWindow.Left + (mainWindow.Width / 2) - (windowLoad.Width / 2);
             windowLoad.Top = mainWindow.Top + (mainWindow.Height / 2) - (windowLoad.Height / 2);
-
+            
             ModelIFC TempModel = new ModelIFC();
-            windowLoad.Show();
-            await Task.Run(() =>
+
+            new Thread(() =>
             {
                 TempModel.Load(path);
-            });
+                windowLoad.Dispatcher.Invoke(() =>
+                {
+                    windowLoad.Close();
+                });
+            }).Start();
+            
+            windowLoad.ShowDialog();
 
-            windowLoad.Hide();
-
-            if (TempModel == null)
-            {
-                Title = null;
-            }
-            else
+            mainWindow.IsEnabled = true;
+            if (TempModel != null)
             {
                 modelIFC = TempModel;
             }
@@ -102,9 +106,7 @@ namespace IFC_Table_View.ViewModels
 
         private void OnLoadApplicationCommandExecuted(object o)
         {
-
             LoadModelAsync(HelperFileIFC.OpenIFC_File());
-            
         }
 
 
