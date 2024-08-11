@@ -207,7 +207,7 @@
                                             <TextBlock Text="{Binding Path=Name}" />
                                         </Expander.Header>
                                         <ListBox
-                                                    MaxHeight="200"
+                                                    MaxHeight="300"
                                                     Grid.Column="0"
                                                     Background="Transparent"
                                                     BorderThickness="0"

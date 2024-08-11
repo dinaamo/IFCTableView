@@ -6,7 +6,8 @@
              xmlns:vm="clr-namespace:IFC_Table_View.ViewModels"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:mi="clr-namespace:IFC_Table_View.IFC.ModelItem"
-             StartupUri="View\Windows\MainWindow.xaml">
+             StartupUri="View\Windows\MainWindow.xaml"
+             ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
