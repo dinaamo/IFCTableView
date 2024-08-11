@@ -74,9 +74,17 @@ namespace IFC_Table_View.ViewModels
             mainWindow.IsEnabled = false;
 
             WindowLoad windowLoad = new WindowLoad();
-            windowLoad.Left = mainWindow.Left + (mainWindow.Width / 2) - (windowLoad.Width / 2);
-            windowLoad.Top = mainWindow.Top + (mainWindow.Height / 2) - (windowLoad.Height / 2);
-            
+            if (mainWindow.WindowState == WindowState.Maximized)
+            {
+                windowLoad.Left = (System.Windows.SystemParameters.PrimaryScreenWidth / 2) - (windowLoad.Width / 2);
+                windowLoad.Top = (System.Windows.SystemParameters.PrimaryScreenHeight / 2) - (windowLoad.Height / 2);
+            }
+            else
+            {
+                windowLoad.Left = mainWindow.Left + (mainWindow.Width / 2) - (windowLoad.Width / 2);
+                windowLoad.Top = mainWindow.Top + (mainWindow.Height / 2) - (windowLoad.Height / 2);
+            }
+
             ModelIFC TempModel = new ModelIFC();
             using var signal = new ManualResetEvent(false);
 
@@ -84,7 +92,7 @@ namespace IFC_Table_View.ViewModels
             {
                 TempModel.Load(path);
                 signal.WaitOne();
-                windowLoad.Dispatcher.Invoke(() =>
+                windowLoad.Dispatcher.BeginInvoke(() =>
                 {
                     windowLoad.Close();
                 });
