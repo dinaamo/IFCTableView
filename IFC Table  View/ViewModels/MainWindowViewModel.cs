@@ -78,16 +78,20 @@ namespace IFC_Table_View.ViewModels
             windowLoad.Top = mainWindow.Top + (mainWindow.Height / 2) - (windowLoad.Height / 2);
             
             ModelIFC TempModel = new ModelIFC();
+            using var signal = new ManualResetEvent(false);
 
-            new Thread(() =>
+            Task.Run(() =>
             {
                 TempModel.Load(path);
+                signal.WaitOne();
                 windowLoad.Dispatcher.Invoke(() =>
                 {
                     windowLoad.Close();
                 });
-            }).Start();
-            
+                
+            });
+
+            signal.Set();
             windowLoad.ShowDialog();
 
             mainWindow.IsEnabled = true;
@@ -96,7 +100,6 @@ namespace IFC_Table_View.ViewModels
                 modelIFC = TempModel;
             }
         }
-
 
         #region Комманды
 
