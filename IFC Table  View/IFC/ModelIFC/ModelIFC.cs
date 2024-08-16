@@ -25,7 +25,7 @@ namespace IFC_Table_View.IFC.ModelIFC
 
         public string FilePath
         {
-            get { return DataBase.SourceFilePath; }
+            get { return DataBase?.SourceFilePath; }
         }
 
         public ModelIFC SaveFile(string filePath)

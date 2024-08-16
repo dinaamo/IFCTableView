@@ -66,9 +66,8 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        
 
-        //Загрузка модели с анимацией
+        #region Загрузка модели с анимацией
         void LoadModelAsync(string path)
         {
             mainWindow.IsEnabled = false;
@@ -108,6 +107,7 @@ namespace IFC_Table_View.ViewModels
                 modelIFC = TempModel;
             }
         }
+        #endregion
 
         #region Комманды
 

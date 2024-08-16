@@ -165,7 +165,7 @@ namespace IFC_Table_View.IFC.ModelItem
                 return _PropertyElement;
             }
         }
-
+        
         private Dictionary<string, HashSet<string>> _PropertyElement;
 
         private void PropertyesOject()
@@ -179,8 +179,78 @@ namespace IFC_Table_View.IFC.ModelItem
 
                 if (ifcMaterialSelect != null)
                 {
-                    _PropertyElement.Add("Материал", new HashSet<string>() { ifcMaterialSelect.Name });
-                }
+                    if (ifcMaterialSelect is IfcMaterial materialSingle)
+                    {
+                        _PropertyElement.Add("Материал", new HashSet<string>() { materialSingle.Name });
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialLayer materiaLayer)
+                    {
+                        _PropertyElement.Add("Материал", new HashSet<string>() { materiaLayer.Material.Name });
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialLayerSet materiaLayerSet)
+                    {
+                        HashSet<string> materialSet = new HashSet<string>();
+                        foreach (IfcMaterial material in materiaLayerSet.MaterialLayers.Select(it=>it.Material))
+                        {
+                            materialSet.Add(material.Name);
+                        }
+                        _PropertyElement.Add("Материалы", materialSet);
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialProfile materiaProfile)
+                    {
+                        _PropertyElement.Add("Материал", new HashSet<string>() { materiaProfile.Material.Name });
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialProfileSet materiaProfileSet)
+                    {
+                        HashSet<string> materialSet = new HashSet<string>();
+                        foreach (IfcMaterial material in materiaProfileSet.MaterialProfiles.Select(it => it.Material))
+                        {
+                            materialSet.Add(material.Name);
+                        }
+                        _PropertyElement.Add("Материалы", materialSet);
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialConstituent materiaConstituen)
+                    {
+                        _PropertyElement.Add("Материал", new HashSet<string>() { materiaConstituen.Material.Name });
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialConstituentSet materiaConstituentSet)
+                    {
+                        HashSet<string> materialSet = new HashSet<string>();
+                        foreach (IfcMaterial material in materiaConstituentSet.MaterialConstituents.Select(it => it.Value.Material))
+                        {
+                            materialSet.Add(material.Name);
+                        }
+                        _PropertyElement.Add("Материалы", materialSet);
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialLayerSetUsage materiaLayerSetUsage)
+                    {
+                        HashSet<string> materialSet = new HashSet<string>();
+                        foreach (IfcMaterial material in materiaLayerSetUsage.ForLayerSet.MaterialLayers.Select(it => it.Material))
+                        {
+                            materialSet.Add(material.Name);
+                        }
+                        _PropertyElement.Add("Материалы", materialSet);
+                    }
+                    else if (ifcMaterialSelect is IfcMaterialProfileSetUsage materiaProfileSetUsag)
+                    {
+                        HashSet<string> materialSet = new HashSet<string>();
+                        foreach (IfcMaterial material in materiaProfileSetUsag.ForProfileSet.MaterialProfiles.Select(it => it.Material))
+                        {
+                            materialSet.Add(material.Name);
+                        }
+                        _PropertyElement.Add("Материалы", materialSet);
+                    }
+                    else if(ifcMaterialSelect is IfcMaterialList materialList)
+                    {
+                        HashSet<string> materialListValue = new HashSet<string>();
+
+                        foreach (IfcMaterial material in materialList.Materials)
+                        {
+                            materialListValue.Add(material.Name);
+                        }
+                        _PropertyElement.Add("Материалы", materialListValue);
+                    }
+                }               
             }
 
             if (_IFCObjectdefinition.Description != string.Empty)
@@ -223,12 +293,12 @@ namespace IFC_Table_View.IFC.ModelItem
             }
             if (listobjectIsDecomposedBy.Count > 0)
             {
-                _PropertyElement.Add("Разлагается на объекты (IsDecomposedBy)", listobjectIsDecomposedBy);
+                _PropertyElement.Add("Раскладывается на объекты (IsDecomposedBy)", listobjectIsDecomposedBy);
             }
 
             if (_IFCObjectdefinition is IfcObject IFCObject)
             {
-                //Приложение
+                
 
                 //Тип объекта
                 if (IFCObject.ObjectType != string.Empty)
@@ -240,8 +310,6 @@ namespace IFC_Table_View.IFC.ModelItem
                 HashSet<string> listobjectIsDefinedBy = new HashSet<string>();
                 foreach (IfcRelDefinesByProperties relDef in IFCObject.IsDefinedBy)
                 {
-                    IfcRoot tt = relDef.Relating();
-
                     foreach (IfcObjectDefinition obj in relDef.RelatedObjects)
                     {
                         listobjectIsDefinedBy.Add(
