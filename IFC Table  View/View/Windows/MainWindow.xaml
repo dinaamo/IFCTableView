@@ -22,8 +22,8 @@
         <Menu DockPanel.Dock="Top" >
             <MenuItem Header="Файл">
                 <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть" />
-                <MenuItem Command="{Binding SaveFileCommand}" Header="Сохранить" />
-                <MenuItem Command="{Binding SaveAsFileCommand}" Header="Сохранить как" />
+                <MenuItem Command="{Binding SaveFileCommand}" Header="Сохранить" Visibility="Collapsed"/>
+                <MenuItem Command="{Binding SaveAsFileCommand}" Header="Сохранить как" Visibility="Collapsed"/>
                 <!--<MenuItem Command="{Binding SaveAsIFCXMLFileCommand}" Header="Сохранить как(.ifcxml)"/>-->
                 <MenuItem Header="Выход">
                     <MenuItem.Command>
@@ -31,11 +31,11 @@
                     </MenuItem.Command>
                 </MenuItem>
             </MenuItem> 
-            <MenuItem Header="Таблицы">
+            <MenuItem Header="Таблицы" Visibility="Collapsed">
                 <MenuItem Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу"  />
                 <MenuItem Command="{Binding DeleteTableCommand}" CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}" Header="Удалить таблицу" />
             </MenuItem>
-            <MenuItem Header="Ссылки">
+            <MenuItem Visibility="Collapsed">
                 <MenuItem Command="{Binding AddReferenceToTheTable}" Header="Задать ссылку на таблицу" CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}" />
             </MenuItem>
             <MenuItem Header="Справка">

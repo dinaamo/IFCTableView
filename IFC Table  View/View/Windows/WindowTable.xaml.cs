@@ -18,6 +18,9 @@ namespace IFC_Table_View.View.Windows
 
             dataTable = ModelItemIFCTable.FiilDataTable(ifcTable);
             DataContext = dataTable;
+
+            MaxWidth = SystemParameters.PrimaryScreenWidth;
+            MaxHeight = SystemParameters.PrimaryScreenHeight;
         }
     }
 }

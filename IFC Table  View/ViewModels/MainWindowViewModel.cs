@@ -85,7 +85,7 @@ namespace IFC_Table_View.ViewModels
             }
 
             ModelIFC TempModel = new ModelIFC();
-            using var signal = new ManualResetEvent(false);
+            using ManualResetEvent signal = new ManualResetEvent(false);
 
             Task.Run(() =>
             {

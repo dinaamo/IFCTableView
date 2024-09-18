@@ -27,7 +27,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
                 }
                 else if (value is IfcQuantityArea quantityArea)
                 {
-                    return System.Convert.ToString(quantityArea.AreaValue) + System.Convert.ToString(quantityArea.Unit);
+                    return System.Convert.ToString(quantityArea.AreaValue);
                 }
                 else if (value is IfcQuantityCount quantityCount)
                 {

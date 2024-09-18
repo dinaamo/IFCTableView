@@ -7,20 +7,16 @@
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
         mc:Ignorable="d"
         Name="Win"
-        Title="{Binding Path=TableName}" Height="700" Width="1500">
+        Title="{Binding Path=TableName}" SizeToContent="WidthAndHeight">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="283*"/>
-            <ColumnDefinition Width="36*"/>
-            <ColumnDefinition Width="81*"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Vertical" Grid.ColumnSpan="3">
+        <StackPanel Orientation="Horizontal" x:Name="stPan">
             <GroupBox
                     x:Name="grBox"
                     Margin="5"
                     Header="Таблица">
-                <DataGrid   Name="dgTable"
-                            
+                    <DataGrid   
+                            Name="dgTable" 
+                        
                             ItemsSource="{Binding}"
                             VerticalGridLinesBrush="#FFC9C9C9" 
                             HorizontalGridLinesBrush="#FFC8C8C8"
@@ -32,7 +28,6 @@
                             CanUserSortColumns="False">
 
                 </DataGrid>
-
             </GroupBox>
         </StackPanel>
 
