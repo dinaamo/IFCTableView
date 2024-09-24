@@ -22,24 +22,24 @@
         <Menu DockPanel.Dock="Top" >
             <MenuItem Header="Файл">
                 <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть" />
-                <MenuItem Command="{Binding SaveFileCommand}" Header="Сохранить" Visibility="Collapsed"/>
-                <MenuItem Command="{Binding SaveAsFileCommand}" Header="Сохранить как" Visibility="Collapsed"/>
-                <!--<MenuItem Command="{Binding SaveAsIFCXMLFileCommand}" Header="Сохранить как(.ifcxml)"/>-->
+                <MenuItem Command="{Binding SaveFileCommand}" Header="Сохранить" Visibility="Visible"/>
+                <MenuItem Command="{Binding SaveAsFileCommand}" Header="Сохранить как" Visibility="Visible"/>
+                <MenuItem Command="{Binding SaveAsIFCXMLFileCommand}" Header="Сохранить как(.ifcxml)" Visibility="Collapsed"/>
                 <MenuItem Header="Выход">
                     <MenuItem.Command>
                         <cmnd:CloseApplicationCommand />
                     </MenuItem.Command>
                 </MenuItem>
             </MenuItem> 
-            <MenuItem Header="Таблицы" Visibility="Collapsed">
+                <MenuItem Header="Таблицы" Visibility="Visible">
                 <MenuItem Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу"  />
                 <MenuItem Command="{Binding DeleteTableCommand}" CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}" Header="Удалить таблицу" />
             </MenuItem>
-            <MenuItem Visibility="Collapsed">
+            <MenuItem Header="Ссылки" Visibility="Visible">
                 <MenuItem Command="{Binding AddReferenceToTheTable}" Header="Задать ссылку на таблицу" CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}" />
             </MenuItem>
             <MenuItem Header="Справка">
-                <MenuItem Header="О программе" />
+                <MenuItem Command="{Binding OpenHelp}" Header="Справка по программе" />
             </MenuItem>
         </Menu>
 
@@ -59,7 +59,7 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="firstColumn" Width="249*" />
+                <ColumnDefinition x:Name="firstColumn" Width="300*" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="102*" />
                 <ColumnDefinition Width="442*" />

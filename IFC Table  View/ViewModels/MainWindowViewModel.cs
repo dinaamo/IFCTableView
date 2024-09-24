@@ -10,6 +10,7 @@ using IFC_Table_View.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,9 +18,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
 
 namespace IFC_Table_View.ViewModels
 {
@@ -65,7 +67,6 @@ namespace IFC_Table_View.ViewModels
             set => Set(ref _ModelItems, value);
         }
         #endregion
-
 
         #region Загрузка модели с анимацией
         void LoadModelAsync(string path)
@@ -320,6 +321,25 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
+        #region Открыть справку
+        public ICommand OpenHelp { get; }
+
+        private void OnOpenHelpCommandExecuted(object o)
+        {
+            string fileHelpPath = "IFC Table View.chm";
+            if(System.IO.File.Exists(fileHelpPath))
+            {
+                Process.Start(fileHelpPath);
+
+            }
+        }
+
+        private bool CanOpenHelpCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
         #endregion
 
         public MainWindowViewModel()
@@ -366,6 +386,10 @@ namespace IFC_Table_View.ViewModels
             AddReferenceToTheTable = new ActionCommand(
                 OnAddReferenceToTheTable,
                 CanAddReferenceToTheTable);
+
+            OpenHelp = new ActionCommand(
+                OnOpenHelpCommandExecuted,
+                CanOpenHelpCommandExecute);
             #endregion
         }
 
