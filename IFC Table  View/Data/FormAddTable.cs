@@ -52,12 +52,14 @@ namespace IFC_Table_View.Data
                                     {
                                         string val = (string)Convert.ChangeType(sCells[i],
                                                               oCell.ValueType);
-                                        oCell.Value = val.Trim('\n', '\r');
+                                        //val = val.Replace("\"\"", "");
+
+                                        oCell.Value = val.Trim('\n', '\r').Replace('\"', '\0');
                                         //  oCell.Style.BackColor = Color.Tomato;
                                     }
                                     else
                                         iFail++;
-                                    //only traps a fail if the data has changed
+                                    //only traps a fail if the data has changed  \"
                                     //and you are pasting into a read only cell
                                 }
                             }
@@ -132,7 +134,7 @@ namespace IFC_Table_View.Data
                 {
                     if (r == 0)
                     {
-                        row[dataTable.Columns[c].ColumnName] = dataTable.Columns[c].ColumnName;
+                        row[dataTable.Columns[c].ColumnName] = dataTable.Columns[c];
                     }
                     else
                     {

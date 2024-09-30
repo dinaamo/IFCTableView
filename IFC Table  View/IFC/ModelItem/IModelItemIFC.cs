@@ -7,7 +7,7 @@ namespace IFC_Table_View.IFC.ModelItem
     {
         object ItemTreeView { get; }
 
-        Dictionary<string, HashSet<string>> PropertyElement { get; }
+        Dictionary<string, HashSet<object>> PropertyElement { get; }
 
         ObservableCollection<IModelItemIFC> ModelItems { get; }
     }

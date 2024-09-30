@@ -61,7 +61,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
             }
         }
 
-        public class ConvertItemProperiesIFC : IValueConverter
+        public class ConvertItemPropertiesIFC : IValueConverter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {

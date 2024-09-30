@@ -12,10 +12,14 @@ namespace IFC_Table_View.IFC.ModelItem
 {
     public class ModelItemIFCObject : IModelItemIFC, INotifyPropertyChanged
     {
-        private IfcObjectDefinition _IFCObjectdefinition;
+        private IfcObjectDefinition _IFCObjectDefinition;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Событие изменения элемента
+        /// </summary>
+        /// <param name="PropertyName"></param>
         protected virtual void OnPropertyChanged(string PropertyName = null)
         {
             if (PropertyChanged != null)
@@ -26,14 +30,15 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public event EventHandler<PropertyReferenceChangedEventArg> PropertyReferenceChanged;
 
+
+        /// <summary>
+        /// Прокидываем по дереву вверх состояние элемента
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="e"></param>
         public void ChangePropertyReference(object obj, PropertyReferenceChangedEventArg e)
         {
-            bool containRefObject = ModelItems.
-                                        OfType<ModelItemIFCObject>().
-                                        Select(it => it.IsContainPropertyReference).
-                                        Any(it => it == true);
-
-            if (e.IsContainPropertyReference == true || containRefObject)
+            if (IsContainPropertyReference == true || e.IsContainPropertyReference == true)
             {
                 IsContainPropertyReference = true;
                 BrushImageForeground = System.Windows.Media.Brushes.Green;
@@ -47,10 +52,15 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+        /// <summary>
+        /// Наличие в элементе ссылки на таблицы
+        /// </summary>
         public bool IsContainPropertyReference { get; set; }
 
         private Brush _BrushImageForeground = System.Windows.Media.Brushes.DarkRed;
-
+        /// <summary>
+        /// Кисть для маркера
+        /// </summary>
         public Brush BrushImageForeground
         {
             get { return _BrushImageForeground; }
@@ -63,17 +73,52 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement)
         {
+            //Если есть элемент выше по дереву то подключаем к нему обработчик события изменения состояния элемента
             if (TopElement != null)
             {
                 PropertyReferenceChanged += TopElement.ChangePropertyReference;
             }
+           
+            _IFCObjectDefinition = IFCObject;
 
-            _IFCObjectdefinition = IFCObject;
+
+            InitializationElementModelObject();
+        }
+
+        
+
+        public void AddToTheTableReferenceElement(ObservableCollection<ModelItemIFCTable> tableItemSet)
+        {
+            IEnumerable<IfcPropertyReferenceValue> propertyReferenceSet = CollectionPropertySet?.OfType<IfcPropertySet>().
+                SelectMany(it => it.HasProperties.Values).
+                OfType<IfcPropertyReferenceValue>();
+
+            foreach (IfcPropertyReferenceValue propertyReference in propertyReferenceSet)
+            {
+                foreach (ModelItemIFCTable tableItem in tableItemSet)
+                {
+                    if (propertyReference.PropertyReference == tableItem.ItemTreeView as IfcTable)
+                    {
+                        tableItem.AddReferenceToTheElement(this);
+                    }
+                }
+            }
+        }
+        
+        ModelObjectHelper modelHelper;
+
+        /// <summary>
+        /// Инициализация элементов объекта модели
+        /// </summary>
+        private void InitializationElementModelObject()
+        {
+            modelHelper = new ModelObjectHelper(_IFCObjectDefinition);
 
             CollectionPropertySet = new ObservableCollection<IfcPropertySetDefinition>();
 
-            FillCollectionPropertySet();
-            PropertyesOject();
+            modelHelper.FillCollectionPropertySet(CollectionPropertySet);
+
+            _PropertyElement = modelHelper.GetPropertyObject();
 
             int? countPropRef = CollectionPropertySet?.OfType<IfcPropertySet>().
                 SelectMany(it => it.HasProperties.Values).
@@ -89,31 +134,13 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        private void FillCollectionPropertySet()
+        /// <summary>
+        /// Добавление ссылок на таблицы
+        /// </summary>
+        /// <param name="RefTableSet"></param>
+        public void AddReferenceTable(List<ModelItemIFCTable> RefTableSet)
         {
-            if (_IFCObjectdefinition is IfcObject obj)
-            {
-                CollectionPropertySet.Clear();
-                foreach (IfcPropertySetDefinition propSetIsObj in obj.IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition).OfType<IfcPropertySetDefinition>())
-                {
-                    CollectionPropertySet.Add(propSetIsObj);
-                }
-
-                IEnumerable<IfcPropertySetDefinition> collectionTypeProperty = obj.IsTypedBy?.RelatingType?.HasPropertySets?.Cast<IfcPropertySetDefinition>();
-
-                if (collectionTypeProperty != null)
-                {
-                    foreach (IfcPropertySetDefinition propSetIsType in collectionTypeProperty)
-                    {
-                        CollectionPropertySet.Add(propSetIsType);
-                    }
-                }
-            }
-        }
-
-        public void AddReferenseTable(List<ModelItemIFCTable> RefTableSet)
-        {
-            if (_IFCObjectdefinition is IfcObject obj)
+            if (_IFCObjectDefinition is IfcObject obj)
             {
                 IfcPropertySet PropSetTableReference = CollectionPropertySet.
                                                     OfType<IfcPropertySet>().
@@ -121,7 +148,7 @@ namespace IFC_Table_View.IFC.ModelItem
 
                 foreach (ModelItemIFCTable RefTable in RefTableSet)
                 {
-                    IfcPropertyReferenceValue pref = new IfcPropertyReferenceValue(_IFCObjectdefinition.Database, RefTable.IFCTable.Name);
+                    IfcPropertyReferenceValue pref = new IfcPropertyReferenceValue(_IFCObjectDefinition.Database, RefTable.IFCTable.Name);
 
                     pref.PropertyReference = RefTable.IFCTable;
                     pref.Name = RefTable.IFCTable.Name;
@@ -129,27 +156,34 @@ namespace IFC_Table_View.IFC.ModelItem
                     if (PropSetTableReference == null)
                     {
                         PropSetTableReference = new IfcPropertySet("RZDP_Ссылки", pref);
-                        IfcRelDefinesByProperties reldefProp = new IfcRelDefinesByProperties(_IFCObjectdefinition, PropSetTableReference);
+                        IfcRelDefinesByProperties reldefProp = new IfcRelDefinesByProperties(_IFCObjectDefinition, PropSetTableReference);
                         obj.IsDefinedBy.Add(reldefProp);
                     }
                     else
                     {
                         PropSetTableReference.AddProperty(pref);
                     }
+                    //Добавляем в таблицу ссылки
+                    RefTable.AddReferenceToTheElement(this);
+
+                    //Прокидываем наверх по дереву событие добавления ссылки
                     ChangePropertyReference(this, new PropertyReferenceChangedEventArg(true));
                 }
 
-                FillCollectionPropertySet();
+                modelHelper.FillCollectionPropertySet(CollectionPropertySet);
             }
         }
 
+        /// <summary>
+        /// Получение элемента вложенного дерева
+        /// </summary>
         public object ItemTreeView
         {
             get
             {
-                if (_IFCObjectdefinition != null)
+                if (_IFCObjectDefinition != null)
                 {
-                    return _IFCObjectdefinition;
+                    return _IFCObjectDefinition;
                 }
                 else
                 {
@@ -158,22 +192,81 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        public Dictionary<string, HashSet<string>> PropertyElement
+        private Dictionary<string, HashSet<object>> _PropertyElement;
+        /// <summary>
+        /// Свойства элемента
+        /// </summary>
+        public Dictionary<string, HashSet<object>> PropertyElement
         {
             get
             {
                 return _PropertyElement;
             }
         }
-        
-        private Dictionary<string, HashSet<string>> _PropertyElement;
 
-        private void PropertyesOject()
+        private ObservableCollection<IfcPropertySetDefinition> _CollectionPropertySet;
+        /// <summary>
+        /// Наборы характеристик
+        /// </summary>
+        public ObservableCollection<IfcPropertySetDefinition> CollectionPropertySet
         {
-            _PropertyElement = new Dictionary<string, HashSet<string>>();
+            get
+            {
+                return _CollectionPropertySet;
+            }
+
+            set
+            {
+                OnPropertyChanged("CollectionPropertySet");
+                _CollectionPropertySet = value;
+            }
+        }
+
+        private ObservableCollection<IModelItemIFC> _ModelItems;
+        /// <summary>
+        /// Элемент дерева
+        /// </summary>
+        public ObservableCollection<IModelItemIFC> ModelItems
+        {
+            get
+            {
+                if (_ModelItems == null)
+                {
+                    _ModelItems = new ObservableCollection<IModelItemIFC>();
+                }
+                return _ModelItems;
+            }
+        }
+    
+    }
+
+
+
+
+    /// <summary>
+    /// Вспомогательный класс для объекта дерева
+    /// </summary>
+    class ModelObjectHelper
+    {
+        IfcObjectDefinition IFCObjectDefinition;
+
+        public ModelObjectHelper(IfcObjectDefinition IFCObjectDefinition)
+        {
+            this.IFCObjectDefinition = IFCObjectDefinition;
+        }
+
+        #region Заполнение свойств элемента
+        public Dictionary<string, HashSet<object>> GetPropertyObject()
+        {
+
+            Dictionary<string, HashSet<object>> PropertyElement = new Dictionary<string, HashSet<object>>();
+            if (this.IFCObjectDefinition == null)
+            { 
+                return PropertyElement; 
+            }
 
             //Материал
-            if (_IFCObjectdefinition is IfcElement IFCElement)
+            if (IFCObjectDefinition is IfcElement IFCElement)
             {
                 IfcMaterialSelect ifcMaterialSelect = IFCElement.MaterialSelect();
 
@@ -181,86 +274,86 @@ namespace IFC_Table_View.IFC.ModelItem
                 {
                     if (ifcMaterialSelect is IfcMaterial materialSingle)
                     {
-                        _PropertyElement.Add("Материал", new HashSet<string>() { materialSingle.Name });
+                        PropertyElement.Add("Материал", new HashSet<object>() { materialSingle.Name });
                     }
                     else if (ifcMaterialSelect is IfcMaterialLayer materiaLayer)
                     {
-                        _PropertyElement.Add("Материал", new HashSet<string>() { materiaLayer.Material.Name });
+                        PropertyElement.Add("Материал", new HashSet<object>() { materiaLayer.Material.Name });
                     }
                     else if (ifcMaterialSelect is IfcMaterialLayerSet materiaLayerSet)
                     {
-                        HashSet<string> materialSet = new HashSet<string>();
-                        foreach (IfcMaterial material in materiaLayerSet.MaterialLayers.Select(it=>it.Material))
+                        HashSet<object> materialSet = new HashSet<object>();
+                        foreach (IfcMaterial material in materiaLayerSet.MaterialLayers.Select(it => it.Material))
                         {
                             materialSet.Add(material.Name);
                         }
-                        _PropertyElement.Add("Материалы", materialSet);
+                        PropertyElement.Add("Материалы", materialSet);
                     }
                     else if (ifcMaterialSelect is IfcMaterialProfile materiaProfile)
                     {
-                        _PropertyElement.Add("Материал", new HashSet<string>() { materiaProfile.Material.Name });
+                        PropertyElement.Add("Материал", new HashSet<object>() { materiaProfile.Material.Name });
                     }
                     else if (ifcMaterialSelect is IfcMaterialProfileSet materiaProfileSet)
                     {
-                        HashSet<string> materialSet = new HashSet<string>();
+                        HashSet<object> materialSet = new HashSet<object>();
                         foreach (IfcMaterial material in materiaProfileSet.MaterialProfiles.Select(it => it.Material))
                         {
                             materialSet.Add(material.Name);
                         }
-                        _PropertyElement.Add("Материалы", materialSet);
+                        PropertyElement.Add("Материалы", materialSet);
                     }
                     else if (ifcMaterialSelect is IfcMaterialConstituent materiaConstituen)
                     {
-                        _PropertyElement.Add("Материал", new HashSet<string>() { materiaConstituen.Material.Name });
+                        PropertyElement.Add("Материал", new HashSet<object>() { materiaConstituen.Material.Name });
                     }
                     else if (ifcMaterialSelect is IfcMaterialConstituentSet materiaConstituentSet)
                     {
-                        HashSet<string> materialSet = new HashSet<string>();
+                        HashSet<object> materialSet = new HashSet<object>();
                         foreach (IfcMaterial material in materiaConstituentSet.MaterialConstituents.Select(it => it.Value.Material))
                         {
                             materialSet.Add(material.Name);
                         }
-                        _PropertyElement.Add("Материалы", materialSet);
+                        PropertyElement.Add("Материалы", materialSet);
                     }
                     else if (ifcMaterialSelect is IfcMaterialLayerSetUsage materiaLayerSetUsage)
                     {
-                        HashSet<string> materialSet = new HashSet<string>();
+                        HashSet<object> materialSet = new HashSet<object>();
                         foreach (IfcMaterial material in materiaLayerSetUsage.ForLayerSet.MaterialLayers.Select(it => it.Material))
                         {
                             materialSet.Add(material.Name);
                         }
-                        _PropertyElement.Add("Материалы", materialSet);
+                        PropertyElement.Add("Материалы", materialSet);
                     }
                     else if (ifcMaterialSelect is IfcMaterialProfileSetUsage materiaProfileSetUsag)
                     {
-                        HashSet<string> materialSet = new HashSet<string>();
+                        HashSet<object> materialSet = new HashSet<object>();
                         foreach (IfcMaterial material in materiaProfileSetUsag.ForProfileSet.MaterialProfiles.Select(it => it.Material))
                         {
                             materialSet.Add(material.Name);
                         }
-                        _PropertyElement.Add("Материалы", materialSet);
+                        PropertyElement.Add("Материалы", materialSet);
                     }
-                    else if(ifcMaterialSelect is IfcMaterialList materialList)
+                    else if (ifcMaterialSelect is IfcMaterialList materialList)
                     {
-                        HashSet<string> materialListValue = new HashSet<string>();
+                        HashSet<object> materialListValue = new HashSet<object>();
 
                         foreach (IfcMaterial material in materialList.Materials)
                         {
                             materialListValue.Add(material.Name);
                         }
-                        _PropertyElement.Add("Материалы", materialListValue);
+                        PropertyElement.Add("Материалы", materialListValue);
                     }
-                }               
+                }
             }
 
-            if (_IFCObjectdefinition.Description != string.Empty)
+            if (IFCObjectDefinition.Description != string.Empty)
             {
-                _PropertyElement.Add("Описание", new HashSet<string>() { _IFCObjectdefinition.Description });
+                PropertyElement.Add("Описание", new HashSet<object>() { IFCObjectDefinition.Description });
             }
 
             //Вложенные объекты
-            HashSet<string> listobjectIsNestedBy = new HashSet<string>();
-            foreach (IfcRelNests relNest in _IFCObjectdefinition.IsNestedBy)
+            HashSet<object> listobjectIsNestedBy = new HashSet<object>();
+            foreach (IfcRelNests relNest in IFCObjectDefinition.IsNestedBy)
             {
                 foreach (IfcObjectDefinition obj in relNest.RelatedObjects)
                 {
@@ -274,12 +367,12 @@ namespace IFC_Table_View.IFC.ModelItem
             }
             if (listobjectIsNestedBy.Count > 0)
             {
-                _PropertyElement.Add("Вложенные объекты (IsNestedBy)", listobjectIsNestedBy);
+                PropertyElement.Add("Вложенные объекты (IsNestedBy)", listobjectIsNestedBy);
             }
 
             //Разлагается на объекты
-            HashSet<string> listobjectIsDecomposedBy = new HashSet<string>();
-            foreach (IfcRelAggregates relDecomp in _IFCObjectdefinition.IsDecomposedBy)
+            HashSet<object> listobjectIsDecomposedBy = new HashSet<object>();
+            foreach (IfcRelAggregates relDecomp in IFCObjectDefinition.IsDecomposedBy)
             {
                 foreach (IfcObjectDefinition obj in relDecomp.RelatedObjects)
                 {
@@ -293,21 +386,21 @@ namespace IFC_Table_View.IFC.ModelItem
             }
             if (listobjectIsDecomposedBy.Count > 0)
             {
-                _PropertyElement.Add("Раскладывается на объекты (IsDecomposedBy)", listobjectIsDecomposedBy);
+                PropertyElement.Add("Раскладывается на объекты (IsDecomposedBy)", listobjectIsDecomposedBy);
             }
 
-            if (_IFCObjectdefinition is IfcObject IFCObject)
+            if (IFCObjectDefinition is IfcObject IFCObject)
             {
-                
+
 
                 //Тип объекта
                 if (IFCObject.ObjectType != string.Empty)
                 {
-                    _PropertyElement.Add("Тип", new HashSet<string>() { IFCObject.ObjectType });
+                    PropertyElement.Add("Тип", new HashSet<object>() { IFCObject.ObjectType });
                 }
 
                 //Связанные объекты
-                HashSet<string> listobjectIsDefinedBy = new HashSet<string>();
+                HashSet<object> listobjectIsDefinedBy = new HashSet<object>();
                 foreach (IfcRelDefinesByProperties relDef in IFCObject.IsDefinedBy)
                 {
                     foreach (IfcObjectDefinition obj in relDef.RelatedObjects)
@@ -323,14 +416,14 @@ namespace IFC_Table_View.IFC.ModelItem
 
                 if (listobjectIsDefinedBy.Count > 0)
                 {
-                    _PropertyElement.Add("Связанные объекты (IsDefinedBy)", listobjectIsDefinedBy);
+                    PropertyElement.Add("Связанные объекты (IsDefinedBy)", listobjectIsDefinedBy);
                 }
             }
 
             //Содержит объекты
-            HashSet<string> listobjectContainElement = new HashSet<string>();
+            HashSet<object> listobjectContainElement = new HashSet<object>();
 
-            if (_IFCObjectdefinition is IfcSpatialStructureElement IFCStrElem)
+            if (IFCObjectDefinition is IfcSpatialStructureElement IFCStrElem)
             {
                 foreach (IfcRelContainedInSpatialStructure spartialStucture in IFCStrElem.ContainsElements)
                 {
@@ -348,38 +441,46 @@ namespace IFC_Table_View.IFC.ModelItem
 
             if (listobjectContainElement.Count > 0)
             {
-                _PropertyElement.Add("Содержит объекты (ContainsElements)", listobjectContainElement);
+                PropertyElement.Add("Содержит объекты (ContainsElements)", listobjectContainElement);
             }
+
+
+            return PropertyElement;
         }
+        #endregion
 
-        private ObservableCollection<IfcPropertySetDefinition> _CollectionPropertySet;
-
-        public ObservableCollection<IfcPropertySetDefinition> CollectionPropertySet
+        #region Заполнение характеристик элемента
+        public bool FillCollectionPropertySet(ObservableCollection<IfcPropertySetDefinition> CollectionPropertySet)
         {
-            get
+            if (this.IFCObjectDefinition == null)
             {
-                return _CollectionPropertySet;
+                return false;
             }
 
-            private set
+            if (IFCObjectDefinition is IfcObject obj)
             {
-                OnPropertyChanged("CollectionPropertySet");
-                _CollectionPropertySet = value;
-            }
-        }
+                CollectionPropertySet.Clear();
 
-        private ObservableCollection<IModelItemIFC> _ModelItems;
+                IEnumerable<IfcPropertySetDefinition> collectionProperty = obj.IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition).OfType<IfcPropertySetDefinition>();
 
-        public ObservableCollection<IModelItemIFC> ModelItems
-        {
-            get
-            {
-                if (_ModelItems == null)
+                foreach (IfcPropertySetDefinition propSetIsObj in collectionProperty)
                 {
-                    _ModelItems = new ObservableCollection<IModelItemIFC>();
+                    CollectionPropertySet.Add(propSetIsObj);
                 }
-                return _ModelItems;
+
+                IEnumerable<IfcPropertySetDefinition> collectionTypeProperty = obj.IsTypedBy?.RelatingType?.HasPropertySets?.Cast<IfcPropertySetDefinition>();
+
+                if (collectionTypeProperty != null)
+                {
+                    foreach (IfcPropertySetDefinition propSetIsType in collectionTypeProperty)
+                    {
+                        CollectionPropertySet.Add(propSetIsType);
+                    }
+                }
             }
+
+            return true;
         }
+        #endregion
     }
 }

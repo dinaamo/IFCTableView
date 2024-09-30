@@ -71,6 +71,11 @@ namespace IFC_Table_View.ViewModels
         #region Загрузка модели с анимацией
         void LoadModelAsync(string path)
         {
+            if (path == null)
+            {
+                return;
+            }
+
             mainWindow.IsEnabled = false;
 
             WindowLoad windowLoad = new WindowLoad();
@@ -90,6 +95,7 @@ namespace IFC_Table_View.ViewModels
 
             Task.Run(() =>
             {
+
                 TempModel.Load(path);
                 signal.WaitOne();
                 windowLoad.Dispatcher.BeginInvoke(() =>
@@ -118,6 +124,7 @@ namespace IFC_Table_View.ViewModels
 
         private void OnLoadApplicationCommandExecuted(object o)
         {
+
             LoadModelAsync(HelperFileIFC.OpenIFC_File());
         }
 
@@ -295,7 +302,7 @@ namespace IFC_Table_View.ViewModels
 
                 form_Add_Reference_To_Table.ShowDialog();
 
-                modelObject.AddReferenseTable(form_Add_Reference_To_Table.TableNameCollection);
+                modelObject.AddReferenceTable(form_Add_Reference_To_Table.TableNameCollection);
 
             }
         }

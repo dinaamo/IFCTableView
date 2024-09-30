@@ -12,7 +12,7 @@ namespace IFC_Table_View.IFC.ModelItem
         public ModelItemIFCFile(DatabaseIfc database)
         {
             this.database = database;
-            PropertyOject();
+            PropertyObject();
         }
 
         public IfcProject Project => database.Project;
@@ -25,7 +25,7 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        public Dictionary<string, HashSet<string>> PropertyElement
+        public Dictionary<string, HashSet<object>> PropertyElement
         {
             get
             {
@@ -33,19 +33,19 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        private Dictionary<string, HashSet<string>> _PropertyElement;
+        private Dictionary<string, HashSet<object>> _PropertyElement;
 
-        private void PropertyOject()
+        private void PropertyObject()
         {
-            _PropertyElement = new Dictionary<string, HashSet<string>>
+            _PropertyElement = new Dictionary<string, HashSet<object>>
             {
-                { "Путь к файлу", new HashSet<string>() { database.SourceFilePath } },
-                { "Версия", new HashSet<string>() { Convert.ToString(database.Release) } },
-                { "Формат", new HashSet<string>() { Convert.ToString(database.Format) } },
-                { "Модельный вид", new HashSet<string>() { Convert.ToString(database.ModelView) } },
-                { "Приложение", new HashSet<string>() { Convert.ToString(Project.OwnerHistory?.OwningApplication?.ApplicationFullName) } },
-                { "Автор проекта", new HashSet<string>() { Convert.ToString(Project.OwnerHistory?.OwningUser?.ThePerson?.Name) }},
-                { "Организация", new HashSet<string>() { Convert.ToString(Project.OwnerHistory?.OwningUser?.TheOrganization?.Name) }},
+                { "Путь к файлу", new HashSet<object>() { database.SourceFilePath } },
+                { "Версия", new HashSet<object>() { Convert.ToString(database.Release) } },
+                { "Формат", new HashSet<object>() { Convert.ToString(database.Format) } },
+                { "Модельный вид", new HashSet<object>() { Convert.ToString(database.ModelView) } },
+                { "Приложение", new HashSet<object>() { Convert.ToString(Project.OwnerHistory?.OwningApplication?.ApplicationFullName) } },
+                { "Автор проекта", new HashSet<object>() { Convert.ToString(Project.OwnerHistory?.OwningUser?.ThePerson?.Name) }},
+                { "Организация", new HashSet<object>() { Convert.ToString(Project.OwnerHistory?.OwningUser?.TheOrganization?.Name) }},
             };
         }
 

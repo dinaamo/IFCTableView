@@ -79,10 +79,12 @@
                 <TreeView x:Name="treeViewIFC" />
             </GroupBox>
 
+
             <TabControl
                 Grid.Column="1"
                 Grid.ColumnSpan="3"
                 Margin="6,0,0,6">
+                <!--Сведения элемента-->
                 <TabItem x:Name="PropertyItem">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
@@ -108,7 +110,9 @@
                                  BorderThickness="0"
                                  Margin="0,0,0,0"
                                  DockPanel.Dock="Bottom"
-                                 ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvItemIFC}}"
+                                 ItemsSource="{Binding ElementName=treeViewIFC, 
+                                                        Path=SelectedItem, 
+                                                        Converter={StaticResource ConvItemIFC}}"
          >
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -121,7 +125,7 @@
                                         <ListBox
                                                  Background="Transparent"
                                                  BorderThickness="0"
-                                                 ItemsSource="{Binding Path=Value}"  Width="{Binding ElementName=PrIt, Path=ActualWidth}">
+                                                 ItemsSource="{Binding Path=Value, Converter={StaticResource ConvPropertyesItem}}"  Width="{Binding ElementName=PrIt, Path=ActualWidth}">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal">
@@ -145,7 +149,7 @@
                 </TabItem>
 
 
-
+                <!--Характеристики элемента-->
                 <TabItem x:Name="PropertyElementTabItem">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
@@ -157,7 +161,6 @@
                             <TextBlock Text="Характеристики" />
                         </StackPanel>
                     </TabItem.Header>
-
                     <TabItem.Style>
                         <Style>
                             <Setter Property="TabItem.Visibility" Value="Collapsed"/>
@@ -257,7 +260,7 @@
                 </TabItem>
 
 
-
+                <!--Таблица-->
                 <TabItem  x:Name="TableTabItem">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">

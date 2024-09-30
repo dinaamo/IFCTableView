@@ -13,11 +13,12 @@
     <cnv:ConvertItemStatusName x:Key="ConvStatusName" />
     <cnv:ConvertItemStatusClassIFC x:Key="ConvStatusClassIFC" />
     <cnv:ConvertItemPropSetIFC x:Key="ConvPropSet" />
-    <cnv:ConvertItemProperiesIFC x:Key="ConvProperties" />
+    <cnv:ConvertItemPropertiesIFC x:Key="ConvProperties" />
     <cnv:ConvertItemIFCValue x:Key="ConvIFCValue" /> 
     <cnv:ConvertItemTable x:Key="ConvIFCTable" />
     <cnv:ConvertItemTypeClassIFC x:Key="ConvIFCType" />
     <cnv:ConvertItemIFC x:Key="ConvItemIFC" />
+    <cnv:ConvertConvPropertyesItem x:Key="ConvPropertyesItem" />
 
 
     <Style TargetType="DataGridColumnHeader">
@@ -60,7 +61,7 @@
                                     Height="8"
                                     Margin="0,0,3,0"
                                     Icon="Circle"
-                                    Foreground="{Binding Path=BrushImageForeground}">
+                                    Foreground="{Binding Path=BrushImageForeground, UpdateSourceTrigger=PropertyChanged}">
 
             </fa:ImageAwesome>
             <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">

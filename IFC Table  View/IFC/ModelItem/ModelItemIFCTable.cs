@@ -13,6 +13,7 @@ using IFC_Table_View.HelperIFC;
 using System.Collections;
 using Microsoft.Win32;
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
@@ -25,17 +26,35 @@ namespace IFC_Table_View.IFC.ModelItem
         public ModelItemIFCTable(IfcTable IFCTable)
         {
             this.IFCTable = IFCTable;
-            dataTable = FiilDataTable(this.IFCTable);
+            dataTable = FillDataTable(this.IFCTable);
             //test();
         }
-        
-        void test()
+
+
+        /// <summary>
+        /// Коллекция ссылок на объекты
+        /// </summary>
+        public Dictionary<string, HashSet<object>> PropertyElement
         {
-            //IfcReference refer = new IfcReference(IFCTable.Database);
+            get
+            {
+                return _PropertyElement;
+            }
+        }
+        private Dictionary<string, HashSet<object>> _PropertyElement;
 
-            //refer.TypeIdentifier = $"";
+        HashSet<object> referenceObjectCollection;
 
-            //IFCTable.Columns[0].ReferencePath = refer;
+        public void AddReferenceToTheElement(ModelItemIFCObject referenceObject)
+        {
+            if (_PropertyElement == null)
+            {
+                _PropertyElement = new Dictionary<string, HashSet<object>>();
+                referenceObjectCollection = new HashSet<object>();
+                _PropertyElement.Add("Ссылки на объекты", referenceObjectCollection);
+            }
+            
+            referenceObjectCollection.Add(referenceObject);
         }
 
         public object ItemTreeView
@@ -52,18 +71,11 @@ namespace IFC_Table_View.IFC.ModelItem
                 }
             }
         }
-        public Dictionary<string, HashSet<string>> PropertyElement
-        {
-            get
-            {
-                return _PropertyElement;
-            }
-        }
-        private Dictionary<string, HashSet<string>> _PropertyElement;
 
-        void PropertyOject() 
+
+        void PropertyObject() 
         {
-            _PropertyElement = new Dictionary<string, HashSet<string>>();
+            _PropertyElement = new Dictionary<string, HashSet<object>>();
 
         }
 
@@ -71,9 +83,15 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public ObservableCollection<IModelItemIFC> ModelItems => null;
 
-        public bool t => throw new NotImplementedException();
+        //public bool t => throw new NotImplementedException();
 
-        public static DataTable FiilDataTable(IfcTable IFCTable)
+
+        /// <summary>
+        /// Заполнение DataTable
+        /// </summary>
+        /// <param name="IFCTable"></param>
+        /// <returns></returns>
+        public static DataTable FillDataTable(IfcTable IFCTable)
         {
             if (IFCTable == null && IFCTable.Rows.Count == 0)
             {

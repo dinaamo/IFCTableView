@@ -16,7 +16,7 @@ namespace IFC_Table_View.View.Windows
         {
             InitializeComponent();
 
-            dataTable = ModelItemIFCTable.FiilDataTable(ifcTable);
+            dataTable = ModelItemIFCTable.FillDataTable(ifcTable);
             DataContext = dataTable;
 
             MaxWidth = SystemParameters.PrimaryScreenWidth;

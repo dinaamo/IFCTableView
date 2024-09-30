@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace IFC_Table_View.IFC.ModelIFC
 {
@@ -79,27 +80,10 @@ namespace IFC_Table_View.IFC.ModelIFC
 
         }
 
-        //public ModelIFC Load(string filePath)
-        //{
-
-        //    if (filePath == null)
-        //    {
-        //        return null;
-        //    }
-        //    LoadDataBase(filePath);
-
-        //    if (DataBase == null || DataBase.Project == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    FillCollectionModelItem();
-
-        //    return this;
-
-        //}
-
-        //Открываем файл
+        /// <summary>
+        /// Открываем файл
+        /// </summary>
+        /// <param name="filePath"></param>
         private void LoadDataBase(string filePath)
         {
             try
@@ -108,7 +92,7 @@ namespace IFC_Table_View.IFC.ModelIFC
 
                 if (DataBase.Project == null)
                 {
-                    throw new Exception("В файле не найдет класс IFCProject");
+                    throw new Exception("В файле нет объекта IFCProject");
                 }
             }
             catch (AggregateException aex)
@@ -130,29 +114,49 @@ namespace IFC_Table_View.IFC.ModelIFC
 
         }
         ModelItemIFCFile FileItem;
-        //Заполняем коллекцию экземпляров модели
+
+
+        ObservableCollection<ModelItemIFCTable> tempTableItemSet;
+
+        /// <summary>
+        /// Заполняем коллекцию элементов дерева модели
+        /// </summary>
         private void FillCollectionModelItem()
         {
             ModelItems = new ObservableCollection<IModelItemIFC>();
 
-            FileItem = new ModelItemIFCFile(DataBase);
 
+            //Добавляем в дерево первым элементом файл 
+            FileItem = new ModelItemIFCFile(DataBase);
             ModelItems.Add(FileItem);
 
+            //Ищем все таблицы в файле и заполняем временную коллекцию элементов дерева с таблицами
+            IEnumerable<IfcTable> tableSet = DataBase.Where(it => it.GetType() == typeof(IfcTable)).Cast<IfcTable>();
+            tempTableItemSet = AddIFCTables(tableSet);
+
+            //Составляем дерево объектов модели
             CreationHierarchyIFCObjects(FileItem.Project, FileItem.ModelItems, null);
 
-
-            IEnumerable<IfcTable> tableSet = DataBase.Where(it => it.GetType() == typeof(IfcTable)).Cast<IfcTable>();
-
-            AddIFCTables(tableSet);
+            //После того как составили дерево объектов к нему добавляем таблицы 
+            foreach (IModelItemIFC tableItem in tempTableItemSet)
+            {
+                FileItem.ModelItems.Add(tableItem);
+            }
  
         }
 
-        //Составляем дерево элементов модели
+        /// <summary>
+        /// Составляем дерево элементов модели
+        /// </summary>
+        /// <param name="objDef"></param>
+        /// <param name="collection"></param>
+        /// <param name="topElement"></param>
         private void CreationHierarchyIFCObjects(IfcObjectDefinition objDef, ObservableCollection<IModelItemIFC> collection, ModelItemIFCObject topElement)
         {
             ModelItemIFCObject nestItem = new ModelItemIFCObject(objDef, topElement);
 
+            //Проверяем, что в элементе есть ссылки на таблицы. Если есть то добавляем к таблицам ссылку на элемент
+            nestItem.AddToTheTableReferenceElement(tempTableItemSet);
 
             collection.Add(nestItem);
 
@@ -174,19 +178,31 @@ namespace IFC_Table_View.IFC.ModelIFC
 
         }
 
-        //Добавляем к дереву элементов таблицы
-        private void AddIFCTables(IEnumerable<IfcTable> tableSet)
+        /// <summary>
+        /// Добавляем к дереву элементов таблицы
+        /// </summary>
+        /// <param name="tableSet"></param>
+        /// <returns></returns>
+        private ObservableCollection<ModelItemIFCTable> AddIFCTables(IEnumerable<IfcTable> tableSet)
         {
-
-
+            ObservableCollection<ModelItemIFCTable> tempTableItemSet = new ObservableCollection<ModelItemIFCTable>();
             if (tableSet != null)
             {
                 foreach (IfcTable table in tableSet)
                 {
-                    FileItem.ModelItems.Add(new ModelItemIFCTable(table));
+                    tempTableItemSet.Add(new ModelItemIFCTable(table));
                 }
+
+                return tempTableItemSet;
             }
+            return null;
+
         }
+
+        /// <summary>
+        /// Удаляем таблицу
+        /// </summary>
+        /// <param name="tableToDelete"></param>
         public void DeleteTable(IfcTable tableToDelete)
         {
             
@@ -230,7 +246,7 @@ namespace IFC_Table_View.IFC.ModelIFC
 
 
         /// <summary>
-        /// Добавляем в файл таблицу
+        /// Добавляем в модель таблицу
         /// </summary>
         /// <param name="dataTable"></param>
         public void CreateNewIFCTable(DataTable dataTable)
