@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.Xml.Linq;
 
 namespace IFC_Table_View.Infracrucrure.Converter
 {
@@ -30,28 +31,35 @@ namespace IFC_Table_View.Infracrucrure.Converter
         }
     }
 
-    public class ConvertConvPropertyesItem : IValueConverter
+    public class ConvertConvPropertyItem : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is HashSet<object> collectionProperty)
-            {
-                HashSet<string> collectionTableReference = new HashSet<string>();
-                foreach (object element in collectionProperty)
-                {
-                    if (element is ModelItemIFCObject elementObject)
-                    {
-                        IfcObjectDefinition ifcObject = (IfcObjectDefinition)elementObject.ItemTreeView;
-                        collectionTableReference.Add((
-                                        $"Guid:{ifcObject.Guid} " +
-                                        $"\nКласс: {ifcObject.StepClassName} " +
-                                        $"\nИмя: {ifcObject.Name}"));
-                    }
-                }
-                return collectionTableReference;
-            }
+            return value;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
             return null;
+        }
+    }
 
+    public class ConvertConvReferenceToObject : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ModelItemIFCObject elementObject)
+            {
+                IfcObjectDefinition ifcObject = (IfcObjectDefinition)elementObject.ItemTreeView;
+
+                return $"Guid:{ifcObject.Guid} " +
+                        $"\nКласс: {ifcObject.StepClassName} " +
+                        $"\nИмя: {ifcObject.Name}";
+            }
+            else
+            {
+                return value;
+            }
+            
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

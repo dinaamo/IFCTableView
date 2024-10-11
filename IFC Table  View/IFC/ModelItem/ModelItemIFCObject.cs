@@ -31,6 +31,20 @@ namespace IFC_Table_View.IFC.ModelItem
         public event EventHandler<PropertyReferenceChangedEventArg> PropertyReferenceChanged;
 
 
+        private bool _IsFocusReference { get; set; } = false;
+        /// <summary>
+        /// Фокус элемента
+        /// </summary>
+        public bool IsFocusReference
+        {
+            get { return _IsFocusReference; }
+            set
+            {
+                _IsFocusReference = value;
+                OnPropertyChanged("IsFocusReference");
+            }
+        }
+
         /// <summary>
         /// Прокидываем по дереву вверх состояние элемента
         /// </summary>
@@ -71,6 +85,11 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="IFCObject"></param>
+        /// <param name="TopElement"></param>
         public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement)
         {
             //Если есть элемент выше по дереву то подключаем к нему обработчик события изменения состояния элемента
@@ -421,7 +440,7 @@ namespace IFC_Table_View.IFC.ModelItem
             }
 
             //Содержит объекты
-            HashSet<object> listobjectContainElement = new HashSet<object>();
+            HashSet<object> listObjectContainElement = new HashSet<object>();
 
             if (IFCObjectDefinition is IfcSpatialStructureElement IFCStrElem)
             {
@@ -429,7 +448,7 @@ namespace IFC_Table_View.IFC.ModelItem
                 {
                     foreach (IfcProduct obj in spartialStucture.RelatedElements)
                     {
-                        listobjectContainElement.Add(
+                        listObjectContainElement.Add(
                             $"Наименование связи: {spartialStucture.Name}\n" +
                             $"Описание связи: {spartialStucture.Description}\n" +
                             $"Наименование элемента: {obj.Name}\n" +
@@ -439,9 +458,9 @@ namespace IFC_Table_View.IFC.ModelItem
                 }
             }
 
-            if (listobjectContainElement.Count > 0)
+            if (listObjectContainElement.Count > 0)
             {
-                PropertyElement.Add("Содержит объекты (ContainsElements)", listobjectContainElement);
+                PropertyElement.Add("Содержит объекты (ContainsElements)", listObjectContainElement);
             }
 
 

@@ -14,14 +14,27 @@ using System.Collections;
 using Microsoft.Win32;
 using System.Reflection;
 using System.Xml.Linq;
+using System.ComponentModel;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
-    public class ModelItemIFCTable : IModelItemIFC
+    public class ModelItemIFCTable : IModelItemIFC, INotifyPropertyChanged
     {
         public IfcTable IFCTable { get; private set; }
 
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// Событие изменения элемента
+        /// </summary>
+        /// <param name="PropertyName"></param>
+        protected virtual void OnPropertyChanged(string PropertyName = null)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+            }
+        }
 
         public ModelItemIFCTable(IfcTable IFCTable)
         {
@@ -30,6 +43,20 @@ namespace IFC_Table_View.IFC.ModelItem
             //test();
         }
 
+
+        private bool _IsFocusReference { get; set; } = false;
+        /// <summary>
+        /// Фокус элемента
+        /// </summary>
+        public bool IsFocusReference
+        {
+            get { return _IsFocusReference; }
+            set
+            {
+                _IsFocusReference = value;
+                OnPropertyChanged("IsFocusReference");
+            }
+        }
 
         /// <summary>
         /// Коллекция ссылок на объекты

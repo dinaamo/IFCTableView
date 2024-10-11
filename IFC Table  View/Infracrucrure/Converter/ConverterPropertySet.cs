@@ -12,11 +12,50 @@ using System.Windows.Data;
 
 namespace IFC_Table_View.Infracrucrure.Converter
 {
-
-        public class ConvertItemIFCValue : IValueConverter
+    // <summary>
+    /// Возвращаем наименование характеристики
+    /// </summary>
+    public class ConvertItemIFCNameProperty : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            if (value is KeyValuePair<string, IfcProperty> ifcPairProperty)
             {
+                return ifcPairProperty.Key;
+            }
+            else if (value is KeyValuePair<string, IfcPhysicalQuantity> ifcPairPhysicalQuantity)
+            {
+                return ifcPairPhysicalQuantity.Key;
+            }
+
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Возвращаем значение характеристики
+    /// </summary>
+    public class ConvertItemIFCValue : IValueConverter
+        {
+
+            public object Convert(object valueObject, Type targetType, object parameter, CultureInfo culture)
+            {
+
+                object value = null;
+
+                if (valueObject is KeyValuePair<string, IfcProperty> ifcPairProperty)
+                {
+                    value = ifcPairProperty.Value;
+                }
+                else if (valueObject is KeyValuePair<string, IfcPhysicalQuantity> ifcPairPhysicalQuantity)
+                {
+                    value = ifcPairPhysicalQuantity.Value;
+                }
                 if (value is IfcPropertySingleValue ifcValue)
                 {
                     return System.Convert.ToString(ifcValue?.NominalValue?.ValueString);
@@ -39,7 +78,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
                 }
                 else if (value is IfcQuantityTime quantityTime)
                 {
-                     return System.Convert.ToString(quantityTime.TimeValue);
+                        return System.Convert.ToString(quantityTime.TimeValue);
                 }
                 else if (value is IfcQuantityVolume quantityVolume)
                 {
@@ -50,7 +89,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
                     return System.Convert.ToString(quantityWeight.WeightValue);
                 }
                 else
-                    {
+                {
                     return null;
                 }        
             }
@@ -85,7 +124,6 @@ namespace IFC_Table_View.Infracrucrure.Converter
                 return null;
             }
         }
-
 
         public class ConvertItemPropSetIFC : IValueConverter
         {

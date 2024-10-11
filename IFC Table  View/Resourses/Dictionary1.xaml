@@ -18,9 +18,11 @@
     <cnv:ConvertItemTable x:Key="ConvIFCTable" />
     <cnv:ConvertItemTypeClassIFC x:Key="ConvIFCType" />
     <cnv:ConvertItemIFC x:Key="ConvItemIFC" />
-    <cnv:ConvertConvPropertyesItem x:Key="ConvPropertyesItem" />
-
-
+    <cnv:ConvertConvPropertyItem x:Key="ConvPropertyesItem" /> 
+    <cnv:ConvertConvReferenceToObject x:Key="ConvertConvReferenceToObject" />
+    <cnv:ConvertItemIFCNameProperty x:Key="ConvertItemIFCNameProperty" />
+    
+    
     <Style TargetType="DataGridColumnHeader">
 
     </Style>
@@ -28,14 +30,15 @@
 
     <HierarchicalDataTemplate 
                                         DataType="{x:Type mi:ModelItemIFCFile}"
-                                        ItemsSource="{Binding Path=ModelItems}" >
+                                        ItemsSource="{Binding Path=ModelItems}">
         <StackPanel Orientation="Horizontal">
+            
             <fa:ImageAwesome
                                     Height="10"
                                     Margin="0,0,3,0"
                                     Foreground="DarkOrange"
                                     Icon="File" />
-            <TextBlock Text="{Binding ItemTreeView}">
+            <TextBlock Text="{Binding ItemTreeView}" ToolTip="{Binding Path=Project.Database.SourceFilePath}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
@@ -56,6 +59,7 @@
                                         ItemsSource="{Binding Path=ModelItems}">
 
         <StackPanel Orientation="Horizontal">
+
             <fa:ImageAwesome        
                                     x:Name="img" 
                                     Height="8"
@@ -63,16 +67,25 @@
                                     Icon="Circle"
                                     Foreground="{Binding Path=BrushImageForeground, UpdateSourceTrigger=PropertyChanged}">
 
+
             </fa:ImageAwesome>
-            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
+            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" ToolTip="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
+  
                         <Style.Triggers>
+                            <DataTrigger  Binding="{Binding Path=IsFocusReference}" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue"/>
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground" Value="DarkBlue"/>
                                 <Setter Property="Background" Value="SkyBlue"/>
                                 <Setter Property="TextDecorations" Value="Underline" />
                             </Trigger>
+                            
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
@@ -89,10 +102,18 @@
                                         Margin="0,0,3,0"
                                         Foreground="OrangeRed"
                                         Icon="Table" />
-            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" MouseDown="TextBlock_MouseDown">
+            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" 
+                            MouseDown="TextBlock_MouseDown"
+                            ToolTip="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
+                            <DataTrigger  Binding="{Binding Path=IsFocusReference}" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue"/>
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground" Value="DarkBlue"/>
                                 <Setter Property="Background" Value="SkyBlue"/>
