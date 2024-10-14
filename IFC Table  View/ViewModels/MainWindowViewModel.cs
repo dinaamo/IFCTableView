@@ -4,6 +4,7 @@ using IFC_Table_View.HelperIFC;
 using IFC_Table_View.IFC.ModelIFC;
 using IFC_Table_View.IFC.ModelItem;
 using IFC_Table_View.Infracrucrure.Commands;
+using IFC_Table_View.Infracrucrure.FindObjectException;
 using IFC_Table_View.View.Windows;
 using IFC_Table_View.ViewModels;
 using IFC_Table_View.ViewModels.Base;
@@ -56,6 +57,8 @@ namespace IFC_Table_View.ViewModels
             set => Set(ref _Title, value);
         }
         #endregion
+
+ 
 
         #region Дерево элементов
         private ObservableCollection<ModelItemIFCTable> _ModelItems;
@@ -112,8 +115,40 @@ namespace IFC_Table_View.ViewModels
             if (TempModel != null)
             {
                 modelIFC = TempModel;
+                
             }
         }
+
+        #endregion
+
+        #region Обговление дерева
+        //void UpdateTreeView()
+        //{           
+        //    TreeViewItem topElement = mainWindow.treeViewIFC.ItemContainerGenerator.ContainerFromItem(mainWindow.treeViewIFC.Items[0]) as TreeViewItem;
+            
+        //    TreeViewItem secondTreeViewElement = topElement.ItemContainerGenerator.ContainerFromItem(topElement.Items[0]) as TreeViewItem;
+
+        //    while (secondTreeViewElement == null)
+        //    {
+        //        Thread.Sleep(200);
+        //        secondTreeViewElement = topElement.ItemContainerGenerator.ContainerFromItem(topElement.Items[0]) as TreeViewItem;
+        //    }
+
+        //    secondTreeViewElement = topElement.ItemContainerGenerator.ContainerFromItem(topElement.Items[0]) as TreeViewItem;
+
+        //    mainWindow.Dispatcher.BeginInvoke(() =>
+        //    {
+        //        secondTreeViewElement.IsExpanded = false;
+        //    });
+        //    mainWindow.Dispatcher.BeginInvoke(() =>
+        //    {
+        //        topElement.IsExpanded = false;
+        //    });
+        //}
+
+ 
+
+
         #endregion
 
         #region Комманды
@@ -124,8 +159,13 @@ namespace IFC_Table_View.ViewModels
 
         private void OnLoadApplicationCommandExecuted(object o)
         {
-
             LoadModelAsync(HelperFileIFC.OpenIFC_File());
+
+            //Task.Run(() =>
+            //{
+            //    UpdateTreeView();
+            //});
+            
         }
 
 
@@ -290,7 +330,7 @@ namespace IFC_Table_View.ViewModels
             if (o is ModelItemIFCObject modelObject)
             {
 
-                var collection = mainWindow.treeViewIFC.ItemsSource.
+                List<ModelItemIFCTable> collectionModelTable = mainWindow.treeViewIFC.ItemsSource.
                                                 Cast<IModelItemIFC>().
                                                 ToList()[0].
                                                 ModelItems.
@@ -298,7 +338,7 @@ namespace IFC_Table_View.ViewModels
                                                 ToList();
 
 
-                Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(modelObject, collection);
+                Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(modelObject, collectionModelTable);
 
                 form_Add_Reference_To_Table.ShowDialog();
 
@@ -309,11 +349,53 @@ namespace IFC_Table_View.ViewModels
 
         private bool CanAddReferenceToTheTable(object o)
         {
-            if (modelIFC == null)
+            if (o is ModelItemIFCObject obj)
+            {
+                if (obj.ItemTreeView is IfcObject)
+                {
+                    return true;
+                }
+                return false;
+            }
+            else
             {
                 return false;
             }
-            else if (((IModelItemIFC)o) is ModelItemIFCObject obj)
+        }
+        #endregion
+
+        #region Удалить ссылку на таблицу
+        public ICommand DeleteReferenceToTheTable { get; }
+
+        private void OnDeleteReferenceToTheTable(object o)
+        {
+
+            if (o is ModelItemIFCObject modelObject)
+            {
+                Form_Delete_Reference_To_Table form_Delete_Reference_To_Table = new Form_Delete_Reference_To_Table(modelObject);
+
+                form_Delete_Reference_To_Table.ShowDialog();
+
+                List<ModelItemIFCTable> collectionModelTable = mainWindow.treeViewIFC.ItemsSource.
+                                                Cast<IModelItemIFC>().
+                                                ToList()[0].
+                                                ModelItems.
+                                                OfType<ModelItemIFCTable>().
+                                                ToList();
+
+                modelObject.DeleteReferenceTable(form_Delete_Reference_To_Table.ifcPropertyReferenceValueDictionaryToDelete, collectionModelTable);
+
+            }
+        }
+
+        private bool CanDeleteReferenceToTheTable(object o)
+        {
+            //if (modelIFC == null)
+            //{
+            //    return false;
+            //}
+            //else if (((IModelItemIFC)o) is ModelItemIFCObject obj)
+            if (o is ModelItemIFCObject obj)
             {
                 if (obj.ItemTreeView is IfcObject)
                 {
@@ -393,6 +475,10 @@ namespace IFC_Table_View.ViewModels
             AddReferenceToTheTable = new ActionCommand(
                 OnAddReferenceToTheTable,
                 CanAddReferenceToTheTable);
+
+            DeleteReferenceToTheTable = new ActionCommand(
+                OnDeleteReferenceToTheTable,
+                CanDeleteReferenceToTheTable);
 
             OpenHelp = new ActionCommand(
                 OnOpenHelpCommandExecuted,

@@ -1,6 +1,6 @@
 ﻿namespace IFC_Table_View.Data
 {
-    partial class Form_Add_Reference_To_Table
+    partial class Form_Delete_Reference_To_Table
     {
         /// <summary>
         /// Required designer variable.
@@ -47,11 +47,11 @@
             this.button_Add_Reference.Location = new System.Drawing.Point(16, 107);
             this.button_Add_Reference.Margin = new System.Windows.Forms.Padding(4);
             this.button_Add_Reference.Name = "button_Add_Reference";
-            this.button_Add_Reference.Size = new System.Drawing.Size(161, 33);
+            this.button_Add_Reference.Size = new System.Drawing.Size(218, 33);
             this.button_Add_Reference.TabIndex = 2;
-            this.button_Add_Reference.Text = "Задать ссылку";
+            this.button_Add_Reference.Text = "Удалить ссылки";
             this.button_Add_Reference.UseVisualStyleBackColor = true;
-            this.button_Add_Reference.Click += new System.EventHandler(this.button_Add_Reference_Click);
+            this.button_Add_Reference.Click += new System.EventHandler(this.button_Delete_Reference_Click);
             // 
             // dataGridViewTable
             // 
@@ -68,7 +68,7 @@
             this.dataGridViewTable.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridViewTable.Name = "dataGridViewTable";
             this.dataGridViewTable.RowHeadersWidth = 51;
-            this.dataGridViewTable.Size = new System.Drawing.Size(621, 232);
+            this.dataGridViewTable.Size = new System.Drawing.Size(1002, 232);
             this.dataGridViewTable.TabIndex = 3;
             // 
             // ColumnName
@@ -100,7 +100,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(637, 264);
+            this.groupBox1.Size = new System.Drawing.Size(1018, 264);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Таблицы в текущем файле";
@@ -145,11 +145,11 @@
             this.labelGUID.TabIndex = 5;
             this.labelGUID.Text = "GUID";
             // 
-            // Form_Add_Reference_To_Table
+            // Form_Delete_Reference_To_Table
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(669, 427);
+            this.ClientSize = new System.Drawing.Size(1050, 427);
             this.Controls.Add(this.labelGUID);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.labelName);
@@ -157,9 +157,9 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button_Add_Reference);
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "Form_Add_Reference_To_Table";
+            this.Name = "Form_Delete_Reference_To_Table";
             this.ShowIcon = false;
-            this.Text = "Задать ссылку на таблицу";
+            this.Text = "Удалить ссылки на таблицы";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewTable)).EndInit();
             this.groupBox1.ResumeLayout(false);

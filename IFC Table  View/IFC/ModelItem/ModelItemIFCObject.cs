@@ -45,6 +45,34 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+        private bool _IsExpanded { get; set; } = true;
+        /// <summary>
+        /// IsExpanded
+        /// </summary>
+        public bool IsExpanded
+        {
+            get { return _IsExpanded; }
+            set
+            {
+                _IsExpanded = value;
+                OnPropertyChanged("IsExpanded");
+            }
+        }
+
+        private bool _IsSelected { get; set; } = false;
+        /// <summary>
+        /// IsSelected 
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return _IsSelected; }
+            set
+            {
+                _IsSelected = value;
+                OnPropertyChanged("IsSelected");
+            }
+        }
+
         /// <summary>
         /// Прокидываем по дереву вверх состояние элемента
         /// </summary>
@@ -66,10 +94,27 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+        public bool _IsContainPropertyReference { get; set; }
         /// <summary>
         /// Наличие в элементе ссылки на таблицы
         /// </summary>
-        public bool IsContainPropertyReference { get; set; }
+        public bool IsContainPropertyReference
+        {
+            get { return _IsContainPropertyReference; }
+            set
+            {
+                ////Изменяем цвет маркера НЕ НАДО МЕНЯЕТСЯ ЧЕРЕЗ СОБЫТИЕ
+                //if (value)
+                //{
+                //    _BrushImageForeground = System.Windows.Media.Brushes.Green;
+                //}
+                //else
+                //{
+                //    _BrushImageForeground = System.Windows.Media.Brushes.DarkRed;
+                //}
+                _IsContainPropertyReference = value;
+            }
+        }
 
         private Brush _BrushImageForeground = System.Windows.Media.Brushes.DarkRed;
         /// <summary>
@@ -103,8 +148,6 @@ namespace IFC_Table_View.IFC.ModelItem
 
             InitializationElementModelObject();
         }
-
-        
 
         public void AddToTheTableReferenceElement(ObservableCollection<ModelItemIFCTable> tableItemSet)
         {
@@ -151,6 +194,49 @@ namespace IFC_Table_View.IFC.ModelItem
             {
                 ChangePropertyReference(this, new PropertyReferenceChangedEventArg(false));
             }
+        }
+
+        /// <summary>
+        /// Удаление ссылок на таблицы
+        /// </summary>
+        /// <param name="ifcPropertyReferenceValueDictionaryToDelete"></param>
+        public void DeleteReferenceTable(Dictionary<string, IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionaryToDelete, List<ModelItemIFCTable> collectionModelTable)
+        {
+            //Получаем необходимый набор характеристик
+            IfcPropertySet PropSetTableReference = CollectionPropertySet.
+                                                   OfType<IfcPropertySet>().
+                                                   FirstOrDefault(it => it.Name == "RZDP_Ссылки");
+
+            //Удаляем ссылки
+            foreach (KeyValuePair<string, IfcPropertyReferenceValue> Pair in ifcPropertyReferenceValueDictionaryToDelete)
+            {
+                ModelItemIFCTable findModelTable = collectionModelTable.FirstOrDefault(it => it.ItemTreeView == Pair.Value.PropertyReference);
+                findModelTable.DeleteReferenceToTheElement(this);
+                PropSetTableReference.HasProperties.Remove(Pair.Key);
+            }
+
+            //Проверяем, остались ли еще ссылки на другие таблицы
+            if (PropSetTableReference.HasProperties.Count == 0)
+            {
+                IfcObject ifcObject = ((IfcObject)_IFCObjectDefinition);
+                //Находим промежуточный класс 
+                IfcRelDefinesByProperties FindRelDef = ifcObject.IsDefinedBy
+                    .FirstOrDefault(it => it.RelatingPropertyDefinition.Contains(PropSetTableReference));
+
+                //Удаляем пустой набор свойств
+                FindRelDef.RelatingPropertyDefinition.Remove(PropSetTableReference);
+
+                //Удаляем пустой промежуточный класс
+                if (FindRelDef.RelatingPropertyDefinition.Count == 0)
+                {
+                    ifcObject.IsDefinedBy.Remove(FindRelDef);
+                }
+                IsContainPropertyReference = false;
+                //Прокидываем наверх по дереву событие удаления ссылок
+                ChangePropertyReference(this, new PropertyReferenceChangedEventArg(false));
+            }
+            //Заполняем заново коллекцию характеристик
+            modelHelper.FillCollectionPropertySet(CollectionPropertySet);
         }
 
         /// <summary>

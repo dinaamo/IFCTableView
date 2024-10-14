@@ -95,6 +95,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Forms\Form_Delete_Reference_To_Table.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Form_Delete_Reference_To_Table.Designer.cs">
+      <DependentUpon>Form_Delete_Reference_To_Table.cs</DependentUpon>
+    </Compile>
     <Compile Include="IFC\ModelItem\ModelItemIFCTable.cs" />
     <Compile Include="Infracrucrure\Event\PropertyReferenceChangedEventArg.cs" />
     <Compile Include="Infracrucrure\Exeption\FindObjectException.cs" />
@@ -117,16 +123,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Data\Form_Add_Reference_To_Table.cs">
+    <Compile Include="Forms\Form_Add_Reference_To_Table.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Data\Form_Add_Reference_To_Table.Designer.cs">
+    <Compile Include="Forms\Form_Add_Reference_To_Table.Designer.cs">
       <DependentUpon>Form_Add_Reference_To_Table.cs</DependentUpon>
     </Compile>
-    <Compile Include="Data\FormAddTable.cs">
+    <Compile Include="Forms\FormAddTable.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Data\FormAddTable.Designer.cs">
+    <Compile Include="Forms\FormAddTable.Designer.cs">
       <DependentUpon>FormAddTable.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperIFC\HelperFileIFC.cs" />
@@ -171,10 +177,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Data\Form_Add_Reference_To_Table.resx">
+    <EmbeddedResource Include="Forms\Form_Delete_Reference_To_Table.resx">
+      <DependentUpon>Form_Delete_Reference_To_Table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Form_Add_Reference_To_Table.resx">
       <DependentUpon>Form_Add_Reference_To_Table.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\FormAddTable.resx">
+    <EmbeddedResource Include="Forms\FormAddTable.resx">
       <DependentUpon>FormAddTable.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

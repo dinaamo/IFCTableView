@@ -22,7 +22,7 @@
         <!--Верхняя панель-->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Файл">
-                <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть" />
+                <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть"/>
                 <MenuItem
                     Command="{Binding SaveFileCommand}"
                     Header="Сохранить"
@@ -52,7 +52,11 @@
                 <MenuItem
                     Command="{Binding AddReferenceToTheTable}"
                     CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Задать ссылку на таблицу" />
+                    Header="Задать ссылки на таблицы" />
+                <MenuItem
+                    Command="{Binding DeleteReferenceToTheTable}"
+                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
+                    Header="Удалить ссылки на таблицы"/>
             </MenuItem>
             <MenuItem Header="Справка">
                 <MenuItem Command="{Binding OpenHelp}" Header="Справка по программе" />
@@ -92,7 +96,17 @@
                 Margin="5"
                 Header="Элементы модели">
 
-                <TreeView x:Name="treeViewIFC" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                <TreeView x:Name="treeViewIFC" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <!--<TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding }" Value="True">
+                                    <Setter Property="IsExpanded" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>-->
+                </TreeView>
             </GroupBox>
 
 
@@ -144,7 +158,8 @@
                                                     <StackPanel Orientation="Horizontal">
                                                         <TextBlock  Text="{Binding Converter={StaticResource ConvertConvReferenceToObject}}" 
                                                                     MouseEnter="IsMouseFocus" 
-                                                                    MouseLeave="IsMouseLostFocus"/>
+                                                                    MouseLeave="IsMouseLostFocus"
+                                                                    MouseDown="TextBlock_MouseDown"/>
 
                                                     </StackPanel>
                                                 </DataTemplate>

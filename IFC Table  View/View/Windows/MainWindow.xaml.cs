@@ -21,11 +21,8 @@ namespace IFC_Table_View
         public MainWindow()
         {
             InitializeComponent();
-
-            
         }
 
-        
         /// <summary>
         /// Двойной клик на ссылке на таблицу
         /// </summary>
@@ -47,7 +44,55 @@ namespace IFC_Table_View
                             }
                         }
                     }
+                    else if (textBlock.DataContext is ModelItemIFCObject findModelObject)
+                    {
+                        
+                        try
+                        {
+                            IEnumerable<ModelItemIFCObject> secondLevelCollection = ((IModelItemIFC)treeViewIFC.Items[0]).ModelItems.
+                                OfType<ModelItemIFCObject>();
+
+                            foreach (ModelItemIFCObject modelObject in secondLevelCollection)
+                            {
+                                modelObject.IsExpanded = true;
+                                FindTreeViewItem(modelObject, findModelObject);
+                            } 
+
+                            
+                        }
+                        catch (FindObjectException find)
+                        {
+                            //TreeViewItem treeViewItem = topElement.ItemContainerGenerator.ContainerFromItem(find) as TreeViewItem;
+                            //targetElement.IsSelected = true;
+                        }
+                        
+                    }
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Ищем элемент в дереве
+        /// </summary>
+        /// <param name="topElement"></param>
+        /// <param name="findObject"></param>
+        /// <returns></returns>
+        /// <exception cref="FindObjectException"></exception>
+        private void FindTreeViewItem(ModelItemIFCObject topElement, ModelItemIFCObject findObject)
+        {
+            foreach (ModelItemIFCObject item in topElement.ModelItems)
+            {
+                //TreeViewItem treeViewItem = topElement.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                if (item == findObject)
+                {
+                    throw new FindObjectException(item);
+                }
+                else
+                {
+                    item.IsExpanded = true;
+                    FindTreeViewItem(item, findObject);
+                }
+                
             }
         }
 
@@ -59,7 +104,10 @@ namespace IFC_Table_View
         private void MainWindowIFC_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = new MainWindowViewModel(this);
+
         }
+
+
 
         //Обработка события потери фокуса мыши
         private void IsMouseLostFocus(object sender, MouseEventArgs e)
@@ -117,99 +165,6 @@ namespace IFC_Table_View
 
             }
         }
-
-
-        //bool mSuppressRequestBringIntoView;
-        //private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
-        //{
-
-        //    // Ignore re-entrant calls
-        //    if (mSuppressRequestBringIntoView)
-        //        return;
-
-        //    // Cancel the current scroll attempt
-        //    e.Handled = true;
-
-        //    //Вызовите BringIntoView, используя прямоугольник, который расширяется в "отрицательное пространство" слева от нашего 
-        //    // фактического элемента управления.
-        //    // Это позволяет вертикальной прокрутке работать без негативного 
-        //    // влияния на текущую горизонтальную позицию прокрутки.
-        //    mSuppressRequestBringIntoView = true;
-
-        //    TreeViewItem tvi = sender as TreeViewItem;
-        //    if (tvi != null)
-        //    {
-        //        Rect newTargetRect = new Rect(-1000, 0, tvi.ActualWidth + 1000, tvi.ActualHeight);
-        //        tvi.BringIntoView(newTargetRect);
-        //    }
-
-        //    mSuppressRequestBringIntoView = false;
-        //}
-
-
-
-
-
-
-
-
-        //Обработка события наведения мыши
-        //private void TextBlock_IsMouseDirectlyOverChanged(object sender, MouseEventArgs e)
-        //{
-        //    if (sender is TextBlock textBlock)
-        //    {
-        //        //Находим искомый элемент
-        //        ModelItemIFCObject findObject = textBlock.DataContext as ModelItemIFCObject;
-
-        //        findObject.IsFocusReference = true;
-
-        //        //Находим корневой элемент
-        //        TreeViewItem topElement = treeViewIFC.ItemContainerGenerator.ContainerFromItem(treeViewIFC.Items[0]) as TreeViewItem;
-
-        //        try
-        //        {
-        //            FindTreeViewItem(topElement, findObject);
-        //        }
-        //        catch (FindObjectException findExeption)
-        //        {
-
-
-        //        }
-
-        //    }
-        //}
-
-
-        #region FINDElEMENT
-
-        //private TreeViewItem FindTreeViewItem(TreeViewItem topElement, ModelItemIFCObject findObject)
-        //{
-
-
-        //    foreach (object item in topElement.Items)
-        //    {
-        //        DependencyObject dependencyObject = topElement.ItemContainerGenerator.ContainerFromItem(item);
-
-        //        if (dependencyObject is TreeViewItem treeViewItem)
-        //        {
-        //            if (item == findObject)
-        //            {
-        //                treeViewItem.IsSelected = true;
-        //                throw new FindObjectException(findObject);
-        //            }
-        //            else
-        //            {
-        //                FindTreeViewItem(treeViewItem, findObject);
-        //            }
-        //        }
-        //    }
-        //    return null;
-        //}
-
-
-
-        #endregion
-
 
     }
 }

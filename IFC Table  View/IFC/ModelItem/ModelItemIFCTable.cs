@@ -84,6 +84,11 @@ namespace IFC_Table_View.IFC.ModelItem
             referenceObjectCollection.Add(referenceObject);
         }
 
+        public void DeleteReferenceToTheElement(ModelItemIFCObject deleteReferenceObject)
+        {
+            _PropertyElement["Ссылки на объекты"].Remove(deleteReferenceObject);
+        }
+
         public object ItemTreeView
         {
             get
