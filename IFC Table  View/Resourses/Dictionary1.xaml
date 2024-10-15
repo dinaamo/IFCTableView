@@ -30,12 +30,8 @@
 
     <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Deepth}" Value="1">
-                <Setter Property="IsExpanded" Value="True"/>
-            </DataTrigger>
-        </Style.Triggers>
+        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Setter Property="FontSize" Value="{Binding FontSize, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
     </Style>
 
     <HierarchicalDataTemplate 
@@ -89,16 +85,9 @@
                                 <Setter Property="FontSize" Value="12"/>
                                 <Setter Property="TextDecorations" Value="Underline" />
                             </DataTrigger>
-                            
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground" Value="DarkBlue"/>
                                 <Setter Property="Background" Value="SkyBlue"/>
-                                <Setter Property="TextDecorations" Value="Underline" />
-                            </Trigger>
-                            <Trigger Property="TreeViewItem.IsSelected" Value="True">
-                                <Setter Property="Foreground" Value="DarkBlue"/>
-                                <Setter Property="Background" Value="SkyBlue"/>
-                                <Setter Property="FontSize" Value="12"/>
                                 <Setter Property="TextDecorations" Value="Underline" />
                             </Trigger>
                         </Style.Triggers>

@@ -21,6 +21,7 @@ namespace IFC_Table_View
         public MainWindow()
         {
             InitializeComponent();
+
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace IFC_Table_View
                     }
                     else if (textBlock.DataContext is ModelItemIFCObject findModelObject)
                     {
-                        
+
                         try
                         {
                             IEnumerable<ModelItemIFCObject> secondLevelCollection = ((IModelItemIFC)treeViewIFC.Items[0]).ModelItems.
@@ -56,21 +57,18 @@ namespace IFC_Table_View
                             {
                                 modelObject.IsExpanded = true;
                                 FindTreeViewItem(modelObject, findModelObject);
-                            } 
-
-                            
+                            }
                         }
                         catch (FindObjectException find)
                         {
-                            //TreeViewItem treeViewItem = topElement.ItemContainerGenerator.ContainerFromItem(find) as TreeViewItem;
-                            //targetElement.IsSelected = true;
+                            find.FindObject.IsSelected = true;
+                            find.FindObject.IsFocusReference = false;
                         }
-                        
                     }
                 }
             }
         }
-        
+
         /// <summary>
         /// Ищем элемент в дереве
         /// </summary>
@@ -82,17 +80,16 @@ namespace IFC_Table_View
         {
             foreach (ModelItemIFCObject item in topElement.ModelItems)
             {
-                //TreeViewItem treeViewItem = topElement.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
                 if (item == findObject)
                 {
                     throw new FindObjectException(item);
                 }
-                else
-                {
-                    item.IsExpanded = true;
-                    FindTreeViewItem(item, findObject);
-                }
-                
+            }
+
+            foreach (ModelItemIFCObject item in topElement.ModelItems)
+            {
+                item.IsExpanded = true;
+                FindTreeViewItem(item, findObject);
             }
         }
 
@@ -142,12 +139,12 @@ namespace IFC_Table_View
         private void IsMouseFocus(object sender, MouseEventArgs e)
         {
             if (sender is TextBlock textBlock)
-            { 
-                if(textBlock.DataContext is ModelItemIFCObject findObject)
+            {
+                if (textBlock.DataContext is ModelItemIFCObject findObject)
                 {
                     findObject.IsFocusReference = true;
                 }
-                else if(textBlock.DataContext is KeyValuePair<string, IfcProperty> pairPropertyRefVal)
+                else if (textBlock.DataContext is KeyValuePair<string, IfcProperty> pairPropertyRefVal)
                 {
                     IfcPropertyReferenceValue PropertyRefVa = pairPropertyRefVal.Value as IfcPropertyReferenceValue;
 

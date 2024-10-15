@@ -45,7 +45,7 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        private bool _IsExpanded { get; set; } = true;
+        private bool _IsExpanded { get; set; } = false;
         /// <summary>
         /// IsExpanded
         /// </summary>
@@ -68,8 +68,32 @@ namespace IFC_Table_View.IFC.ModelItem
             get { return _IsSelected; }
             set
             {
+                if (value)
+                {
+                    FontSize = 15;
+                }
+                else
+                {
+                    FontSize = 12;
+                }
+
                 _IsSelected = value;
                 OnPropertyChanged("IsSelected");
+            }
+        }
+
+
+        private int _FontSize { get; set; } = 12;
+        /// <summary>
+        /// IsSelected 
+        /// </summary>
+        public int FontSize
+        {
+            get { return _FontSize; }
+            set
+            {
+                _FontSize = value;
+                OnPropertyChanged("FontSize");
             }
         }
 
