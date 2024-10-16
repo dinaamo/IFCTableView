@@ -272,8 +272,12 @@ namespace IFC_Table_View.IFC.ModelIFC
                 }
             }
 
+            ObservableCollection<ModelItemIFCTable> tempTableItemSet = AddIFCTables(new List<IfcTable>() { ifcTable });
 
-            AddIFCTables(new List<IfcTable>() { ifcTable });
+            foreach (IModelItemIFC tableItem in tempTableItemSet)
+            {
+                FileItem.ModelItems.Add(tableItem);
+            }
         }
 
 
