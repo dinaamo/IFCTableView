@@ -149,7 +149,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                object element = ((IModelItemIFC)value)?.ItemTreeView;
+                object element = ((BaseModelItemIFC)value)?.ItemTreeView;
 
                 if (element != null)
                 {
@@ -173,7 +173,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                object element = ((IModelItemIFC)value)?.ItemTreeView;
+                object element = ((BaseModelItemIFC)value)?.ItemTreeView;
 
                 if (element is IfcObjectDefinition ifcObj)
                 {
@@ -200,7 +200,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                object element = ((IModelItemIFC)value)?.ItemTreeView;
+                object element = ((BaseModelItemIFC)value)?.ItemTreeView;
 
                 if (element is IfcObjectDefinition ifcObjectDef)
                 {

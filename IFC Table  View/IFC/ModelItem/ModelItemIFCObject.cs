@@ -6,96 +6,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
-    public class ModelItemIFCObject : IModelItemIFC, INotifyPropertyChanged
+    public class ModelItemIFCObject : BaseModelItemIFC
     {
         private IfcObjectDefinition _IFCObjectDefinition;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Событие изменения элемента
-        /// </summary>
-        /// <param name="PropertyName"></param>
-        protected virtual void OnPropertyChanged(string PropertyName = null)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-            }
-        }
-
         public event EventHandler<PropertyReferenceChangedEventArg> PropertyReferenceChanged;
 
-
-        private bool _IsFocusReference { get; set; } = false;
-        /// <summary>
-        /// Фокус элемента
-        /// </summary>
-        public bool IsFocusReference
-        {
-            get { return _IsFocusReference; }
-            set
-            {
-                _IsFocusReference = value;
-                OnPropertyChanged("IsFocusReference");
-            }
-        }
-
-        private bool _IsExpanded { get; set; } = false;
-        /// <summary>
-        /// IsExpanded
-        /// </summary>
-        public bool IsExpanded
-        {
-            get { return _IsExpanded; }
-            set
-            {
-                _IsExpanded = value;
-                OnPropertyChanged("IsExpanded");
-            }
-        }
-
-        private bool _IsSelected { get; set; } = false;
-        /// <summary>
-        /// IsSelected 
-        /// </summary>
-        public bool IsSelected
-        {
-            get { return _IsSelected; }
-            set
-            {
-                if (value)
-                {
-                    FontSize = 15;
-                }
-                else
-                {
-                    FontSize = 12;
-                }
-
-                _IsSelected = value;
-                OnPropertyChanged("IsSelected");
-            }
-        }
-
-
-        private int _FontSize { get; set; } = 12;
-        /// <summary>
-        /// IsSelected 
-        /// </summary>
-        public int FontSize
-        {
-            get { return _FontSize; }
-            set
-            {
-                _FontSize = value;
-                OnPropertyChanged("FontSize");
-            }
-        }
 
         /// <summary>
         /// Прокидываем по дереву вверх состояние элемента
@@ -127,15 +48,7 @@ namespace IFC_Table_View.IFC.ModelItem
             get { return _IsContainPropertyReference; }
             set
             {
-                ////Изменяем цвет маркера НЕ НАДО МЕНЯЕТСЯ ЧЕРЕЗ СОБЫТИЕ
-                //if (value)
-                //{
-                //    _BrushImageForeground = System.Windows.Media.Brushes.Green;
-                //}
-                //else
-                //{
-                //    _BrushImageForeground = System.Windows.Media.Brushes.DarkRed;
-                //}
+
                 _IsContainPropertyReference = value;
             }
         }
@@ -190,6 +103,8 @@ namespace IFC_Table_View.IFC.ModelItem
                 }
             }
         }
+
+
         
         ModelObjectHelper modelHelper;
 
@@ -306,7 +221,7 @@ namespace IFC_Table_View.IFC.ModelItem
         /// <summary>
         /// Получение элемента вложенного дерева
         /// </summary>
-        public object ItemTreeView
+        public override object ItemTreeView
         {
             get
             {
@@ -325,7 +240,7 @@ namespace IFC_Table_View.IFC.ModelItem
         /// <summary>
         /// Свойства элемента
         /// </summary>
-        public Dictionary<string, HashSet<object>> PropertyElement
+        public override Dictionary<string, HashSet<object>> PropertyElement
         {
             get
             {
@@ -351,22 +266,22 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        private ObservableCollection<IModelItemIFC> _ModelItems;
+        private ObservableCollection<BaseModelItemIFC> _ModelItems;
         /// <summary>
         /// Элемент дерева
         /// </summary>
-        public ObservableCollection<IModelItemIFC> ModelItems
+        public override ObservableCollection<BaseModelItemIFC> ModelItems
         {
             get
             {
                 if (_ModelItems == null)
                 {
-                    _ModelItems = new ObservableCollection<IModelItemIFC>();
+                    _ModelItems = new ObservableCollection<BaseModelItemIFC>();
                 }
                 return _ModelItems;
             }
         }
-    
+
     }
 
 
@@ -377,11 +292,11 @@ namespace IFC_Table_View.IFC.ModelItem
     /// </summary>
     class ModelObjectHelper
     {
-        IfcObjectDefinition IFCObjectDefinition;
+        IfcObjectDefinition ifcObjectDefinition;
 
         public ModelObjectHelper(IfcObjectDefinition IFCObjectDefinition)
         {
-            this.IFCObjectDefinition = IFCObjectDefinition;
+            this.ifcObjectDefinition = IFCObjectDefinition;
         }
 
         #region Заполнение свойств элемента
@@ -389,13 +304,13 @@ namespace IFC_Table_View.IFC.ModelItem
         {
 
             Dictionary<string, HashSet<object>> PropertyElement = new Dictionary<string, HashSet<object>>();
-            if (this.IFCObjectDefinition == null)
+            if (this.ifcObjectDefinition == null)
             { 
                 return PropertyElement; 
             }
 
             //Материал
-            if (IFCObjectDefinition is IfcElement IFCElement)
+            if (ifcObjectDefinition is IfcElement IFCElement)
             {
                 IfcMaterialSelect ifcMaterialSelect = IFCElement.MaterialSelect();
 
@@ -475,23 +390,30 @@ namespace IFC_Table_View.IFC.ModelItem
                 }
             }
 
-            if (IFCObjectDefinition.Description != string.Empty)
+            if (ifcObjectDefinition.Description != string.Empty)
             {
-                PropertyElement.Add("Описание", new HashSet<object>() { IFCObjectDefinition.Description });
+                PropertyElement.Add("Описание", new HashSet<object>() { ifcObjectDefinition.Description });
             }
 
             //Вложенные объекты
             HashSet<object> listobjectIsNestedBy = new HashSet<object>();
-            foreach (IfcRelNests relNest in IFCObjectDefinition.IsNestedBy)
+            foreach (IfcRelNests relNest in ifcObjectDefinition.IsNestedBy)
             {
                 foreach (IfcObjectDefinition obj in relNest.RelatedObjects)
                 {
-                    listobjectIsNestedBy.Add(
-                        $"Наименование связи: {relNest.Name}\n" +
-                        $"Описание связи: {relNest.Description}\n" +
-                        $"Наименование элемента: {obj.Name}\n" +
-                        $"Класс IFC: {obj.GetType().Name}\n" +
-                        $"GUID: {obj.Guid}");
+                    if (obj == ifcObjectDefinition)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        listobjectIsNestedBy.Add(
+                            $"Наименование связи: {relNest.Name}\n" +
+                            $"Описание связи: {relNest.Description}\n" +
+                            $"Наименование элемента: {obj.Name}\n" +
+                            $"Класс IFC: {obj.GetType().Name}\n" +
+                            $"GUID: {obj.Guid}");
+                    }
                 }
             }
             if (listobjectIsNestedBy.Count > 0)
@@ -501,16 +423,23 @@ namespace IFC_Table_View.IFC.ModelItem
 
             //Разлагается на объекты
             HashSet<object> listobjectIsDecomposedBy = new HashSet<object>();
-            foreach (IfcRelAggregates relDecomp in IFCObjectDefinition.IsDecomposedBy)
+            foreach (IfcRelAggregates relDecomp in ifcObjectDefinition.IsDecomposedBy)
             {
                 foreach (IfcObjectDefinition obj in relDecomp.RelatedObjects)
                 {
-                    listobjectIsDecomposedBy.Add(
-                        $"Наименование связи: {relDecomp.Name}\n" +
-                        $"Описание связи: {relDecomp.Description}\n" +
-                        $"Наименование элемента: {obj.Name}\n" +
-                        $"Класс IFC: {obj.GetType().Name}\n" +
-                        $"GUID: {obj.Guid}");
+                    if (obj == ifcObjectDefinition)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        listobjectIsDecomposedBy.Add(
+                            $"Наименование связи: {relDecomp.Name}\n" +
+                            $"Описание связи: {relDecomp.Description}\n" +
+                            $"Наименование элемента: {obj.Name}\n" +
+                            $"Класс IFC: {obj.GetType().Name}\n" +
+                            $"GUID: {obj.Guid}");
+                    }
                 }
             }
             if (listobjectIsDecomposedBy.Count > 0)
@@ -518,7 +447,7 @@ namespace IFC_Table_View.IFC.ModelItem
                 PropertyElement.Add("Раскладывается на объекты (IsDecomposedBy)", listobjectIsDecomposedBy);
             }
 
-            if (IFCObjectDefinition is IfcObject IFCObject)
+            if (ifcObjectDefinition is IfcObject IFCObject)
             {
 
 
@@ -529,41 +458,56 @@ namespace IFC_Table_View.IFC.ModelItem
                 }
 
                 //Связанные объекты
-                HashSet<object> listobjectIsDefinedBy = new HashSet<object>();
+                HashSet<object> listObjectIsDefinedBy = new HashSet<object>();
                 foreach (IfcRelDefinesByProperties relDef in IFCObject.IsDefinedBy)
                 {
                     foreach (IfcObjectDefinition obj in relDef.RelatedObjects)
                     {
-                        listobjectIsDefinedBy.Add(
+                        if (obj == ifcObjectDefinition)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            listObjectIsDefinedBy.Add(
                             $"Наименование связи: {relDef.Name}\n" +
                             $"Описание связи: {relDef.Description}\n" +
                             $"Наименование элемента: {obj.Name}\n" +
                             $"Класс IFC: {obj.GetType().Name}\n" +
                             $"GUID: {obj.Guid}");
+                        }
+
                     }
                 }
 
-                if (listobjectIsDefinedBy.Count > 0)
+                if (listObjectIsDefinedBy.Count > 0)
                 {
-                    PropertyElement.Add("Связанные объекты (IsDefinedBy)", listobjectIsDefinedBy);
+                    PropertyElement.Add("Связанные объекты (IsDefinedBy)", listObjectIsDefinedBy);
                 }
             }
 
             //Содержит объекты
             HashSet<object> listObjectContainElement = new HashSet<object>();
 
-            if (IFCObjectDefinition is IfcSpatialStructureElement IFCStrElem)
+            if (ifcObjectDefinition is IfcSpatialStructureElement IFCStrElem)
             {
                 foreach (IfcRelContainedInSpatialStructure spartialStucture in IFCStrElem.ContainsElements)
                 {
                     foreach (IfcProduct obj in spartialStucture.RelatedElements)
                     {
-                        listObjectContainElement.Add(
+                        if (obj == ifcObjectDefinition)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            listObjectContainElement.Add(
                             $"Наименование связи: {spartialStucture.Name}\n" +
                             $"Описание связи: {spartialStucture.Description}\n" +
                             $"Наименование элемента: {obj.Name}\n" +
                             $"Класс IFC: {obj.GetType().Name}\n" +
                             $"GUID: {obj.Guid} ");
+                        }
                     }
                 }
             }
@@ -581,12 +525,12 @@ namespace IFC_Table_View.IFC.ModelItem
         #region Заполнение характеристик элемента
         public bool FillCollectionPropertySet(ObservableCollection<IfcPropertySetDefinition> CollectionPropertySet)
         {
-            if (this.IFCObjectDefinition == null)
+            if (this.ifcObjectDefinition == null)
             {
                 return false;
             }
 
-            if (IFCObjectDefinition is IfcObject obj)
+            if (ifcObjectDefinition is IfcObject obj)
             {
                 CollectionPropertySet.Clear();
 

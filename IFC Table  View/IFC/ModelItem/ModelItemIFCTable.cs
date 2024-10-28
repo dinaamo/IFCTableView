@@ -15,26 +15,15 @@ using Microsoft.Win32;
 using System.Reflection;
 using System.Xml.Linq;
 using System.ComponentModel;
+using System.Windows;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
-    public class ModelItemIFCTable : IModelItemIFC, INotifyPropertyChanged
+    public class ModelItemIFCTable : BaseModelItemIFC
     {
         public IfcTable IFCTable { get; private set; }
 
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        /// <summary>
-        /// Событие изменения элемента
-        /// </summary>
-        /// <param name="PropertyName"></param>
-        protected virtual void OnPropertyChanged(string PropertyName = null)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-            }
-        }
 
         public ModelItemIFCTable(IfcTable IFCTable)
         {
@@ -44,24 +33,11 @@ namespace IFC_Table_View.IFC.ModelItem
         }
 
 
-        private bool _IsFocusReference { get; set; } = false;
-        /// <summary>
-        /// Фокус элемента
-        /// </summary>
-        public bool IsFocusReference
-        {
-            get { return _IsFocusReference; }
-            set
-            {
-                _IsFocusReference = value;
-                OnPropertyChanged("IsFocusReference");
-            }
-        }
 
         /// <summary>
         /// Коллекция ссылок на объекты
         /// </summary>
-        public Dictionary<string, HashSet<object>> PropertyElement
+        public override Dictionary<string, HashSet<object>> PropertyElement
         {
             get
             {
@@ -89,7 +65,7 @@ namespace IFC_Table_View.IFC.ModelItem
             _PropertyElement["Ссылки на объекты"].Remove(deleteReferenceObject);
         }
 
-        public object ItemTreeView
+        public override object ItemTreeView
         {
             get
             {
@@ -113,7 +89,7 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public DataTable dataTable { get; private set; }
 
-        public ObservableCollection<IModelItemIFC> ModelItems => null;
+        public override ObservableCollection<BaseModelItemIFC> ModelItems => null;
 
         //public bool t => throw new NotImplementedException();
 

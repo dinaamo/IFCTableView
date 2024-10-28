@@ -22,7 +22,7 @@ namespace IFC_Table_View.IFC.ModelIFC
     { 
         private DatabaseIfc DataBase = null;
 
-        public ObservableCollection<IModelItemIFC> ModelItems { get; private set; }
+        public ObservableCollection<BaseModelItemIFC> ModelItems { get; private set; }
 
         public string FilePath
         {
@@ -123,7 +123,7 @@ namespace IFC_Table_View.IFC.ModelIFC
         /// </summary>
         private void FillCollectionModelItem()
         {
-            ModelItems = new ObservableCollection<IModelItemIFC>();
+            ModelItems = new ObservableCollection<BaseModelItemIFC>();
 
 
             //Добавляем в дерево первым элементом файл 
@@ -138,7 +138,7 @@ namespace IFC_Table_View.IFC.ModelIFC
             CreationHierarchyIFCObjects(FileItem.Project, FileItem.ModelItems, null);
 
             //После того как составили дерево объектов к нему добавляем таблицы 
-            foreach (IModelItemIFC tableItem in tempTableItemSet)
+            foreach (BaseModelItemIFC tableItem in tempTableItemSet)
             {
                 FileItem.ModelItems.Add(tableItem);
             }
@@ -151,7 +151,7 @@ namespace IFC_Table_View.IFC.ModelIFC
         /// <param name="objDef"></param>
         /// <param name="collection"></param>
         /// <param name="topElement"></param>
-        private void CreationHierarchyIFCObjects(IfcObjectDefinition objDef, ObservableCollection<IModelItemIFC> collection, ModelItemIFCObject topElement)
+        private void CreationHierarchyIFCObjects(IfcObjectDefinition objDef, ObservableCollection<BaseModelItemIFC> collection, ModelItemIFCObject topElement)
         {
             ModelItemIFCObject nestItem = new ModelItemIFCObject(objDef, topElement);
 
@@ -274,7 +274,7 @@ namespace IFC_Table_View.IFC.ModelIFC
 
             ObservableCollection<ModelItemIFCTable> tempTableItemSet = AddIFCTables(new List<IfcTable>() { ifcTable });
 
-            foreach (IModelItemIFC tableItem in tempTableItemSet)
+            foreach (BaseModelItemIFC tableItem in tempTableItemSet)
             {
                 FileItem.ModelItems.Add(tableItem);
             }

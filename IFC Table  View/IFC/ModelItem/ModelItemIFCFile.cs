@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
-    public class ModelItemIFCFile : IModelItemIFC
+    public class ModelItemIFCFile : BaseModelItemIFC
     {
         private DatabaseIfc database;
 
@@ -17,7 +18,7 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public IfcProject Project => database.Project;
 
-        public object ItemTreeView
+        public override object ItemTreeView
         {
             get
             {
@@ -25,7 +26,7 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        public Dictionary<string, HashSet<object>> PropertyElement
+        public override Dictionary<string, HashSet<object>> PropertyElement
         {
             get
             {
@@ -49,18 +50,19 @@ namespace IFC_Table_View.IFC.ModelItem
             };
         }
 
-        private ObservableCollection<IModelItemIFC> _ModelItems;
+        private ObservableCollection<BaseModelItemIFC> _ModelItems;
 
-        public ObservableCollection<IModelItemIFC> ModelItems
+        public override ObservableCollection<BaseModelItemIFC> ModelItems
         {
             get
             {
                 if (_ModelItems == null)
                 {
-                    _ModelItems = new ObservableCollection<IModelItemIFC>();
+                    _ModelItems = new ObservableCollection<BaseModelItemIFC>();
                 }
                 return _ModelItems;
             }
         }
+
     }
 }

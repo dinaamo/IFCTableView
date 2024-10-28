@@ -121,35 +121,7 @@ namespace IFC_Table_View.ViewModels
 
         #endregion
 
-        #region Обговление дерева
-        //void UpdateTreeView()
-        //{           
-        //    TreeViewItem topElement = mainWindow.treeViewIFC.ItemContainerGenerator.ContainerFromItem(mainWindow.treeViewIFC.Items[0]) as TreeViewItem;
-            
-        //    TreeViewItem secondTreeViewElement = topElement.ItemContainerGenerator.ContainerFromItem(topElement.Items[0]) as TreeViewItem;
-
-        //    while (secondTreeViewElement == null)
-        //    {
-        //        Thread.Sleep(200);
-        //        secondTreeViewElement = topElement.ItemContainerGenerator.ContainerFromItem(topElement.Items[0]) as TreeViewItem;
-        //    }
-
-        //    secondTreeViewElement = topElement.ItemContainerGenerator.ContainerFromItem(topElement.Items[0]) as TreeViewItem;
-
-        //    mainWindow.Dispatcher.BeginInvoke(() =>
-        //    {
-        //        secondTreeViewElement.IsExpanded = false;
-        //    });
-        //    mainWindow.Dispatcher.BeginInvoke(() =>
-        //    {
-        //        topElement.IsExpanded = false;
-        //    });
-        //}
-
- 
-
-
-        #endregion
+     
 
         #region Комманды
 
@@ -310,7 +282,7 @@ namespace IFC_Table_View.ViewModels
             {
                 return false;
             }
-            else if(((IModelItemIFC)o)?.ItemTreeView is IfcTable Table)
+            else if(((BaseModelItemIFC)o)?.ItemTreeView is IfcTable Table)
             {
                 return true;
             }
@@ -321,7 +293,7 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        #region Добавить к таблице связь с элементом
+        #region Добавить к элементу связь с таблицей 
         public ICommand AddReferenceToTheTable { get; }
 
         private void OnAddReferenceToTheTable(object o)
@@ -331,7 +303,7 @@ namespace IFC_Table_View.ViewModels
             {
 
                 List<ModelItemIFCTable> collectionModelTable = mainWindow.treeViewIFC.ItemsSource.
-                                                Cast<IModelItemIFC>().
+                                                Cast<BaseModelItemIFC>().
                                                 ToList()[0].
                                                 ModelItems.
                                                 OfType<ModelItemIFCTable>().
@@ -377,7 +349,7 @@ namespace IFC_Table_View.ViewModels
                 form_Delete_Reference_To_Table.ShowDialog();
 
                 List<ModelItemIFCTable> collectionModelTable = mainWindow.treeViewIFC.ItemsSource.
-                                                Cast<IModelItemIFC>().
+                                                Cast<BaseModelItemIFC>().
                                                 ToList()[0].
                                                 ModelItems.
                                                 OfType<ModelItemIFCTable>().
@@ -424,6 +396,39 @@ namespace IFC_Table_View.ViewModels
         }
 
         private bool CanOpenHelpCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
+        #region Действие с раскрывающимися списками
+        public ICommand ActionExpanders { get; }
+
+        private void OnActionExpandedCommandExecuted(object o)
+        {
+            if (IsExpandedPropertySet)
+            {
+                IsExpandedPropertySet = false;
+            }
+            else
+            {
+                IsExpandedPropertySet = true;
+            }
+        }
+
+        private bool _IsExpandedPropertySet { get; set; }
+        public bool IsExpandedPropertySet
+        {
+            get { return _IsExpandedPropertySet; }
+            set
+            {
+                _IsExpandedPropertySet = value;
+                OnPropertyChanged("IsExpandedPropertySet");
+            }
+        }
+
+
+        private bool CanActionExpandedCommandExecute(object o)
         {
             return true;
         }
@@ -483,6 +488,10 @@ namespace IFC_Table_View.ViewModels
             OpenHelp = new ActionCommand(
                 OnOpenHelpCommandExecuted,
                 CanOpenHelpCommandExecute);
+
+            ActionExpanders = new ActionCommand(
+                OnActionExpandedCommandExecuted,
+                CanActionExpandedCommandExecute);
             #endregion
         }
 

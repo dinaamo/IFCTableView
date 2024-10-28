@@ -88,10 +88,16 @@
                 <ColumnDefinition Width="102*" />
                 <ColumnDefinition Width="400*" />
             </Grid.ColumnDefinitions>
+
             <GridSplitter
-                Grid.Column="1"
-                Width="6"
-                HorizontalAlignment="Center" />
+                    Grid.Column="1"
+                        Width="6"
+                    HorizontalAlignment="Center" >
+                
+            </GridSplitter>
+                
+            
+            
 
 
             <GroupBox
@@ -122,24 +128,32 @@
                             <TextBlock Text="Сведения" />
                         </StackPanel>
                     </TabItem.Header>
+                    
+                   
 
-                    <DockPanel>
+                    <DockPanel  >
+                        <Button Style="{StaticResource RoundButton}" DockPanel.Dock="Top" VerticalAlignment="Top" Name="ButtonProperty">
+
+                        </Button>
+
+
                         <ListBox
+                            DockPanel.Dock="Top"
                             Name="PrIt"
                             Margin="0,0,25,0"
-                            DockPanel.Dock="Top"
                             Visibility="Hidden" />
                         <ListView
                             Name="PropertItemyListBox"
                             Margin="0,0,0,0"
                             Background="Transparent"
                             BorderThickness="0"
-                            DockPanel.Dock="Bottom"
                             ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvItemIFC}}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
 
-                                    <Expander MaxHeight="500">
+                                    <Expander MaxHeight="500" IsExpanded="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                                    AncestorType={x:Type Window}}, Path=DataContext.IsExpandedPropertySet, Mode=TwoWay, UpdateSourceTrigger=Explicit}">
+                                    <!--<Expander MaxHeight="500" IsExpanded="{Binding ElementName=ButtonProperty, Path=IsPressed, Mode=OneWay}">-->
                                         <Expander.Header>
                                             <TextBlock Text="{Binding Path=Key}" />
                                         </Expander.Header>
@@ -172,7 +186,7 @@
                         </ListView>
 
                     </DockPanel>
-
+                    
                 </TabItem>
 
 
@@ -200,49 +214,58 @@
                     </TabItem.Style>
 
 
-                    <DockPanel>
+
+                    <DockPanel >
+                        <Button Style="{StaticResource RoundButton}" DockPanel.Dock="Top" VerticalAlignment="Top" Name="ButtonPropertySet"/>
                         <ListBox
                             Name="PrSet"
                             Margin="30,0,30,0"
                             DockPanel.Dock="Top"
                             Visibility="Hidden" />
+
                         <Grid
-                            Width="{Binding ElementName=PrSet, Path=ActualWidth}"
-                            Margin="0,0,30,0"
-                            DockPanel.Dock="Top">
+                                        Width="{Binding ElementName=PrSet, Path=ActualWidth}"
+                                        DockPanel.Dock="Top"
+                                        Margin="0,0,30,0">
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                Text="Наименование" />
+
+                            <TextBlock Text="Наименование" Grid.Column="0" HorizontalAlignment="Center"/>
+
                             <GridSplitter
-                                Grid.Column="1"
-                                Width="2"
-                                IsEnabled="False" />
+                                        Grid.Column="1"
+                                        Width="2"
+                                        IsEnabled="False" />
                             <TextBlock
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                Text="Значение" />
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Center"
+                                        Text="Значение" />
                         </Grid>
+
+
+
                         <ListView
                             Name="PropertyListBox"
                             Margin="0"
                             Background="Transparent"
                             BorderThickness="0"
-                            DockPanel.Dock="Bottom"
+                            
                             ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvPropSet}}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
 
-                                    <Expander>
+                                    <Expander Name="ExpanderPropertSet" IsExpanded="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                                    AncestorType={x:Type Window}}, Path=DataContext.IsExpandedPropertySet, Mode=TwoWay, UpdateSourceTrigger=Explicit}">
+                                    <!--<Expander MaxHeight="500" IsExpanded="{Binding ElementName=ButtonPropertySet, Path=IsPressed, Mode=OneWay}">-->
 
-                                        <Expander.Header>
+                                            <Expander.Header>
                                             <TextBlock Text="{Binding Path=Name}" />
                                         </Expander.Header>
+
                                         <ListBox
                                             Grid.Column="0"
                                             MaxHeight="300"
@@ -297,6 +320,7 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </DockPanel>
+
                 </TabItem>
 
 

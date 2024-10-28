@@ -5,6 +5,7 @@ using IFC_Table_View.View.Windows;
 using IFC_Table_View.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,8 +17,22 @@ namespace IFC_Table_View
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Событие изменения элемента
+        /// </summary>
+        /// <param name = "PropertyName" ></ param >
+        protected virtual void OnPropertyChanged(string PropertyName = null)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+            }
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -25,7 +40,7 @@ namespace IFC_Table_View
         }
 
         /// <summary>
-        /// Двойной клик на ссылке на таблицу
+        /// Двойной клик
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -50,7 +65,7 @@ namespace IFC_Table_View
 
                         try
                         {
-                            IEnumerable<ModelItemIFCObject> secondLevelCollection = ((IModelItemIFC)treeViewIFC.Items[0]).ModelItems.
+                            IEnumerable<ModelItemIFCObject> secondLevelCollection = ((BaseModelItemIFC)treeViewIFC.Items[0]).ModelItems.
                                 OfType<ModelItemIFCObject>();
 
                             foreach (ModelItemIFCObject modelObject in secondLevelCollection)
@@ -104,8 +119,6 @@ namespace IFC_Table_View
 
         }
 
-
-
         //Обработка события потери фокуса мыши
         private void IsMouseLostFocus(object sender, MouseEventArgs e)
         {
@@ -121,7 +134,7 @@ namespace IFC_Table_View
                 {
                     IfcPropertyReferenceValue PropertyRefVa = pairPropertyRefVal.Value as IfcPropertyReferenceValue;
 
-                    ObservableCollection<IModelItemIFC> collectionObjectModel = treeViewIFC.ItemsSource as ObservableCollection<IModelItemIFC>;
+                    ObservableCollection<BaseModelItemIFC> collectionObjectModel = treeViewIFC.ItemsSource as ObservableCollection<BaseModelItemIFC>;
 
                     ModelItemIFCTable targetModelTable = collectionObjectModel[0].ModelItems.
                                                                     OfType<ModelItemIFCTable>().
@@ -148,7 +161,7 @@ namespace IFC_Table_View
                 {
                     IfcPropertyReferenceValue PropertyRefVa = pairPropertyRefVal.Value as IfcPropertyReferenceValue;
 
-                    ObservableCollection<IModelItemIFC> collectionObjectModel = treeViewIFC.ItemsSource as ObservableCollection<IModelItemIFC>;
+                    ObservableCollection<BaseModelItemIFC> collectionObjectModel = treeViewIFC.ItemsSource as ObservableCollection<BaseModelItemIFC>;
 
                     ModelItemIFCTable targetModelTable = collectionObjectModel[0].ModelItems.
                                                                     OfType<ModelItemIFCTable>().
@@ -163,5 +176,9 @@ namespace IFC_Table_View
             }
         }
 
+        public void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

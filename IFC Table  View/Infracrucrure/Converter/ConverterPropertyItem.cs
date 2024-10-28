@@ -15,7 +15,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IModelItemIFC elementFile)
+            if (value is BaseModelItemIFC elementFile)
             {
                 return elementFile?.PropertyElement;
             }
