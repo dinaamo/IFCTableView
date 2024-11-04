@@ -44,20 +44,18 @@ namespace IFC_Table_View.ViewModels
             get => _FontSizeTable;
             set 
             {
-                //if (value < 10)
-                //{
-                //    _FontSizeTable = 10;
-                //}
-                //else if (value > 30)
-                //{
-                //    _FontSizeTable = 30;
-                //}
-                //else
-                //{
-                //    _FontSizeTable = value;
-                //}
-
-                Set(ref _FontSizeTable, value);
+                if (value < 10)
+                {
+                    Set(ref _FontSizeTable, 10);
+                }
+                else if (value > 30)
+                {
+                    Set(ref _FontSizeTable, 30);
+                }
+                else
+                {
+                    Set(ref _FontSizeTable, value);
+                }
             }
         }
 

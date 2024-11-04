@@ -1,43 +1,179 @@
-﻿<Window x:Class="IFC_Table_View.View.Windows.SearchWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:IFC_Table_View.View.Windows"
-        mc:Ignorable="d"
-        Title="SearchWindow" Height="auto" MaxHeight="500" Width="auto">
+﻿<Window
+    x:Class="IFC_Table_View.View.Windows.SearchWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
+    xmlns:local="clr-namespace:IFC_Table_View.View.Windows"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:IFC_Table_View.ViewModels"
+    Title="Поиск элементов"
+    Width="800"
+    Height="auto"
+    Icon="{StaticResource ResourceKey=Search_Image}"
+    mc:Ignorable="d">
+
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Vertical" Margin="10,0,10,0">
-                    <TextBlock Text="Класс IFC" HorizontalAlignment="Center"/>
-                    <ComboBox  DockPanel.Dock="Bottom" MinWidth ="200"/>
-                </StackPanel>
 
-                <StackPanel Orientation="Vertical" Margin="10,0,10,0">
-                    <TextBlock Text="Имя Элемента" HorizontalAlignment="Center"/>
-                    <ComboBox  DockPanel.Dock="Bottom" MinWidth ="200"/>
-                </StackPanel>
+        <DockPanel Margin="7">
+            <GroupBox DockPanel.Dock="Top" Header="Критерии поиска" Padding="2">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5,0,0,0">
 
-                <StackPanel Orientation="Vertical" Margin="10,0,10,0">
-                    <TextBlock Text="Набор характкристик" HorizontalAlignment="Center"/>
-                    <ComboBox  DockPanel.Dock="Bottom" MinWidth ="200"/>
-                </StackPanel>
+                <StackPanel
+                    Width="{Binding ElementName=col0, Path=ActualWidth}"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical">
+                    <TextBlock HorizontalAlignment="Center" Text="GUID" />
+                        <ComboBox 
+                                
+                                TextBoxBase.TextChanged="OnComboboxTextChanged"
+                                IsEditable="True"
+                                IsTextSearchEnabled="False"/>
+                    </StackPanel>
 
-                <StackPanel Orientation="Vertical" Margin="10,0,10,0">
-                    <TextBlock Text="Параметр" HorizontalAlignment="Center"/>
-                    <ComboBox  DockPanel.Dock="Bottom" MinWidth ="200"/>
-                </StackPanel>
+                <StackPanel
+                    Width="{Binding ElementName=col1, Path=ActualWidth}"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical">
+                    <TextBlock HorizontalAlignment="Center" Text="Класс IFC" />
+                        <ComboBox 
+                                TextBoxBase.TextChanged="OnComboboxTextChanged"
+                                IsEditable="True"
+                                IsTextSearchEnabled="False"/>
+                    </StackPanel>
 
-                <StackPanel Orientation="Vertical" Margin="10,0,10,0">
-                    <TextBlock Text="Значение" HorizontalAlignment="Center"/>
-                    <ComboBox  DockPanel.Dock="Bottom" MinWidth ="200"/>
+                <StackPanel
+                    Width="{Binding ElementName=col2, Path=ActualWidth}"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical">
+                    <TextBlock HorizontalAlignment="Center" Text="Имя Элемента" />
+                        <ComboBox 
+                                TextBoxBase.TextChanged="OnComboboxTextChanged"
+                                IsEditable="True"
+                                IsTextSearchEnabled="False"/>   
+                    </StackPanel>
+
+                <StackPanel
+                    Width="{Binding ElementName=col3, Path=ActualWidth}"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Center" Text="Набор характкристик" />
+                            <ComboBox 
+                                    TextBoxBase.TextChanged="OnComboboxTextChanged"
+                                    IsEditable="True"
+                                    IsTextSearchEnabled="False"/>
+                    </StackPanel>
+
+                    <StackPanel
+                    Width="{Binding ElementName=col4, Path=ActualWidth}"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Center" Text="Параметр" />
+                            <ComboBox 
+                                    TextBoxBase.TextChanged="OnComboboxTextChanged"
+                                    IsEditable="True"
+                                    IsTextSearchEnabled="False"/>
+                    </StackPanel>
+
+                    <StackPanel
+                    Width="{Binding ElementName=col5, Path=ActualWidth}"
+                    Margin="0,0,0,0"
+                    Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Center" Text="Значение" />
+                            <ComboBox 
+                                    TextBoxBase.TextChanged="OnComboboxTextChanged"
+                                    IsEditable="True"
+                                    IsTextSearchEnabled="False"/>
                 </StackPanel>
             </StackPanel>
-            <DataGrid Height="auto">
+
                 
+            </GroupBox>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,10,0,10">
+                <TextBlock Text="Найдено элементов:  " VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=SearchItems.Count}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <GroupBox DockPanel.Dock="Top" Header="Элементы" Padding="2">
+            <DataGrid
+                DockPanel.Dock="Top"
+                x:Name="dgSearchElements"
+                Width="auto"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+
+                ItemsSource="{Binding Path=SearchItems}">
+                <DataGrid.Columns>
+
+
+                    <DataGridTextColumn
+                        x:Name="col0"
+                        Width="*"
+                        Binding="{Binding Path=GUID}"
+                        Header="GUID"
+                        Visibility="Visible" >
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn
+                        x:Name="col1"
+                        Width="*"
+                        Binding="{Binding Path=IFCClass}"
+                        Header="Класс IFC"
+                        Visibility="Visible" />
+                    <DataGridTextColumn
+                        x:Name="col2"
+                        Width="*"
+                        Binding="{Binding Path=Name}"
+                        Header="Имя Элемента"
+                        Visibility="Visible" />
+                    <DataGridTemplateColumn
+                        x:Name="col3"
+                        Width="*"
+                        Header="Набор характкристик"
+                        Visibility="Visible">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox 
+                                    ItemsSource="{Binding Path=PropertySetCollection}" 
+                                    DisplayMemberPath ="Name" 
+                                    SelectedIndex="0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        x:Name="col4"
+                        Width="*"
+                        Header="Параметр"
+                        Visibility="Visible">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox 
+                                    ItemsSource="{Binding Path=PropertiesName}" 
+                                    SelectedIndex="0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        x:Name="col5"
+                        Width="*"
+                        Header="Значение"
+                        Visibility="Visible" >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox 
+                                    ItemsSource="{Binding Path=Values}" 
+                                    SelectedIndex="0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" MaxWidth="200"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
             </DataGrid>
-        </StackPanel>
-        
+        </GroupBox>
+        </DockPanel>
     </Grid>
 </Window>

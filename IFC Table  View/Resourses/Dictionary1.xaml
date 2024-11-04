@@ -21,7 +21,7 @@
     <cnv:ConvertConvReferenceToObject x:Key="ConvertConvReferenceToObject" /> 
     <cnv:ConvertItemIFCNameProperty x:Key="ConvertItemIFCNameProperty" />
     <cnv:ConverterImageVisibility x:Key="ConvImageVisibility" />
-
+    <cnv:ConvertTest x:Key="ConvertTest" />
 
 
     <Style TargetType="{x:Type DataGrid}">
@@ -221,5 +221,6 @@
 
 
     <BitmapImage x:Key="RZDP_Image" UriSource="..\Images\RZDP_Image.png" />
+    <BitmapImage x:Key="Search_Image" UriSource="..\Images\Search_Image.png" />
 
 </ResourceDictionary>

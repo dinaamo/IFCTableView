@@ -63,14 +63,32 @@
             </MenuItem>
             <MenuItem Header="Поиск" Visibility="Visible">
                 <MenuItem
-                    Command="{Binding AddReferenceToTheTable}"
+                    Command="{Binding SearchElements}"
                     CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Найти элементы"/>
+                    Header="Найти элементы">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Visibility="{Binding Path=IsContainPropertyReferenceDownTree, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
+                            Icon="Search" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem
-                    Command="{Binding DeleteReferenceToTheTable}"
+                    Command="{Binding ResetSearch}"
                     CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Сбросить"/>
-</MenuItem>
+                    Header="Сбросить">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Visibility="{Binding Path=IsContainPropertyReferenceDownTree, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
+                            Icon="Refresh" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
             <MenuItem Header="Справка">
                 <MenuItem Command="{Binding OpenHelp}" Header="Справка по программе" />

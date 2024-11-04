@@ -56,6 +56,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
                 {
                     value = ifcPairPhysicalQuantity.Value;
                 }
+
                 if (value is IfcPropertySingleValue ifcValue)
                 {
                     return System.Convert.ToString(ifcValue?.NominalValue?.ValueString);

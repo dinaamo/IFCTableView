@@ -58,7 +58,29 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
- 
+        #region Выборка элементов
+        private List<BaseModelItemIFC> SelectionElements(BaseModelItemIFC modelItem)
+        {
+            List< BaseModelItemIFC > list = new List< BaseModelItemIFC >();
+
+            if (!(modelItem is ModelItemIFCFile) && !(modelItem is ModelItemIFCTable))
+            {
+                list.Add(modelItem);
+            }
+
+            if (modelItem.ModelItems != null)
+            {
+                foreach (BaseModelItemIFC nestModelItem in modelItem.ModelItems)
+                {
+                    list.AddRange(SelectionElements(nestModelItem));
+                }
+            }
+            return list;
+
+        }
+
+        #endregion
+
 
         #region Дерево элементов
         private ObservableCollection<ModelItemIFCTable> _ModelItems;
@@ -471,13 +493,23 @@ namespace IFC_Table_View.ViewModels
 
         private void OnSearchElementsCommandExecuted(object o)
         {
-
+            if (o is BaseModelItemIFC modelItem)
+            {
+                new SearchWindow(SelectionElements(modelItem)).Show();
+            }   
         }
 
 
         private bool CanSearchElementsCommandExecute(object o)
         {
-            return true;
+            if (o is BaseModelItemIFC)
+            {
+                return true;
+            }
+            else
+            {
+                return false; 
+            }
         }
         #endregion
 
@@ -492,7 +524,14 @@ namespace IFC_Table_View.ViewModels
 
         private bool CanResetSearchCommandExecute(object o)
         {
-            return true;
+            if (o is BaseModelItemIFC)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         #endregion
 
