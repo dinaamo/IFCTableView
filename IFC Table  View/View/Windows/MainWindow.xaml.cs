@@ -6,9 +6,13 @@ using IFC_Table_View.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -17,33 +21,18 @@ namespace IFC_Table_View
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /// <summary>
-        /// Событие изменения элемента
-        /// </summary>
-        /// <param name = "PropertyName" ></ param >
-        protected virtual void OnPropertyChanged(string PropertyName = null)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-            }
-        }
         public MainWindow()
         {
             InitializeComponent();
 
         }
 
-        /// <summary>
         /// Двойной клик
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount >= 2)
@@ -55,14 +44,13 @@ namespace IFC_Table_View
                         if (property.Value is IfcPropertyReferenceValue propertyRefVal)
                         {
                             if (propertyRefVal.PropertyReference is IfcTable ifcTable)
-                            {
-                                new WindowTable(ifcTable).ShowDialog();
+                            {  
+                                new TableWindow(ifcTable).ShowDialog();
                             }
                         }
                     }
-                    else if (textBlock.DataContext is ModelItemIFCObject findModelObject)
+                    else if (textBlock.DataContext is ModelItemIFCObject searchModelObject)
                     {
-
                         try
                         {
                             IEnumerable<ModelItemIFCObject> secondLevelCollection = ((BaseModelItemIFC)treeViewIFC.Items[0]).ModelItems.
@@ -71,27 +59,22 @@ namespace IFC_Table_View
                             foreach (ModelItemIFCObject modelObject in secondLevelCollection)
                             {
                                 modelObject.IsExpanded = true;
-                                FindTreeViewItem(modelObject, findModelObject);
+                                FindTreeObject(modelObject, searchModelObject);
                             }
                         }
-                        catch (FindObjectException find)
+                        catch (FindObjectException findObj)
                         {
-                            find.FindObject.IsSelected = true;
-                            find.FindObject.IsFocusReference = false;
+                            findObj.FindObject.IsSelected = true;
+                            findObj.FindObject.IsFocusReference = false;
                         }
+
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// Ищем элемент в дереве
-        /// </summary>
-        /// <param name="topElement"></param>
-        /// <param name="findObject"></param>
-        /// <returns></returns>
-        /// <exception cref="FindObjectException"></exception>
-        private void FindTreeViewItem(ModelItemIFCObject topElement, ModelItemIFCObject findObject)
+        /// Ищем элемент в дереве по контексту
+        private void FindTreeObject(ModelItemIFCObject topElement, ModelItemIFCObject findObject)
         {
             foreach (ModelItemIFCObject item in topElement.ModelItems)
             {
@@ -104,21 +87,17 @@ namespace IFC_Table_View
             foreach (ModelItemIFCObject item in topElement.ModelItems)
             {
                 item.IsExpanded = true;
-                FindTreeViewItem(item, findObject);
+                FindTreeObject(item, findObject);
             }
         }
 
-        /// <summary>
         /// Загрузка формы
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MainWindowIFC_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = new MainWindowViewModel(this);
 
         }
-
+        
         //Обработка события потери фокуса мыши
         private void IsMouseLostFocus(object sender, MouseEventArgs e)
         {
@@ -176,9 +155,48 @@ namespace IFC_Table_View
             }
         }
 
-        public void Button_Click(object sender, RoutedEventArgs e)
+        private void SetColumnStyle()
         {
-
+            Style columnStyle = new Style(typeof(TextBlock));
+            columnStyle.Setters.Add(new Setter(
+                                                TextBlock.TextWrappingProperty,
+                                                TextWrapping.Wrap
+                                                ));
+            foreach (DataGridTextColumn column in dgTable.Columns)
+            {
+                column.ElementStyle = columnStyle;
+            }
         }
+        private void ResizeColumns()
+        {
+            foreach (var column in dgTable.Columns)
+            {
+                column.Width = DataGridLength.SizeToHeader;
+                double sizeToHeader = column.Width.DesiredValue;
+
+                column.Width = DataGridLength.SizeToCells;
+                double sizeToCells = column.Width.DesiredValue;
+
+                if (sizeToHeader > sizeToCells || sizeToCells < 50 || sizeToCells > 300)
+                {
+                    column.Width = DataGridLength.SizeToHeader;
+                }
+                else if (sizeToHeader < sizeToCells || sizeToHeader < 50 || sizeToHeader > 300)
+                {
+                    column.Width = DataGridLength.SizeToCells;
+                }
+                else
+                {
+                    column.Width = new DataGridLength(dgTable.Width / dgTable.Columns.Count, DataGridLengthUnitType.Auto);
+                }
+            }
+        }
+
+        private void dgTable_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            ResizeColumns();
+            SetColumnStyle();
+        }
+
     }
 }

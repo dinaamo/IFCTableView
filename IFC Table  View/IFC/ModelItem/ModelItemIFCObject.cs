@@ -1,5 +1,6 @@
 ﻿using GeometryGym.Ifc;
 using IFC_Table_View.Infracrucrure;
+using IFC_Table_View.Infracrucrure.Commands.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +8,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 
 namespace IFC_Table_View.IFC.ModelItem
@@ -17,61 +20,9 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public event EventHandler<PropertyReferenceChangedEventArg> PropertyReferenceChanged;
 
-
-        /// <summary>
-        /// Прокидываем по дереву вверх состояние элемента
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="e"></param>
-        public void ChangePropertyReference(object obj, PropertyReferenceChangedEventArg e)
-        {
-            if (IsContainPropertyReference == true || e.IsContainPropertyReference == true)
-            {
-                IsContainPropertyReference = true;
-                BrushImageForeground = System.Windows.Media.Brushes.Green;
-                PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(true));
-            }
-            else
-            {
-                IsContainPropertyReference = false;
-                BrushImageForeground = System.Windows.Media.Brushes.DarkRed;
-                PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(false));
-            }
-        }
-
-        public bool _IsContainPropertyReference { get; set; }
-        /// <summary>
-        /// Наличие в элементе ссылки на таблицы
-        /// </summary>
-        public bool IsContainPropertyReference
-        {
-            get { return _IsContainPropertyReference; }
-            set
-            {
-
-                _IsContainPropertyReference = value;
-            }
-        }
-
-        private Brush _BrushImageForeground = System.Windows.Media.Brushes.DarkRed;
-        /// <summary>
-        /// Кисть для маркера
-        /// </summary>
-        public Brush BrushImageForeground
-        {
-            get { return _BrushImageForeground; }
-            set
-            {
-                _BrushImageForeground = value;
-                OnPropertyChanged("BrushImageForeground");
-            }
-        }
-
         /// <summary>
         /// Конструктор
         /// </summary>
-        /// <param name="IFCObject"></param>
-        /// <param name="TopElement"></param>
         public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement)
         {
             //Если есть элемент выше по дереву то подключаем к нему обработчик события изменения состояния элемента
@@ -79,39 +30,17 @@ namespace IFC_Table_View.IFC.ModelItem
             {
                 PropertyReferenceChanged += TopElement.ChangePropertyReference;
             }
-           
+
             _IFCObjectDefinition = IFCObject;
 
 
-            InitializationElementModelObject();
+            InitializationModelObject();
         }
-
-        public void AddToTheTableReferenceElement(ObservableCollection<ModelItemIFCTable> tableItemSet)
-        {
-            IEnumerable<IfcPropertyReferenceValue> propertyReferenceSet = CollectionPropertySet?.OfType<IfcPropertySet>().
-                SelectMany(it => it.HasProperties.Values).
-                OfType<IfcPropertyReferenceValue>();
-
-            foreach (IfcPropertyReferenceValue propertyReference in propertyReferenceSet)
-            {
-                foreach (ModelItemIFCTable tableItem in tableItemSet)
-                {
-                    if (propertyReference.PropertyReference == tableItem.ItemTreeView as IfcTable)
-                    {
-                        tableItem.AddReferenceToTheElement(this);
-                    }
-                }
-            }
-        }
-
-
-        
-        ModelObjectHelper modelHelper;
 
         /// <summary>
         /// Инициализация элементов объекта модели
         /// </summary>
-        private void InitializationElementModelObject()
+        private void InitializationModelObject()
         {
             modelHelper = new ModelObjectHelper(_IFCObjectDefinition);
 
@@ -127,11 +56,134 @@ namespace IFC_Table_View.IFC.ModelItem
 
             if (countPropRef > 0)
             {
-                ChangePropertyReference(this, new PropertyReferenceChangedEventArg(true));
+                IsContainPropertyReference = true;
             }
             else
             {
-                ChangePropertyReference(this, new PropertyReferenceChangedEventArg(false));
+                IsContainPropertyReference = false;
+            }
+
+            PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReference));
+        }
+
+        /// <summary>
+        /// Прокидываем по дереву вверх состояние элемента
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="e"></param>
+        public void ChangePropertyReference(object obj, PropertyReferenceChangedEventArg e)
+        {
+            if (e.IsContainPropertyDownTreeReference)
+            {
+                IsContainPropertyReferenceDownTree = true;
+            }
+            else if (!e.IsContainPropertyDownTreeReference)
+            {
+                bool searchResult = ModelItems.
+                        Cast<ModelItemIFCObject>().
+                        Select(mi => mi.IsContainPropertyReferenceValue()).Any(pr => pr == true);
+
+                if (searchResult)
+                {
+                    IsContainPropertyReferenceDownTree = true;
+                }
+                else
+                {
+                    IsContainPropertyReferenceDownTree = false;
+                }
+            }
+            else
+            {
+                IsContainPropertyReferenceDownTree = false;
+            }
+
+            PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReferenceDownTree));
+
+        }
+
+        private bool _IsContainPropertyReference { get; set; } = false;
+        /// <summary>
+        /// Наличие в элементе ссылки
+        /// </summary>
+        public bool IsContainPropertyReference
+        {
+            get { return _IsContainPropertyReference; }
+            set
+            {
+                if (!value && !IsContainPropertyReferenceDownTree)
+                {
+                    IsNotContainAnyReferenceProperty = true;
+                }
+                else
+                {
+                    IsNotContainAnyReferenceProperty = false;
+                }
+
+                _IsContainPropertyReference = value;
+                OnPropertyChanged("IsContainPropertyReference");
+            }
+        }
+
+        private bool _IsContainPropertyReferenceDownTree { get; set; }
+        /// <summary>
+        /// Наличие в ниже по дереву элементов в ссылками
+        /// </summary>
+        public bool IsContainPropertyReferenceDownTree
+        {
+            get { return _IsContainPropertyReferenceDownTree; }
+            set
+            {
+                if (!value && !IsContainPropertyReference)
+                {
+                    IsNotContainAnyReferenceProperty = true;
+                }
+                else
+                {
+                    IsNotContainAnyReferenceProperty = false;
+                }
+
+                _IsContainPropertyReferenceDownTree = value;
+                OnPropertyChanged("IsContainPropertyReferenceDownTree");
+            }
+        }
+
+        private bool _IsNotContainAnyReferenceProperty { get; set; }
+        /// <summary>
+        /// Не содержит ни в себе, ни ниже по дереву ссылок
+        /// </summary>
+        public bool IsNotContainAnyReferenceProperty
+        {
+            get { return _IsNotContainAnyReferenceProperty; }
+            set
+            {
+                _IsNotContainAnyReferenceProperty = value;
+                OnPropertyChanged("IsNotContainAnyReferenceProperty");
+            }
+        }
+        
+        ModelObjectHelper modelHelper;
+
+  
+
+        /// <summary>
+        /// Добавить ссылку на таблицу
+        /// </summary>
+        /// <param name="tableItemSet"></param>
+        public void AddToTheTableReferenceElement(ObservableCollection<ModelItemIFCTable> tableItemSet)
+        {
+            IEnumerable<IfcPropertyReferenceValue> propertyReferenceSet = CollectionPropertySet?.OfType<IfcPropertySet>().
+                SelectMany(it => it.HasProperties.Values).
+                OfType<IfcPropertyReferenceValue>();
+
+            foreach (IfcPropertyReferenceValue propertyReference in propertyReferenceSet)
+            {
+                foreach (ModelItemIFCTable tableItem in tableItemSet)
+                {
+                    if (propertyReference.PropertyReference == tableItem.ItemTreeView as IfcTable)
+                    {
+                        tableItem.AddReferenceToTheElement(this);
+                    }
+                }
             }
         }
 
@@ -172,7 +224,7 @@ namespace IFC_Table_View.IFC.ModelItem
                 }
                 IsContainPropertyReference = false;
                 //Прокидываем наверх по дереву событие удаления ссылок
-                ChangePropertyReference(this, new PropertyReferenceChangedEventArg(false));
+                PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReference));
             }
             //Заполняем заново коллекцию характеристик
             modelHelper.FillCollectionPropertySet(CollectionPropertySet);
@@ -200,8 +252,8 @@ namespace IFC_Table_View.IFC.ModelItem
                     if (PropSetTableReference == null)
                     {
                         PropSetTableReference = new IfcPropertySet("RZDP_Ссылки", pref);
-                        IfcRelDefinesByProperties reldefProp = new IfcRelDefinesByProperties(_IFCObjectDefinition, PropSetTableReference);
-                        obj.IsDefinedBy.Add(reldefProp);
+                        IfcRelDefinesByProperties relDefProp = new IfcRelDefinesByProperties(_IFCObjectDefinition, PropSetTableReference);
+                        obj.IsDefinedBy.Add(relDefProp);
                     }
                     else
                     {
@@ -210,8 +262,10 @@ namespace IFC_Table_View.IFC.ModelItem
                     //Добавляем в таблицу ссылки
                     RefTable.AddReferenceToTheElement(this);
 
+                    IsContainPropertyReference = true;
                     //Прокидываем наверх по дереву событие добавления ссылки
-                    ChangePropertyReference(this, new PropertyReferenceChangedEventArg(true));
+                    PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReference));
+
                 }
 
                 modelHelper.FillCollectionPropertySet(CollectionPropertySet);
@@ -282,6 +336,33 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+
+        /// <summary>
+        /// Проверка наличия ниже по дереву ссылок
+        /// </summary>
+        /// <returns></returns>
+        public bool IsContainPropertyReferenceValue()
+        {
+            if (IsContainPropertyReference)
+            { 
+                return true;
+            }
+            else
+            {
+                foreach (ModelItemIFCObject modelItem in ModelItems.OfType<ModelItemIFCObject>())
+                {
+                    bool searchResult = modelItem.ModelItems.
+                        Cast<ModelItemIFCObject>().
+                        Select(mi => mi.IsContainPropertyReferenceValue()).Any(pr => pr == true);
+
+                    if (searchResult)
+                    { 
+                        return true; 
+                    }
+                }
+                return false;
+            }
+        }
     }
 
 

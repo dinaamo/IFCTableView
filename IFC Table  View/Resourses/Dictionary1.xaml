@@ -18,15 +18,36 @@
     <cnv:ConvertItemTypeClassIFC x:Key="ConvIFCType" />
     <cnv:ConvertItemIFC x:Key="ConvItemIFC" />
     <cnv:ConvertConvPropertyItem x:Key="ConvPropertyesItem" />
-    <cnv:ConvertConvReferenceToObject x:Key="ConvertConvReferenceToObject" />
+    <cnv:ConvertConvReferenceToObject x:Key="ConvertConvReferenceToObject" /> 
     <cnv:ConvertItemIFCNameProperty x:Key="ConvertItemIFCNameProperty" />
+    <cnv:ConverterImageVisibility x:Key="ConvImageVisibility" />
 
 
+
+    <Style TargetType="{x:Type DataGrid}">
+        <Setter Property="ColumnWidth" Value="300"/>
+
+        <Setter Property="ColumnHeaderStyle">
+            <Setter.Value>
+            <Style TargetType="DataGridColumnHeader">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+        
 
     <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Setter Property="FontWeight" Value="{Binding Path=FontWeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <EventSetter Event="Selected" Handler="TreeViewSelectedItemChanged"/>
     </Style>
 
     <Style TargetType="{x:Type ScrollViewer}">
@@ -101,11 +122,29 @@
         <StackPanel Orientation="Horizontal">
 
             <fa:ImageAwesome
-                x:Name="img"
-                Height="8"
+                x:Name="NotContainAnyReferencePropertyIMG"
+                Height="10"
                 Margin="0,0,3,0"
-                Foreground="{Binding Path=BrushImageForeground, UpdateSourceTrigger=PropertyChanged}"
+                Foreground="DarkRed"
+                Visibility="{Binding Path=IsNotContainAnyReferenceProperty, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
                 Icon="Circle" />
+            
+            <fa:ImageAwesome
+                x:Name="ContainPropertyReferenceDownTreeIMG"
+                Height="12"
+                Margin="0,0,3,0"
+                Foreground="DarkBlue"
+                Visibility="{Binding Path=IsContainPropertyReferenceDownTree, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
+                Icon="ArrowCircleDown" />
+            
+            <fa:ImageAwesome
+                x:Name="ContainPropertyReferenceIMG"
+                Height="12"
+                Margin="0,0,3,0"
+                Foreground="DarkGreen"
+                Visibility="{Binding Path=IsContainPropertyReference, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
+                Icon="ExternalLinkSquare" />
+
             <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" ToolTip="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">

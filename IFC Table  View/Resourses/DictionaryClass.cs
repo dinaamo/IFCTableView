@@ -17,23 +17,23 @@ namespace IFC_Table_View.Resourses
                 {
                     if (textBlock.DataContext is ModelItemIFCTable table)
                     {
-                        new WindowTable(table.IFCTable).ShowDialog();
+                        new TableWindow(table.IFCTable).ShowDialog();
                     }
                 }
             }
         }
 
-        //double angleRotate = 0;
-        //public void Mouse_Button_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Button btn = sender as Button;
-        //    if (btn != null)
-        //    {
-        //        angleRotate += 180;
-        //        RotateTransform transform = new RotateTransform(angleRotate);
-        //        btn.RenderTransform = transform;
-        //    }
-        //}
+
+        private void TreeViewSelectedItemChanged(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem item = sender as TreeViewItem;
+            if (item != null)
+            {
+                item.BringIntoView();
+                e.Handled = true;
+            }
+        }
+
 
     }
 

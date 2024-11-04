@@ -61,6 +61,16 @@
                     CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
                     Header="Удалить ссылки на таблицы"/>
             </MenuItem>
+            <MenuItem Header="Поиск" Visibility="Visible">
+                <MenuItem
+                    Command="{Binding AddReferenceToTheTable}"
+                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
+                    Header="Найти элементы"/>
+                <MenuItem
+                    Command="{Binding DeleteReferenceToTheTable}"
+                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
+                    Header="Сбросить"/>
+</MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
             <MenuItem Header="Справка">
                 <MenuItem Command="{Binding OpenHelp}" Header="Справка по программе" />
@@ -108,6 +118,7 @@
 
                 <TreeView x:Name="treeViewIFC" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                     ItemContainerStyle="{StaticResource TreeViewStyle}">
+                    
                 </TreeView>
             </GroupBox>
 
@@ -356,13 +367,13 @@
                         VerticalAlignment="Top"
                         AutoGenerateColumns="True"
                         CanUserSortColumns="False"
-                        ColumnWidth="auto"
                         HorizontalGridLinesBrush="#FFC8C8C8"
                         IsReadOnly="True"
                         ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvIFCTable}}"
                         SelectionMode="Extended"
                         SelectionUnit="FullRow"
-                        VerticalGridLinesBrush="#FFC9C9C9" />
+                        VerticalGridLinesBrush="#FFC9C9C9" LoadingRow="dgTable_LoadingRow" 
+                        />
                 </TabItem>
 
             </TabControl>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
@@ -97,7 +98,6 @@ namespace IFC_Table_View.IFC.ModelItem
                 OnPropertyChanged("IsFocusReference");
             }
         }
-
 
 
     }

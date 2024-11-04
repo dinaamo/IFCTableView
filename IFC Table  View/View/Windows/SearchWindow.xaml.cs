@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace IFC_Table_View.View.Windows
 {
     /// <summary>
-    /// Логика взаимодействия для WindowLoad.xaml
+    /// Логика взаимодействия для SearchWindow.xaml
     /// </summary>
-    public partial class WindowLoad : Window
+    public partial class SearchWindow : Window
     {
-        public WindowLoad()
+        public SearchWindow()
         {
             InitializeComponent();
         }

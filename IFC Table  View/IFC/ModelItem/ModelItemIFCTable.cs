@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Xml.Linq;
 using System.ComponentModel;
 using System.Windows;
+using System.Text.RegularExpressions;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
@@ -27,9 +28,8 @@ namespace IFC_Table_View.IFC.ModelItem
 
         public ModelItemIFCTable(IfcTable IFCTable)
         {
-            this.IFCTable = IFCTable;
+            this.IFCTable = ReplaceSymbols(IFCTable);
             dataTable = FillDataTable(this.IFCTable);
-            //test();
         }
 
 
@@ -97,38 +97,70 @@ namespace IFC_Table_View.IFC.ModelItem
         /// <summary>
         /// Заполнение DataTable
         /// </summary>
-        /// <param name="IFCTable"></param>
+        /// <param name="ifcTable"></param>
         /// <returns></returns>
-        public static DataTable FillDataTable(IfcTable IFCTable)
+        public static DataTable FillDataTable(IfcTable ifcTable)
         {
-            if (IFCTable == null && IFCTable.Rows.Count == 0)
+            if (ifcTable == null && ifcTable.Rows.Count == 0)
             {
                 return null;
             }
 
             DataTable dataTable = new DataTable();
 
-            dataTable.TableName = IFCTable.Name;
-            for (int i = 0; i < IFCTable.Rows[0].RowCells.Count(); i++)
+            dataTable.TableName = ifcTable.Name;
+            for (int i = 0; i < ifcTable.Rows[0].RowCells.Count(); i++)
             {
-                string nameColumn = IFCTable.Rows[0].RowCells[i].Value.ToString();
+                string nameColumn = ifcTable.Rows[0].RowCells[i].Value.ToString();
                 HelreptReplaceSymbols.ReplacingSymbols(ref nameColumn);
 
                 dataTable.Columns.Add(nameColumn);
             }
 
-            for (int i = 1; i < IFCTable.Rows.Count; i++)
+            for (int i = 1; i < ifcTable.Rows.Count; i++)
             {
                 DataRow row = dataTable.NewRow();
 
-                for (int j = 0; j < IFCTable.Rows[i].RowCells.Count(); j++)
+                for (int j = 0; j < ifcTable.Rows[i].RowCells.Count(); j++)
                 {
-                    row[dataTable.Columns[j].ColumnName] = IFCTable.Rows[i].RowCells[j].Value.ToString();
+                    row[dataTable.Columns[j].ColumnName] = ifcTable.Rows[i].RowCells[j].Value.ToString();
                 }
                 dataTable.Rows.Add(row);
             }
             return dataTable;
         }
 
+        /// <summary>
+        /// Замена запрещенных символов
+        /// </summary>
+        private IfcTable ReplaceSymbols(IfcTable ifcTable)
+        {
+
+            for (int row = 0; row < ifcTable.Rows.Count; row++)
+            {
+                IfcTableRow tt = ifcTable.Rows[row];
+
+                for (int cell = 0; cell < ifcTable.Rows[row].RowCells.Count; cell++)
+                {
+                    string valueString = ifcTable.Rows[row].RowCells[cell].ValueString;
+
+                    string newValueString = Regex.Replace(valueString, @"\s+", " ");
+
+                    newValueString = newValueString.Trim((char)32);
+
+                    newValueString = newValueString.Replace("измере-ния", "измерения");
+
+                    newValueString = newValueString.Replace("оли-чество", "оличество");
+
+                    newValueString = newValueString.Replace("ед_,", "ед");
+
+                    newValueString = newValueString.Replace("Ед_", "Ед");
+
+                    ifcTable.Rows[row].RowCells[cell] = new IfcText(newValueString);
+                }
+            }
+
+            return ifcTable;
+        }
     }
 }

@@ -72,6 +72,7 @@ namespace IFC_Table_View.ViewModels
         #endregion
 
         #region Загрузка модели с анимацией
+
         void LoadModelAsync(string path)
         {
             if (path == null)
@@ -81,7 +82,7 @@ namespace IFC_Table_View.ViewModels
 
             mainWindow.IsEnabled = false;
 
-            WindowLoad windowLoad = new WindowLoad();
+            LoadWindow windowLoad = new LoadWindow("Загрузка");
             if (mainWindow.WindowState == WindowState.Maximized)
             {
                 windowLoad.Left = (System.Windows.SystemParameters.PrimaryScreenWidth / 2) - (windowLoad.Width / 2);
@@ -149,7 +150,6 @@ namespace IFC_Table_View.ViewModels
 
         #endregion
 
-
         #region Добавить_таблицу
         public ICommand AddIFCTableCommand { get; }
 
@@ -181,7 +181,39 @@ namespace IFC_Table_View.ViewModels
 
         private void OnSaveFileCommandExecuted(object o)
         {
-            modelIFC.SaveFile(modelIFC.FilePath);   
+            mainWindow.IsEnabled = false;
+
+            LoadWindow windowLoad = new LoadWindow("Сохранение");
+            if (mainWindow.WindowState == WindowState.Maximized)
+            {
+                windowLoad.Left = (System.Windows.SystemParameters.PrimaryScreenWidth / 2) - (windowLoad.Width / 2);
+                windowLoad.Top = (System.Windows.SystemParameters.PrimaryScreenHeight / 2) - (windowLoad.Height / 2);
+            }
+            else
+            {
+                windowLoad.Left = mainWindow.Left + (mainWindow.Width / 2) - (windowLoad.Width / 2);
+                windowLoad.Top = mainWindow.Top + (mainWindow.Height / 2) - (windowLoad.Height / 2);
+            }
+
+            using ManualResetEvent signal = new ManualResetEvent(false);
+
+            Task.Run(() =>
+            {
+
+                modelIFC.SaveFile(modelIFC.FilePath);
+                signal.WaitOne();
+                windowLoad.Dispatcher.BeginInvoke(() =>
+                {
+                    windowLoad.Close();
+                });
+
+            });
+
+            signal.Set();
+            windowLoad.ShowDialog();
+
+            mainWindow.IsEnabled = true;
+            
         }
 
         private bool CanSaveFileCommandExecute(object o)
@@ -434,6 +466,37 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
+        #region Поиск элементов
+        public ICommand SearchElements { get; }
+
+        private void OnSearchElementsCommandExecuted(object o)
+        {
+
+        }
+
+
+        private bool CanSearchElementsCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
+        #region Сброс поиска
+        public ICommand ResetSearch { get; }
+
+        private void OnResetSearchCommandExecuted(object o)
+        {
+
+        }
+
+
+        private bool CanResetSearchCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
+
         #endregion
 
         public MainWindowViewModel()
@@ -492,6 +555,15 @@ namespace IFC_Table_View.ViewModels
             ActionExpanders = new ActionCommand(
                 OnActionExpandedCommandExecuted,
                 CanActionExpandedCommandExecute);
+
+            SearchElements = new ActionCommand(
+                OnSearchElementsCommandExecuted,
+                CanSearchElementsCommandExecute);
+
+            ResetSearch = new ActionCommand(
+                OnResetSearchCommandExecuted,
+                CanResetSearchCommandExecute);
+
             #endregion
         }
 
