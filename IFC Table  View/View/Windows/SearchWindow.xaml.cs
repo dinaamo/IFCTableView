@@ -25,18 +25,25 @@ namespace IFC_Table_View.View.Windows
         {
             InitializeComponent();
 
-            DataContext = new SearchWindowViewModel(ModelElementsForSearch);
+            SearchWindowViewModel searchWindowViewModel = new SearchWindowViewModel(ModelElementsForSearch);
+
+            DataContext = searchWindowViewModel;
+
+
+            CBGUID.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.GUID).Distinct();
+            CBClassElement.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.IFCClass).Distinct();
+            CBNameElement.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.Name).Distinct();
+            CBPropertySet.ItemsSource = searchWindowViewModel.SearchItems.SelectMany(it => it.PropertySetCollection).Select(it => it.Name).Distinct();
+            CBPropertyName.ItemsSource = searchWindowViewModel.SearchItems.SelectMany(it => it.PropertiesName).Cast<string>().Distinct();
+            CBPropertyValue.ItemsSource = searchWindowViewModel.SearchItems.SelectMany(it => it.Values).Cast<string>().Distinct();
+        
         }
+
+
 
         void OnComboboxTextChanged(object sender, RoutedEventArgs e)
         {
-            //CB.IsDropDownOpen = true;
-            //// убрать selection, если dropdown только открылся
-            //var tb = (TextBox)e.OriginalSource;
-            //tb.Select(tb.SelectionStart + tb.SelectionLength, 0);
-            //CollectionView cv = (CollectionView)CollectionViewSource.GetDefaultView(CB.ItemsSource);
-            //cv.Filter = s =>
-            //    ((string)s).IndexOf(CB.Text, StringComparison.CurrentCultureIgnoreCase) >= 0;
+            
         }
     }
 }

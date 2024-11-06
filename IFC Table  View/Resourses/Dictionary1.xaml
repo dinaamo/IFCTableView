@@ -21,8 +21,8 @@
     <cnv:ConvertConvReferenceToObject x:Key="ConvertConvReferenceToObject" /> 
     <cnv:ConvertItemIFCNameProperty x:Key="ConvertItemIFCNameProperty" />
     <cnv:ConverterImageVisibility x:Key="ConvImageVisibility" />
-    <cnv:ConvertTest x:Key="ConvertTest" />
-
+    <cnv:ConvertTest x:Key="ConvertTest" /> 
+    <cnv:ConvertParametersCombobox x:Key="ConvertParametersCombobox" />
 
     <Style TargetType="{x:Type DataGrid}">
         <Setter Property="ColumnWidth" Value="300"/>

@@ -72,6 +72,9 @@
       <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1001\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.135\lib\net462\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="ReachFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -109,6 +112,7 @@
     <Compile Include="IFC\ModelItem\ModelItemIFCTable.cs" />
     <Compile Include="Infracrucrure\Converter\ConverterTest.cs" />
     <Compile Include="Infracrucrure\Converter\ConverterImageVisibility.cs" />
+    <Compile Include="Infracrucrure\Converter\ConvertParametrsCombobox.cs" />
     <Compile Include="Infracrucrure\Event\PropertyReferenceChangedEventArg.cs" />
     <Compile Include="Infracrucrure\Exeption\FindTreeViewException.cs" />
     <Compile Include="Infracrucrure\Exeption\FindObjectException.cs" />

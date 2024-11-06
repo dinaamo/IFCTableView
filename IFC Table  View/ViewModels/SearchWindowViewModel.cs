@@ -7,23 +7,41 @@ using IFC_Table_View.ViewModels.Base;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.Common;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace IFC_Table_View.ViewModels
 {
     internal class SearchWindowViewModel : BaseViewModel
     {
-        public List<SearchItem> SearchItems { get; private set; }
+        public ObservableCollection<SearchItem> SearchItems { get; private set; }
+
+        private ObservableCollection<SearchItem> _FilteredSearchItems;
+
+        public ObservableCollection<SearchItem> FilteredSearchItems
+        {
+            get
+            {
+                return _FilteredSearchItems;
+            }
+
+            private set
+            {
+                OnPropertyChanged("FilteredSearchItems");
+                _FilteredSearchItems = value;
+            }
+        }
 
         #region Комманды
 
         #region Найти элементы
-
-
-        public ICommand SelectElement { get; }
+        public ICommand SelectElements { get; }
 
         private void OnSelectElementCommandExecuted(object o)
         {
@@ -32,6 +50,38 @@ namespace IFC_Table_View.ViewModels
 
 
         private bool CanSelectElementCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
+        #region Фильтр
+        public ICommand FilteredElements { get; }
+
+        private void OnFilteredElementsCommandExecuted(object o)
+        {
+            object[] ComboBoxArray = (object[])o;
+
+            string textGUID = ((ComboBox)ComboBoxArray[0]).Text;
+            string textClassElement = ((ComboBox)ComboBoxArray[1]).Text;
+            string textNameElement = ((ComboBox)ComboBoxArray[2]).Text;
+            string textPropertySet = ((ComboBox)ComboBoxArray[3]).Text;
+            string textPropertyName = ((ComboBox)ComboBoxArray[4]).Text;
+            string textPropertyValue = ((ComboBox)ComboBoxArray[5]).Text;
+
+
+            FilteredSearchItems = new ObservableCollection<SearchItem>(SearchItems.
+                        Where(it => it.GUID.Contains(textGUID)).
+                        Where(it => it.IFCClass.Contains(textClassElement)).
+                        Where(it => it.Name.Contains(textNameElement)).
+                        Where(it => it.PropertySetCollection.Select(prSet => prSet.Name).
+                                        Any(namePrSet => namePrSet.Contains(textPropertySet))).
+                        Where(it => it.PropertiesName.Any(namePr => namePr.Contains(textPropertyName))).
+                        Where(it => it.Values.Any(valuePr => valuePr.Contains(textPropertyValue))));
+        }
+
+
+        private bool CanFilteredElementsCommandExecute(object o)
         {
             return true;
         }
@@ -48,19 +98,25 @@ namespace IFC_Table_View.ViewModels
 
         public SearchWindowViewModel(IEnumerable<BaseModelItemIFC> modelElementsForSearch)
         {
-            SearchItems = new List<SearchItem>();
+            SearchItems = new ObservableCollection<SearchItem>();
             foreach (BaseModelItemIFC modelItem in modelElementsForSearch)
             {
                 SearchItems.Add(new SearchItem(modelItem));
             }
 
+            FilteredSearchItems = new ObservableCollection<SearchItem>(SearchItems);
+
             #region Комманды
 
-            SelectElement = new ActionCommand(
+            SelectElements = new ActionCommand(
                 OnSelectElementCommandExecuted,
                 CanSelectElementCommandExecute);
 
-            
+            FilteredElements = new ActionCommand(
+                OnFilteredElementsCommandExecuted,
+                CanFilteredElementsCommandExecute);
+
+
 
             #endregion
 
@@ -68,6 +124,12 @@ namespace IFC_Table_View.ViewModels
         }
     }
 
+
+
+
+    /// <summary>
+    /// Элемент для поска
+    /// </summary>
     public class SearchItem
     {
         BaseModelItemIFC modelItem;
@@ -86,9 +148,9 @@ namespace IFC_Table_View.ViewModels
 
         public List<IfcPropertySetDefinition> PropertySetCollection { get; private set; }
 
-        private List<object> _PropertiesName;
+        private List<string> _PropertiesName;
 
-        public IEnumerable<object> PropertiesName 
+        public IEnumerable<string> PropertiesName 
         { 
             get
             {
@@ -97,9 +159,9 @@ namespace IFC_Table_View.ViewModels
             
         }
 
-        private List<object> _Values;
+        private List<string> _Values;
 
-        public List<object> Values
+        public List<string> Values
         {
             get
             {
@@ -114,8 +176,8 @@ namespace IFC_Table_View.ViewModels
             ConvertItemIFCNameProperty convertItemIFCNameProperty = new ConvertItemIFCNameProperty();
             ConvertItemIFCValue convertItemIFCValue = new ConvertItemIFCValue();
 
-            _PropertiesName = new List<object>();
-            _Values = new List<object>();
+            _PropertiesName = new List<string>();
+            _Values = new List<string>();
 
             //Получаем класс
             IFCClass = ((IfcObjectDefinition)modelItem.ItemTreeView).StepClassName;
@@ -140,16 +202,16 @@ namespace IFC_Table_View.ViewModels
                     {
                         foreach (object property in properties)
                         {
-                            _PropertiesName.Add(convertItemIFCNameProperty.Convert(property, null, null, null));
-                            _Values.Add(convertItemIFCValue.Convert(property, null, null, null));
+                            _PropertiesName.Add(convertItemIFCNameProperty.Convert(property, null, null, null).ToString());
+                            _Values.Add(convertItemIFCValue.Convert(property, null, null, null).ToString());
                         }
                     }
                     else if (PropertiesDef is Dictionary<string, IfcPhysicalQuantity> quantities)
                     {
                         foreach (object quantity in quantities)
                         {
-                            _PropertiesName.Add(convertItemIFCNameProperty.Convert(quantity, null, null, null));
-                            _Values.Add(convertItemIFCValue.Convert(quantity, null, null, null));
+                            _PropertiesName.Add(convertItemIFCNameProperty.Convert(quantity, null, null, null).ToString());
+                            _Values.Add(convertItemIFCValue.Convert(quantity, null, null, null).ToString());
                         }
                     }
                 }
