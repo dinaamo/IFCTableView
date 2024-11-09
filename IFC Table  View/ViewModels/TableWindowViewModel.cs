@@ -1,7 +1,7 @@
 ﻿using GeometryGym.Ifc;
 using IFC_Table_View.Data;
 using IFC_Table_View.HelperIFC;
-using IFC_Table_View.IFC.ModelIFC;
+using IFC_Table_View.IFC.Model;
 using IFC_Table_View.IFC.ModelItem;
 using IFC_Table_View.Infracrucrure.Commands;
 using IFC_Table_View.View.Windows;

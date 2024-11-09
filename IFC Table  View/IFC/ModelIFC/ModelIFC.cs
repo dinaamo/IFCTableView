@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
-namespace IFC_Table_View.IFC.ModelIFC
+namespace IFC_Table_View.IFC.Model
 {
     public class ModelIFC
     { 
@@ -127,7 +127,7 @@ namespace IFC_Table_View.IFC.ModelIFC
 
 
             //Добавляем в дерево первым элементом файл 
-            FileItem = new ModelItemIFCFile(DataBase);
+            FileItem = new ModelItemIFCFile(DataBase, this);
             ModelItems.Add(FileItem);
 
             //Ищем все таблицы в файле и заполняем временную коллекцию элементов дерева с таблицами
@@ -153,7 +153,7 @@ namespace IFC_Table_View.IFC.ModelIFC
         /// <param name="topElement"></param>
         private void CreationHierarchyIFCObjects(IfcObjectDefinition objDef, ObservableCollection<BaseModelItemIFC> collection, ModelItemIFCObject topElement)
         {
-            ModelItemIFCObject nestItem = new ModelItemIFCObject(objDef, topElement);
+            ModelItemIFCObject nestItem = new ModelItemIFCObject(objDef, topElement, this);
 
             //Проверяем, что в элементе есть ссылки на таблицы. Если есть то добавляем к таблицам ссылку на элемент
             nestItem.AddToTheTableReferenceElement(tempTableItemSet);
@@ -190,7 +190,7 @@ namespace IFC_Table_View.IFC.ModelIFC
             {
                 foreach (IfcTable table in tableSet)
                 {
-                    tempTableItemSet.Add(new ModelItemIFCTable(table));
+                    tempTableItemSet.Add(new ModelItemIFCTable(table, this));
                 }
 
                 return tempTableItemSet;

@@ -45,49 +45,8 @@
             </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
             <MenuItem Header="Таблицы" Visibility="Visible">
-                <MenuItem Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу" />
-                <MenuItem
-                    Command="{Binding DeleteTableCommand}"
-                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Удалить таблицу" />
-            </MenuItem>
-            <MenuItem Header="Ссылки" Visibility="Visible">
-                <MenuItem
-                    Command="{Binding AddReferenceToTheTable}"
-                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Задать ссылки на таблицы" />
-                <MenuItem
-                    Command="{Binding DeleteReferenceToTheTable}"
-                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Удалить ссылки на таблицы"/>
-            </MenuItem>
-            <MenuItem Header="Поиск" Visibility="Visible">
-                <MenuItem
-                    Command="{Binding SearchElements}"
-                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Найти элементы">
-                    <MenuItem.Icon>
-                        <fa:ImageAwesome
-                            Height="12"
-                            Margin="0,0,3,0"
-                            Foreground="DarkBlue"
-                            Visibility="{Binding Path=IsContainPropertyReferenceDownTree, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
-                            Icon="Search" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem
-                    Command="{Binding ResetSearch}"
-                    CommandParameter="{Binding ElementName=treeViewIFC, Path=SelectedItem}"
-                    Header="Сбросить">
-                    <MenuItem.Icon>
-                        <fa:ImageAwesome
-                            Height="12"
-                            Margin="0,0,3,0"
-                            Foreground="DarkBlue"
-                            Visibility="{Binding Path=IsContainPropertyReferenceDownTree, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
-                            Icon="Refresh" />
-                    </MenuItem.Icon>
-                </MenuItem>
+                <MenuItem 
+                    Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу" />
             </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
             <MenuItem Header="Справка">
@@ -121,22 +80,15 @@
                     Grid.Column="1"
                         Width="6"
                     HorizontalAlignment="Center" >
-                
             </GridSplitter>
-                
-            
-            
-
 
             <GroupBox
                 x:Name="grBox"
                 Grid.Column="0"
                 Margin="5"
                 Header="Элементы модели">
-
                 <TreeView x:Name="treeViewIFC" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                     ItemContainerStyle="{StaticResource TreeViewStyle}">
-                    
                 </TreeView>
             </GroupBox>
 

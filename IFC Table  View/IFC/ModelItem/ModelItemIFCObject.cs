@@ -1,7 +1,13 @@
 ﻿using GeometryGym.Ifc;
+using IFC_Table_View.Data;
+using IFC_Table_View.IFC.Model;
 using IFC_Table_View.Infracrucrure;
+using IFC_Table_View.Infracrucrure.Commands;
 using IFC_Table_View.Infracrucrure.Commands.Base;
+using IFC_Table_View.Infracrucrure.FindObjectException;
+using IFC_Table_View.View.Windows;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,6 +15,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 
@@ -23,7 +30,7 @@ namespace IFC_Table_View.IFC.ModelItem
         /// <summary>
         /// Конструктор
         /// </summary>
-        public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement)
+        public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement, ModelIFC modelIFC) : base(modelIFC)
         {
             //Если есть элемент выше по дереву то подключаем к нему обработчик события изменения состояния элемента
             if (TopElement != null)
@@ -33,15 +40,127 @@ namespace IFC_Table_View.IFC.ModelItem
 
             _IFCObjectDefinition = IFCObject;
 
+            SearchElementsCommand = new ActionCommand(
+                   OnSearchElementsCommandExecuted,
+                   CanSearchElementsCommandExecute);
+
+            ResetSearchCommand = new ActionCommand(
+                OnResetSearchCommandExecuted,
+                CanResetSearchCommandExecute);
+
+            AddReferenceToTheTable = new ActionCommand(
+                    OnAddReferenceToTheTable,
+                    CanAddReferenceToTheTable);
+
+            DeleteReferenceToTheTable = new ActionCommand(
+                OnDeleteReferenceToTheTable,
+                CanDeleteReferenceToTheTable);
 
             InitializationModelObject();
         }
 
+        #region Комманды
+
+        #region Поиск элементов
+        public ICommand SearchElementsCommand { get;}
+
+        private void OnSearchElementsCommandExecuted(object o)
+        {
+            if (o is ModelItemIFCObject modelItem)
+            {
+                new SearchWindow(SelectionElements(modelItem)).Show();
+            }
+        }
+
+
+        private bool CanSearchElementsCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
+        #region Сброс выделения
+        public ICommand ResetSearchCommand { get;}
+
+        private void OnResetSearchCommandExecuted(object o)
+        {
+            if (o is ModelItemIFCObject modelItem)
+            {
+                SelectionElements(modelItem).ForEach(it => it.IsPaint = false);
+            }
+        }
+
+        private bool CanResetSearchCommandExecute(object o)
+        {
+            return true;
+
+        }
+        #endregion
+
+        #region Добавить к элементу связь с таблицей 
+        public ICommand AddReferenceToTheTable { get; }
+
+        private void OnAddReferenceToTheTable(object o)
+        {
+
+            if (o is ModelItemIFCObject modelObject)
+            {
+
+                List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems.
+                                                    OfType<ModelItemIFCTable>().
+                                                    ToList();
+
+
+                Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(this, collectionModelTable);
+
+                form_Add_Reference_To_Table.ShowDialog();
+
+                AddReferenceTable(form_Add_Reference_To_Table.TableNameCollection);
+
+            }
+        }
+
+        private bool CanAddReferenceToTheTable(object o)
+        {
+            return true;
+        }
+        #endregion
+
+        #region Удалить ссылку на таблицу
+        public ICommand DeleteReferenceToTheTable { get; }
+
+        private void OnDeleteReferenceToTheTable(object o)
+        {
+
+            Form_Delete_Reference_To_Table form_Delete_Reference_To_Table = new Form_Delete_Reference_To_Table(this);
+
+            form_Delete_Reference_To_Table.ShowDialog();
+
+            List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems.
+                                                OfType<ModelItemIFCTable>().
+                                                ToList();
+
+            DeleteReferenceTable(form_Delete_Reference_To_Table.ifcPropertyReferenceValueDictionaryToDelete, collectionModelTable);
+  
+        }
+
+        private bool CanDeleteReferenceToTheTable(object o)
+        {
+            return true;
+        }
+        #endregion
+
+
+        #endregion
+
+
+        #region Методы
         /// <summary>
         /// Инициализация элементов объекта модели
         /// </summary>
         private void InitializationModelObject()
         {
+
             modelHelper = new ModelObjectHelper(_IFCObjectDefinition);
 
             CollectionPropertySet = new ObservableCollection<IfcPropertySetDefinition>();
@@ -101,69 +220,7 @@ namespace IFC_Table_View.IFC.ModelItem
 
         }
 
-        private bool _IsContainPropertyReference { get; set; } = false;
-        /// <summary>
-        /// Наличие в элементе ссылки
-        /// </summary>
-        public bool IsContainPropertyReference
-        {
-            get { return _IsContainPropertyReference; }
-            set
-            {
-                if (!value && !IsContainPropertyReferenceDownTree)
-                {
-                    IsNotContainAnyReferenceProperty = true;
-                }
-                else
-                {
-                    IsNotContainAnyReferenceProperty = false;
-                }
-
-                _IsContainPropertyReference = value;
-                OnPropertyChanged("IsContainPropertyReference");
-            }
-        }
-
-        private bool _IsContainPropertyReferenceDownTree { get; set; }
-        /// <summary>
-        /// Наличие в ниже по дереву элементов в ссылками
-        /// </summary>
-        public bool IsContainPropertyReferenceDownTree
-        {
-            get { return _IsContainPropertyReferenceDownTree; }
-            set
-            {
-                if (!value && !IsContainPropertyReference)
-                {
-                    IsNotContainAnyReferenceProperty = true;
-                }
-                else
-                {
-                    IsNotContainAnyReferenceProperty = false;
-                }
-
-                _IsContainPropertyReferenceDownTree = value;
-                OnPropertyChanged("IsContainPropertyReferenceDownTree");
-            }
-        }
-
-        private bool _IsNotContainAnyReferenceProperty { get; set; }
-        /// <summary>
-        /// Не содержит ни в себе, ни ниже по дереву ссылок
-        /// </summary>
-        public bool IsNotContainAnyReferenceProperty
-        {
-            get { return _IsNotContainAnyReferenceProperty; }
-            set
-            {
-                _IsNotContainAnyReferenceProperty = value;
-                OnPropertyChanged("IsNotContainAnyReferenceProperty");
-            }
-        }
-        
         ModelObjectHelper modelHelper;
-
-  
 
         /// <summary>
         /// Добавить ссылку на таблицу
@@ -193,6 +250,12 @@ namespace IFC_Table_View.IFC.ModelItem
         /// <param name="ifcPropertyReferenceValueDictionaryToDelete"></param>
         public void DeleteReferenceTable(Dictionary<string, IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionaryToDelete, List<ModelItemIFCTable> collectionModelTable)
         {
+
+            if (ifcPropertyReferenceValueDictionaryToDelete.Count == 0)
+            {
+                return;
+            }
+
             //Получаем необходимый набор характеристик
             IfcPropertySet PropSetTableReference = CollectionPropertySet.
                                                    OfType<IfcPropertySet>().
@@ -272,6 +335,170 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+
+        /// <summary>
+        /// Проверка наличия ниже по дереву ссылок
+        /// </summary>
+        /// <returns></returns>
+        public bool IsContainPropertyReferenceValue()
+        {
+            if (IsContainPropertyReference)
+            {
+                return true;
+            }
+            else
+            {
+                foreach (ModelItemIFCObject modelItem in ModelItems.OfType<ModelItemIFCObject>())
+                {
+                    bool searchResult = modelItem.ModelItems.
+                        Cast<ModelItemIFCObject>().
+                        Select(mi => mi.IsContainPropertyReferenceValue()).Any(pr => pr == true);
+
+                    if (searchResult)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Ищем элемент в дереве по контексту
+        /// </summary>
+
+        public static void FindMultiplyTreeObject(ModelItemIFCObject topElement, IEnumerable<ModelItemIFCObject> foundObjects)
+        {
+            if (foundObjects.Any(it => it == topElement))
+            {
+                topElement.IsPaint = true;
+            }
+
+            topElement.IsExpanded = true;
+
+            foreach (ModelItemIFCObject item in topElement.ModelItems)
+            {
+                FindMultiplyTreeObject(item, foundObjects);
+            }
+        }
+
+
+        public static void FindSingleTreeObject(ModelItemIFCObject topElement, ModelItemIFCObject foundObject)
+        {
+            foreach (ModelItemIFCObject item in topElement.ModelItems)
+            {
+                if (item == foundObject)
+                {
+                    throw new FindObjectException(item);
+                }
+            }
+
+            foreach (ModelItemIFCObject item in topElement.ModelItems)
+            {
+                item.IsExpanded = true;
+                FindSingleTreeObject(item, foundObject);
+            }
+        }
+
+        #region Выборка элементов
+        private List<ModelItemIFCObject> SelectionElements(ModelItemIFCObject modelItem)
+        {
+            List<ModelItemIFCObject> list = new List<ModelItemIFCObject>();
+
+            list.Add(modelItem);
+
+            if (modelItem.ModelItems != null)
+            {
+                foreach (ModelItemIFCObject nestModelItem in modelItem.ModelItems)
+                {
+                    list.AddRange(SelectionElements(nestModelItem));
+                }
+            }
+            return list;
+
+        }
+        #endregion
+        #endregion
+
+        #region Свойства
+
+        private bool _IsContainPropertyReference { get; set; } = false;
+        /// <summary>
+        /// Наличие в элементе ссылки
+        /// </summary>
+        public bool IsContainPropertyReference
+        {
+            get { return _IsContainPropertyReference; }
+            set
+            {
+                if (!value && !IsContainPropertyReferenceDownTree)
+                {
+                    IsNotContainAnyReferenceProperty = true;
+                }
+                else
+                {
+                    IsNotContainAnyReferenceProperty = false;
+                }
+
+                _IsContainPropertyReference = value;
+                OnPropertyChanged("IsContainPropertyReference");
+            }
+        }
+
+        private bool _IsContainPropertyReferenceDownTree { get; set; }
+        /// <summary>
+        /// Наличие в ниже по дереву элементов в ссылками
+        /// </summary>
+        public bool IsContainPropertyReferenceDownTree
+        {
+            get { return _IsContainPropertyReferenceDownTree; }
+            set
+            {
+                if (!value && !IsContainPropertyReference)
+                {
+                    IsNotContainAnyReferenceProperty = true;
+                }
+                else
+                {
+                    IsNotContainAnyReferenceProperty = false;
+                }
+
+                _IsContainPropertyReferenceDownTree = value;
+                OnPropertyChanged("IsContainPropertyReferenceDownTree");
+            }
+        }
+
+        private bool _IsNotContainAnyReferenceProperty { get; set; }
+        /// <summary>
+        /// Не содержит ни в себе, ни ниже по дереву ссылок
+        /// </summary>
+        public bool IsNotContainAnyReferenceProperty
+        {
+            get { return _IsNotContainAnyReferenceProperty; }
+            set
+            {
+                _IsNotContainAnyReferenceProperty = value;
+                OnPropertyChanged("IsNotContainAnyReferenceProperty");
+            }
+        }
+
+
+
+        private bool _IsPaint { get; set; }
+        /// <summary>
+        /// Покрасить элементы
+        /// </summary>
+        public bool IsPaint
+        {
+            get { return _IsPaint; }
+            set
+            {
+                _IsPaint = value;
+                OnPropertyChanged("IsPaint");
+            }
+        }
+
+
         /// <summary>
         /// Получение элемента вложенного дерева
         /// </summary>
@@ -337,32 +564,12 @@ namespace IFC_Table_View.IFC.ModelItem
         }
 
 
-        /// <summary>
-        /// Проверка наличия ниже по дереву ссылок
-        /// </summary>
-        /// <returns></returns>
-        public bool IsContainPropertyReferenceValue()
-        {
-            if (IsContainPropertyReference)
-            { 
-                return true;
-            }
-            else
-            {
-                foreach (ModelItemIFCObject modelItem in ModelItems.OfType<ModelItemIFCObject>())
-                {
-                    bool searchResult = modelItem.ModelItems.
-                        Cast<ModelItemIFCObject>().
-                        Select(mi => mi.IsContainPropertyReferenceValue()).Any(pr => pr == true);
+        #endregion 
 
-                    if (searchResult)
-                    { 
-                        return true; 
-                    }
-                }
-                return false;
-            }
-        }
+
+
+
+
     }
 
 

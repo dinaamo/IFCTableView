@@ -1,4 +1,5 @@
 ﻿using GeometryGym.Ifc;
+using IFC_Table_View.IFC.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,8 +10,9 @@ namespace IFC_Table_View.IFC.ModelItem
     public class ModelItemIFCFile : BaseModelItemIFC
     {
         private DatabaseIfc database;
+        
 
-        public ModelItemIFCFile(DatabaseIfc database)
+        public ModelItemIFCFile(DatabaseIfc database, ModelIFC modelIFC) : base(modelIFC)
         {
             this.database = database;
             PropertyObject();

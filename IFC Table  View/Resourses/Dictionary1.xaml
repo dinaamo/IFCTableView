@@ -21,8 +21,10 @@
     <cnv:ConvertConvReferenceToObject x:Key="ConvertConvReferenceToObject" /> 
     <cnv:ConvertItemIFCNameProperty x:Key="ConvertItemIFCNameProperty" />
     <cnv:ConverterImageVisibility x:Key="ConvImageVisibility" />
-    <cnv:ConvertTest x:Key="ConvertTest" /> 
+    <cnv:ConvertTest x:Key="ConvertTest" />
     <cnv:ConvertParametersCombobox x:Key="ConvertParametersCombobox" />
+
+
 
     <Style TargetType="{x:Type DataGrid}">
         <Setter Property="ColumnWidth" Value="300"/>
@@ -41,7 +43,11 @@
             </Setter.Value>
         </Setter>
     </Style>
-        
+
+    <Style x:Key="NoStyleDataGrid" TargetType="{x:Type DataGrid}">
+
+    </Style>
+
 
     <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -50,9 +56,16 @@
         <EventSetter Event="Selected" Handler="TreeViewSelectedItemChanged"/>
     </Style>
 
+
     <Style TargetType="{x:Type ScrollViewer}">
         <Setter Property="CanContentScroll" Value="False" />
     </Style>
+
+    <Style x:Key="ConditionsSearch" TargetType="ComboBox">
+        <Setter Property="ItemsSource" Value="{Binding Path=СonditionsSearch}"/>
+        <Setter Property="SelectedIndex" Value="2"/>
+    </Style>
+
 
     <Style x:Key="RoundButton" TargetType="{x:Type Button}">
         <Setter Property="ToolTip" Value="Развернуть/Сверуть все списки"/>
@@ -120,7 +133,7 @@
     <HierarchicalDataTemplate DataType="{x:Type mi:ModelItemIFCObject}" ItemsSource="{Binding Path=ModelItems}">
 
         <StackPanel Orientation="Horizontal">
-
+            
             <fa:ImageAwesome
                 x:Name="NotContainAnyReferencePropertyIMG"
                 Height="10"
@@ -154,6 +167,9 @@
                                 <Setter Property="Background" Value="SkyBlue" />
                                 <Setter Property="TextDecorations" Value="Underline" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=IsPaint, Mode=OneWay}" Value="True">
+                                <Setter Property="Background" Value="Tomato" />
+                            </DataTrigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground" Value="DarkBlue" />
                                 <Setter Property="Background" Value="SkyBlue" />
@@ -163,6 +179,58 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <StackPanel.ContextMenu>
+                        <ContextMenu>
+                    <MenuItem
+                            Command="{Binding SearchElementsCommand}"
+                            CommandParameter="{Binding}"
+                            Header="Найти элементы">        
+                        <MenuItem.Icon>
+                            <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Icon="Search" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem
+                        Command="{Binding ResetSearchCommand}"
+                        CommandParameter="{Binding}"
+                        Header="Сбросить">
+                        <MenuItem.Icon>
+                            <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Icon="Refresh" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem
+                            Command="{Binding AddReferenceToTheTable}"
+                            CommandParameter="{Binding}"
+                            Header="Задать ссылки на таблицы" >
+                        <MenuItem.Icon>
+                            <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkGreen"
+                            Icon="ExternalLinkSquare" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem
+                            Command="{Binding DeleteReferenceToTheTable}"
+                            CommandParameter="{Binding}"
+                            Header="Удалить ссылки на таблицы">
+                        <MenuItem.Icon>
+                            <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkRed"
+                            Icon="Remove" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </StackPanel.ContextMenu>
         </StackPanel>
     </HierarchicalDataTemplate>
 
@@ -197,6 +265,22 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <StackPanel.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                                Command="{Binding DeleteTableCommand}"
+                                CommandParameter="{Binding}"
+                                Header="Удалить таблицу" >
+                    <MenuItem.Icon>
+                            <fa:ImageAwesome
+                                Height="12"
+                                Margin="0,0,3,0"
+                                Foreground="DarkRed"
+                                Icon="Close" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </StackPanel.ContextMenu>
         </StackPanel>
     </DataTemplate>
 
@@ -219,8 +303,7 @@
     </Style>
 
 
-
-    <BitmapImage x:Key="RZDP_Image" UriSource="..\Images\RZDP_Image.png" />
-    <BitmapImage x:Key="Search_Image" UriSource="..\Images\Search_Image.png" />
+    <BitmapImage x:Key="RZDP_Image" UriSource="..\Infracrucrure\Images\RZDP_Image.png" />
+    <BitmapImage x:Key="Search_Image" UriSource="..\Infracrucrure\Images\Search_Image.png" />
 
 </ResourceDictionary>

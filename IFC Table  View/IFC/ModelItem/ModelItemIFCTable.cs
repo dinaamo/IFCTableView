@@ -17,6 +17,9 @@ using System.Xml.Linq;
 using System.ComponentModel;
 using System.Windows;
 using System.Text.RegularExpressions;
+using IFC_Table_View.IFC.Model;
+using System.Windows.Input;
+using IFC_Table_View.Infracrucrure.Commands;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
@@ -26,13 +29,62 @@ namespace IFC_Table_View.IFC.ModelItem
 
 
 
-        public ModelItemIFCTable(IfcTable IFCTable)
+        public ModelItemIFCTable(IfcTable IFCTable, ModelIFC modelIFC) : base(modelIFC)
         {
             this.IFCTable = ReplaceSymbols(IFCTable);
             dataTable = FillDataTable(this.IFCTable);
+
+            DeleteTableCommand = new ActionCommand(
+                        OnDeleteTableCommandExecuted,
+                        CanDeleteTableCommandExecute);
         }
 
+        #region Удалить_таблицу
+        public ICommand DeleteTableCommand { get; }
 
+        private void OnDeleteTableCommandExecuted(object o)
+        {
+            var referenceToDelete = PropertyElement
+                                        .SelectMany(it => it.Value)
+                                        .Cast<ModelItemIFCObject>()
+                                        .Where(it => it.ItemTreeView is IfcObject);
+
+
+            foreach (ModelItemIFCObject modelObject in referenceToDelete.ToArray())
+            {
+                // Получаем все характеристики типа IfcPropertyReferenceValue
+                Dictionary<string, IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionary = ((IfcObject)modelObject.ItemTreeView).IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition)
+                                                                                    .OfType<IfcPropertySet>()
+                                                                                    .SelectMany(PropSet => PropSet.HasProperties)
+                                                                                    .Where(dict => dict.Value.GetType() == typeof(IfcPropertyReferenceValue))
+                                                                                    .Where(dict => ((IfcPropertyReferenceValue)dict.Value).PropertyReference == IFCTable)
+                                                                                    .ToDictionary(x => x.Key, y => (IfcPropertyReferenceValue)y.Value);
+
+
+                modelObject.DeleteReferenceTable(ifcPropertyReferenceValueDictionary, new List<ModelItemIFCTable>() { this});
+                DeleteReferenceToTheElement(modelObject);
+            }
+
+            modelIFC.DeleteTable(IFCTable);
+            
+        }
+
+        private bool CanDeleteTableCommandExecute(object o)
+        {
+            if (modelIFC == null)
+            {
+                return false;
+            }
+            else if (((BaseModelItemIFC)o)?.ItemTreeView is IfcTable Table)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Коллекция ссылок на объекты

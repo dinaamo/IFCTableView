@@ -1,7 +1,7 @@
 ﻿using GeometryGym.Ifc;
 using IFC_Table_View.Data;
 using IFC_Table_View.HelperIFC;
-using IFC_Table_View.IFC.ModelIFC;
+using IFC_Table_View.IFC.Model;
 using IFC_Table_View.IFC.ModelItem;
 using IFC_Table_View.Infracrucrure.Commands;
 using IFC_Table_View.Infracrucrure.FindObjectException;
@@ -26,14 +26,12 @@ using System.Windows.Media.Media3D;
 
 namespace IFC_Table_View.ViewModels
 {
-    //public static class StartArguments
-    //{
-    //    public static string StartPath { get; set; }
-    //}
+    
     internal class MainWindowViewModel : BaseViewModel 
     {
+        #region Свойства
 
-
+        #region Модель
         private ModelIFC _modelIFC;
         public ModelIFC modelIFC 
         { 
@@ -46,6 +44,7 @@ namespace IFC_Table_View.ViewModels
                 mainWindow.treeViewIFC.ItemsSource = modelIFC.ModelItems;
             } 
         }
+        #endregion
 
         #region Заголовок
         private string _Title;
@@ -58,30 +57,6 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        #region Выборка элементов
-        private List<BaseModelItemIFC> SelectionElements(BaseModelItemIFC modelItem)
-        {
-            List< BaseModelItemIFC > list = new List< BaseModelItemIFC >();
-
-            if (!(modelItem is ModelItemIFCFile) && !(modelItem is ModelItemIFCTable))
-            {
-                list.Add(modelItem);
-            }
-
-            if (modelItem.ModelItems != null)
-            {
-                foreach (BaseModelItemIFC nestModelItem in modelItem.ModelItems)
-                {
-                    list.AddRange(SelectionElements(nestModelItem));
-                }
-            }
-            return list;
-
-        }
-
-        #endregion
-
-
         #region Дерево элементов
         private ObservableCollection<ModelItemIFCTable> _ModelItems;
 
@@ -93,8 +68,10 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        #region Загрузка модели с анимацией
+        #endregion
 
+        #region Методы
+        #region Загрузка модели с анимацией
         void LoadModelAsync(string path)
         {
             if (path == null)
@@ -144,7 +121,7 @@ namespace IFC_Table_View.ViewModels
 
         #endregion
 
-     
+        #endregion
 
         #region Комманды
 
@@ -317,124 +294,9 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        #region Удалить_таблицу
-        public ICommand DeleteTableCommand { get; }
-
-        private void OnDeleteTableCommandExecuted(object o)
-        {
-            object element = ((ModelItemIFCTable)o)?.ItemTreeView;
-
-            if (element is IfcTable Table)
-            {
-                modelIFC.DeleteTable(Table);
-            }
-        }
-
-        private bool CanDeleteTableCommandExecute(object o)
-        {
-            if (modelIFC == null)
-            {
-                return false;
-            }
-            else if(((BaseModelItemIFC)o)?.ItemTreeView is IfcTable Table)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        #endregion
-
-        #region Добавить к элементу связь с таблицей 
-        public ICommand AddReferenceToTheTable { get; }
-
-        private void OnAddReferenceToTheTable(object o)
-        {
-
-            if (o is ModelItemIFCObject modelObject)
-            {
-
-                List<ModelItemIFCTable> collectionModelTable = mainWindow.treeViewIFC.ItemsSource.
-                                                Cast<BaseModelItemIFC>().
-                                                ToList()[0].
-                                                ModelItems.
-                                                OfType<ModelItemIFCTable>().
-                                                ToList();
 
 
-                Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(modelObject, collectionModelTable);
 
-                form_Add_Reference_To_Table.ShowDialog();
-
-                modelObject.AddReferenceTable(form_Add_Reference_To_Table.TableNameCollection);
-
-            }
-        }
-
-        private bool CanAddReferenceToTheTable(object o)
-        {
-            if (o is ModelItemIFCObject obj)
-            {
-                if (obj.ItemTreeView is IfcObject)
-                {
-                    return true;
-                }
-                return false;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        #endregion
-
-        #region Удалить ссылку на таблицу
-        public ICommand DeleteReferenceToTheTable { get; }
-
-        private void OnDeleteReferenceToTheTable(object o)
-        {
-
-            if (o is ModelItemIFCObject modelObject)
-            {
-                Form_Delete_Reference_To_Table form_Delete_Reference_To_Table = new Form_Delete_Reference_To_Table(modelObject);
-
-                form_Delete_Reference_To_Table.ShowDialog();
-
-                List<ModelItemIFCTable> collectionModelTable = mainWindow.treeViewIFC.ItemsSource.
-                                                Cast<BaseModelItemIFC>().
-                                                ToList()[0].
-                                                ModelItems.
-                                                OfType<ModelItemIFCTable>().
-                                                ToList();
-
-                modelObject.DeleteReferenceTable(form_Delete_Reference_To_Table.ifcPropertyReferenceValueDictionaryToDelete, collectionModelTable);
-
-            }
-        }
-
-        private bool CanDeleteReferenceToTheTable(object o)
-        {
-            //if (modelIFC == null)
-            //{
-            //    return false;
-            //}
-            //else if (((IModelItemIFC)o) is ModelItemIFCObject obj)
-            if (o is ModelItemIFCObject obj)
-            {
-                if (obj.ItemTreeView is IfcObject)
-                {
-                    return true;
-                }
-                return false;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        #endregion
 
         #region Открыть справку
         public ICommand OpenHelp { get; }
@@ -488,52 +350,7 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        #region Поиск элементов
-        public ICommand SearchElements { get; }
 
-        private void OnSearchElementsCommandExecuted(object o)
-        {
-            if (o is BaseModelItemIFC modelItem)
-            {
-                new SearchWindow(SelectionElements(modelItem)).Show();
-            }   
-        }
-
-
-        private bool CanSearchElementsCommandExecute(object o)
-        {
-            if (o is BaseModelItemIFC)
-            {
-                return true;
-            }
-            else
-            {
-                return false; 
-            }
-        }
-        #endregion
-
-        #region Сброс поиска
-        public ICommand ResetSearch { get; }
-
-        private void OnResetSearchCommandExecuted(object o)
-        {
-
-        }
-
-
-        private bool CanResetSearchCommandExecute(object o)
-        {
-            if (o is BaseModelItemIFC)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        #endregion
 
 
         #endregion
@@ -563,9 +380,7 @@ namespace IFC_Table_View.ViewModels
                 OnAddIFCTableCommandExecuted,
                 CanAddIFCTableCommandExecute);
 
-            DeleteTableCommand = new ActionCommand(
-                OnDeleteTableCommandExecuted,
-                CanDeleteTableCommandExecute);
+
 
             SaveFileCommand = new ActionCommand(
                 OnSaveFileCommandExecuted,
@@ -579,13 +394,7 @@ namespace IFC_Table_View.ViewModels
                 OnSaveAsIFCXMLFileCommandExecuted,
                 CanSaveAsIFCXMLFileCommandExecute);
 
-            AddReferenceToTheTable = new ActionCommand(
-                OnAddReferenceToTheTable,
-                CanAddReferenceToTheTable);
 
-            DeleteReferenceToTheTable = new ActionCommand(
-                OnDeleteReferenceToTheTable,
-                CanDeleteReferenceToTheTable);
 
             OpenHelp = new ActionCommand(
                 OnOpenHelpCommandExecuted,
@@ -595,13 +404,7 @@ namespace IFC_Table_View.ViewModels
                 OnActionExpandedCommandExecuted,
                 CanActionExpandedCommandExecute);
 
-            SearchElements = new ActionCommand(
-                OnSearchElementsCommandExecuted,
-                CanSearchElementsCommandExecute);
 
-            ResetSearch = new ActionCommand(
-                OnResetSearchCommandExecuted,
-                CanResetSearchCommandExecute);
 
             #endregion
         }

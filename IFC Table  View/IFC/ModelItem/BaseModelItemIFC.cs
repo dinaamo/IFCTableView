@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using IFC_Table_View.IFC.Model;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
@@ -13,6 +14,14 @@ namespace IFC_Table_View.IFC.ModelItem
 
     public abstract class BaseModelItemIFC : INotifyPropertyChanged
     {
+        protected ModelIFC modelIFC { get; set; }
+
+        public BaseModelItemIFC(ModelIFC modelIFC)
+        {
+            this.modelIFC = modelIFC;
+        }
+
+
         public abstract object ItemTreeView { get; }
 
         public abstract Dictionary<string, HashSet<object>> PropertyElement { get; }

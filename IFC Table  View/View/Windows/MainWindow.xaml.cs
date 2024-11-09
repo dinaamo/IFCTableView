@@ -24,8 +24,6 @@ namespace IFC_Table_View
     public partial class MainWindow : Window
     {
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -59,7 +57,7 @@ namespace IFC_Table_View
                             foreach (ModelItemIFCObject modelObject in secondLevelCollection)
                             {
                                 modelObject.IsExpanded = true;
-                                FindTreeObject(modelObject, searchModelObject);
+                                ModelItemIFCObject.FindSingleTreeObject(modelObject, searchModelObject);
                             }
                         }
                         catch (FindObjectException findObj)
@@ -73,23 +71,7 @@ namespace IFC_Table_View
             }
         }
 
-        /// Ищем элемент в дереве по контексту
-        private void FindTreeObject(ModelItemIFCObject topElement, ModelItemIFCObject findObject)
-        {
-            foreach (ModelItemIFCObject item in topElement.ModelItems)
-            {
-                if (item == findObject)
-                {
-                    throw new FindObjectException(item);
-                }
-            }
 
-            foreach (ModelItemIFCObject item in topElement.ModelItems)
-            {
-                item.IsExpanded = true;
-                FindTreeObject(item, findObject);
-            }
-        }
 
         /// Загрузка формы
         private void MainWindowIFC_Loaded(object sender, RoutedEventArgs e)
@@ -155,6 +137,7 @@ namespace IFC_Table_View
             }
         }
 
+        //Установка стиля для колонок dataGrid
         private void SetColumnStyle()
         {
             Style columnStyle = new Style(typeof(TextBlock));
@@ -167,6 +150,8 @@ namespace IFC_Table_View
                 column.ElementStyle = columnStyle;
             }
         }
+   
+        //Подбор содержимого колонок по контексту
         private void ResizeColumns()
         {
             foreach (var column in dgTable.Columns)
@@ -192,6 +177,8 @@ namespace IFC_Table_View
             }
         }
 
+
+        //Событие загрузка датагрид
         private void dgTable_LoadingRow(object sender, DataGridRowEventArgs e)
         {
             ResizeColumns();

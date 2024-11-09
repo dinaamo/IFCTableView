@@ -19,7 +19,7 @@ namespace IFC_Table_View.Data
         {
             InitializeComponent();
             ifcPropertyReferenceValueDictionaryToDelete = new Dictionary<string, IfcPropertyReferenceValue>();
-            
+
             this.modelItemObject = modelItemObject;
         }
 

@@ -1,0 +1,48 @@
+﻿<Window x:Class="IFC_Table_View.View.Windows.WindowLoad"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IFC_Table_View.View.Windows"
+        mc:Ignorable="d"
+        Title="WindowLoad" Height="400" Width="400" 
+        WindowStyle="None" 
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Grid>
+        <DockPanel>
+            <TextBlock  DockPanel.Dock="Left"
+                       x:Name="txtStateRunning"
+                       Text="   Загрузка" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Left"
+                       FontSize="50" 
+                       Foreground="DarkBlue"
+                       FontWeight="Bold">
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="textAnimation">
+                                    <StringAnimationUsingKeyFrames  Storyboard.TargetName="txtStateRunning" 
+                                                                    Storyboard.TargetProperty="(TextBlock.Text)" 
+                                                                    RepeatBehavior="Forever" 
+                                                                    AutoReverse="False"
+                                                                    FillBehavior="Stop"
+                                                                    Duration="0:0:3">
+                                        <DiscreteStringKeyFrame Value="   Загрузка."   KeyTime="0:0:0.5" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка.."  KeyTime="0:0:1" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка..." KeyTime="0:0:1.5" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка...." KeyTime="0:0:2" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка....."  KeyTime="0:0:2.5" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка......" KeyTime="0:0:3" />
+                                        <DiscreteStringKeyFrame Value="   Загрузка......" KeyTime="0:0:3" />
+                                </StringAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+            </TextBlock>
+        </DockPanel>
+        
+    </Grid>
+</Window>

@@ -21,7 +21,7 @@ namespace IFC_Table_View.View.Windows
     /// </summary>
     public partial class SearchWindow : Window
     {
-        public SearchWindow(IEnumerable<BaseModelItemIFC> ModelElementsForSearch)
+        public SearchWindow(IEnumerable<ModelItemIFCObject> ModelElementsForSearch)
         {
             InitializeComponent();
 
@@ -30,13 +30,15 @@ namespace IFC_Table_View.View.Windows
             DataContext = searchWindowViewModel;
 
 
-            CBGUID.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.GUID).Distinct();
-            CBClassElement.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.IFCClass).Distinct();
-            CBNameElement.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.Name).Distinct();
-            CBPropertySet.ItemsSource = searchWindowViewModel.SearchItems.SelectMany(it => it.PropertySetCollection).Select(it => it.Name).Distinct();
-            CBPropertyName.ItemsSource = searchWindowViewModel.SearchItems.SelectMany(it => it.PropertiesName).Cast<string>().Distinct();
-            CBPropertyValue.ItemsSource = searchWindowViewModel.SearchItems.SelectMany(it => it.Values).Cast<string>().Distinct();
-        
+            CBGUIDValue.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.GUID).Distinct();
+            CBClassElementValue.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.IFCClass).Distinct();
+            CBNameElementValue.ItemsSource = searchWindowViewModel.SearchItems.Select(it => it.Name).Distinct();
+            CBPropertySetValue.ItemsSource = searchWindowViewModel.SearchItems.Where(it => it.PropertySetCollection != null).SelectMany(it => it.PropertySetCollection).Select(it => it?.Name).Distinct();
+            CBPropertyNameValue.ItemsSource = searchWindowViewModel.SearchItems.Where(it => it.PropertiesName != null).SelectMany(it => it.PropertiesName).Cast<string>().Distinct();
+            CBPropertyValue.ItemsSource = searchWindowViewModel.SearchItems.Where(it => it.Values != null).SelectMany(it => it.Values).Cast<string>().Distinct();
+            
+
+
         }
 
 

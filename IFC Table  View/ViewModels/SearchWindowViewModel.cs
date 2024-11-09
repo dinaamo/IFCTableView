@@ -18,8 +18,11 @@ using System.Windows.Input;
 
 namespace IFC_Table_View.ViewModels
 {
+
     internal class SearchWindowViewModel : BaseViewModel
     {
+
+        public string[] СonditionsSearch { get; private set; } = { "Равно", "Не равно", "Содержит", "Не содержит"};
         public ObservableCollection<SearchItem> SearchItems { get; private set; }
 
         private ObservableCollection<SearchItem> _FilteredSearchItems;
@@ -40,16 +43,55 @@ namespace IFC_Table_View.ViewModels
 
         #region Комманды
 
-        #region Найти элементы
-        public ICommand SelectElements { get; }
+        #region Покрасить элементы
+        public ICommand PaintElements { get; }
 
-        private void OnSelectElementCommandExecuted(object o)
+        private void OnPaintElementCommandExecuted(object o)
         {
-            
+            var topElement = SearchItems[0].GetModelItem();
+            var foundItems = FilteredSearchItems.Select(it => it.GetModelItem());
+            ModelItemIFCObject.FindMultiplyTreeObject(topElement, foundItems);
         }
 
 
-        private bool CanSelectElementCommandExecute(object o)
+        private bool CanPaintElementCommandExecute(object o)
+        {
+            return FilteredSearchItems != null && FilteredSearchItems.Count() > 0 && FilteredSearchItems.Count() != SearchItems.Count();
+        }
+        #endregion
+
+        #region Сбросить условия поиска
+        public ICommand ResetSeachСonditions { get; }
+
+        private void OnResetSeachСonditionsCommandExecuted(object o)
+        {
+            object[] ControlArray = (object[])o;
+
+            ((ComboBox)ControlArray[0]).SelectedIndex = 2;
+            ((ComboBox)ControlArray[1]).Text = string.Empty;
+
+            ((ComboBox)ControlArray[2]).SelectedIndex = 2;
+            ((ComboBox)ControlArray[3]).Text = string.Empty;
+
+            ((ComboBox)ControlArray[4]).SelectedIndex = 2;
+            ((ComboBox)ControlArray[5]).Text = string.Empty;
+
+            ((ComboBox)ControlArray[6]).SelectedIndex = 2;
+            ((ComboBox)ControlArray[7]).Text = string.Empty;
+
+            ((ComboBox)ControlArray[8]).SelectedIndex = 2;
+            ((ComboBox)ControlArray[9]).Text = string.Empty;
+
+            ((ComboBox)ControlArray[10]).SelectedIndex = 2;
+            ((ComboBox)ControlArray[11]).Text = string.Empty;
+
+            DataGrid dataGrid = ControlArray[12] as DataGrid;
+
+            dataGrid.ItemsSource = FilteredSearchItems = new ObservableCollection<SearchItem>(SearchItems);
+        }
+
+
+        private bool CanResetSeachСonditionsCommandExecute(object o)
         {
             return true;
         }
@@ -60,26 +102,73 @@ namespace IFC_Table_View.ViewModels
 
         private void OnFilteredElementsCommandExecuted(object o)
         {
-            object[] ComboBoxArray = (object[])o;
+            object[] ControlArray = (object[])o;
 
-            string textGUID = ((ComboBox)ComboBoxArray[0]).Text;
-            string textClassElement = ((ComboBox)ComboBoxArray[1]).Text;
-            string textNameElement = ((ComboBox)ComboBoxArray[2]).Text;
-            string textPropertySet = ((ComboBox)ComboBoxArray[3]).Text;
-            string textPropertyName = ((ComboBox)ComboBoxArray[4]).Text;
-            string textPropertyValue = ((ComboBox)ComboBoxArray[5]).Text;
+            string FilterSearchValueGUID = ((ComboBox)ControlArray[0]).Text;
+            string textGUID = ((ComboBox)ControlArray[1]).Text;
 
+            string FilterSearchValueClassElement = ((ComboBox)ControlArray[2]).Text;
+            string textClassElement = ((ComboBox)ControlArray[3]).Text;
 
-            FilteredSearchItems = new ObservableCollection<SearchItem>(SearchItems.
-                        Where(it => it.GUID.Contains(textGUID)).
-                        Where(it => it.IFCClass.Contains(textClassElement)).
-                        Where(it => it.Name.Contains(textNameElement)).
-                        Where(it => it.PropertySetCollection.Select(prSet => prSet.Name).
-                                        Any(namePrSet => namePrSet.Contains(textPropertySet))).
-                        Where(it => it.PropertiesName.Any(namePr => namePr.Contains(textPropertyName))).
-                        Where(it => it.Values.Any(valuePr => valuePr.Contains(textPropertyValue))));
+            string FilterSearchValueNameElement = ((ComboBox)ControlArray[4]).Text;
+            string textNameElement = ((ComboBox)ControlArray[5]).Text;
+
+            string FilterSearchValuePropertySet = ((ComboBox)ControlArray[6]).Text;
+            string textPropertySet = ((ComboBox)ControlArray[7]).Text;
+
+            string FilterSearchValuePropertyName = ((ComboBox)ControlArray[8]).Text;
+            string textPropertyName = ((ComboBox)ControlArray[9]).Text;
+
+            string FilterSearchValuePropertyValue = ((ComboBox)ControlArray[10]).Text;
+            string textPropertyValue = ((ComboBox)ControlArray[11]).Text;
+
+            DataGrid dataGrid = ControlArray[12] as DataGrid;
+
+            dataGrid.ItemsSource = null;
+
+            var col1 = SearchItems.Where(it => IsFilterString(new List<string>() {it.GUID}, textGUID, FilterSearchValueGUID));
+            var col2 = col1.Where(it => IsFilterString(new List<string>() { it.IFCClass }, textClassElement, FilterSearchValueClassElement));
+            var col3 = col2.Where(it => IsFilterString(new List<string>() { it.Name },textNameElement, FilterSearchValueNameElement));
+            var col4 = col3.Where(it => IsFilterString(it.PropertySetCollection?.Select(it => it.Name), textPropertySet, FilterSearchValuePropertySet));
+            var col5 = col4.Where(it => IsFilterString(it.PropertiesName, textPropertyName, FilterSearchValuePropertyValue));
+            var col6 = col5.Where(it => IsFilterString(it.Values, textPropertyValue, FilterSearchValuePropertyValue));
+
+            FilteredSearchItems = new ObservableCollection<SearchItem>(col6);
+
+            dataGrid.ItemsSource = FilteredSearchItems;
         }
 
+
+        bool IsFilterString(IEnumerable<string> stringCollection, string seachString, string seachingFilter)
+        {
+            if (seachString == string.Empty)
+            {
+                return true;
+            }
+            else 
+            {
+                if(seachingFilter == "Равно")
+                {
+                    return stringCollection.Any(str => str.Equals(seachString));
+                }
+                else if (seachingFilter == "Не равно")
+                {
+                    return stringCollection.Any(str => !str.Equals(seachString));
+                }
+                else if (seachingFilter == "Содержит")
+                {
+                    return stringCollection.Any(str => str.Contains(seachString));
+                }
+                else if (seachingFilter == "Не содержит")
+                {
+                    return stringCollection.Any(str => !str.Contains(seachString));
+                }
+                else
+                {
+                    return false;
+                }
+            } 
+        }
 
         private bool CanFilteredElementsCommandExecute(object o)
         {
@@ -96,26 +185,27 @@ namespace IFC_Table_View.ViewModels
 
         
 
-        public SearchWindowViewModel(IEnumerable<BaseModelItemIFC> modelElementsForSearch)
+        public SearchWindowViewModel(IEnumerable<ModelItemIFCObject> modelElementsForSearch)
         {
             SearchItems = new ObservableCollection<SearchItem>();
-            foreach (BaseModelItemIFC modelItem in modelElementsForSearch)
+            foreach (ModelItemIFCObject modelItem in modelElementsForSearch)
             {
                 SearchItems.Add(new SearchItem(modelItem));
             }
-
             FilteredSearchItems = new ObservableCollection<SearchItem>(SearchItems);
-
             #region Комманды
 
-            SelectElements = new ActionCommand(
-                OnSelectElementCommandExecuted,
-                CanSelectElementCommandExecute);
+            PaintElements = new ActionCommand(
+                OnPaintElementCommandExecuted,
+                CanPaintElementCommandExecute);
 
             FilteredElements = new ActionCommand(
                 OnFilteredElementsCommandExecuted,
                 CanFilteredElementsCommandExecute);
 
+            ResetSeachСonditions = new ActionCommand(
+                OnResetSeachСonditionsCommandExecuted,
+                CanResetSeachСonditionsCommandExecute);
 
 
             #endregion
@@ -132,9 +222,9 @@ namespace IFC_Table_View.ViewModels
     /// </summary>
     public class SearchItem
     {
-        BaseModelItemIFC modelItem;
+        ModelItemIFCObject modelItem;
 
-        public SearchItem(BaseModelItemIFC modelItem)
+        public SearchItem(ModelItemIFCObject modelItem)
         {
             this.modelItem = modelItem;
             SetParameters();
@@ -150,13 +240,13 @@ namespace IFC_Table_View.ViewModels
 
         private List<string> _PropertiesName;
 
-        public IEnumerable<string> PropertiesName 
+        public List<string> PropertiesName 
         { 
             get
             {
                 return _PropertiesName;
             }
-            
+            private set { _PropertiesName = value; }
         }
 
         private List<string> _Values;
@@ -167,6 +257,7 @@ namespace IFC_Table_View.ViewModels
             {
                 return _Values;
             }
+            private set { _Values = value; }
         }
 
 
@@ -175,9 +266,6 @@ namespace IFC_Table_View.ViewModels
             ConvertItemPropertiesIFC convertItemPropertiesIFC = new ConvertItemPropertiesIFC();
             ConvertItemIFCNameProperty convertItemIFCNameProperty = new ConvertItemIFCNameProperty();
             ConvertItemIFCValue convertItemIFCValue = new ConvertItemIFCValue();
-
-            _PropertiesName = new List<string>();
-            _Values = new List<string>();
 
             //Получаем класс
             IFCClass = ((IfcObjectDefinition)modelItem.ItemTreeView).StepClassName;
@@ -193,6 +281,9 @@ namespace IFC_Table_View.ViewModels
                 //Получаем наборы
                 PropertySetCollection = modelObject.CollectionPropertySet.Select(prSet => prSet).ToList();
 
+                PropertiesName = new List<string>();
+                Values = new List<string>();
+
                 //Получаем характеристики
                 foreach (IfcPropertySetDefinition prSet in PropertySetCollection)
                 {
@@ -202,23 +293,23 @@ namespace IFC_Table_View.ViewModels
                     {
                         foreach (object property in properties)
                         {
-                            _PropertiesName.Add(convertItemIFCNameProperty.Convert(property, null, null, null).ToString());
-                            _Values.Add(convertItemIFCValue.Convert(property, null, null, null).ToString());
+                            _PropertiesName.Add(Convert.ToString(convertItemIFCNameProperty.Convert(property, null, null, null)));
+                            _Values.Add(Convert.ToString(convertItemIFCValue.Convert(property, null, null, null)));
                         }
                     }
                     else if (PropertiesDef is Dictionary<string, IfcPhysicalQuantity> quantities)
                     {
                         foreach (object quantity in quantities)
                         {
-                            _PropertiesName.Add(convertItemIFCNameProperty.Convert(quantity, null, null, null).ToString());
-                            _Values.Add(convertItemIFCValue.Convert(quantity, null, null, null).ToString());
+                            _PropertiesName.Add(Convert.ToString(convertItemIFCNameProperty.Convert(quantity, null, null, null)));
+                            _Values.Add(Convert.ToString(convertItemIFCValue.Convert(quantity, null, null, null)));
                         }
                     }
                 }
             }
         }
 
-        public BaseModelItemIFC GetModelItem()
+        public ModelItemIFCObject GetModelItem()
         {
             return modelItem;
         }

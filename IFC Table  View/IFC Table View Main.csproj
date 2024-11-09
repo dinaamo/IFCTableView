@@ -221,9 +221,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\RZDP_Image.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="spreadsheet.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -245,7 +242,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Search_Image.png" />
+    <Resource Include="Infracrucrure\Images\RZDP_Image.PNG" />
+    <Resource Include="Infracrucrure\Images\Search_Image.png" />
+    <Resource Include="Infracrucrure\Images\spreadsheet.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

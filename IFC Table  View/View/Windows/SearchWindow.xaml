@@ -9,352 +9,207 @@
     xmlns:vm="clr-namespace:IFC_Table_View.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     Title="Поиск элементов"
-    Width="1000"
+    Width="1300"
     Height="auto"
     Icon="{StaticResource ResourceKey=Search_Image}"
-    mc:Ignorable="d">
+    mc:Ignorable="d" DataContext="vm:SearchWindowViewModel">
+
 
     <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*" MinWidth="350"/>
+                <ColumnDefinition Width="2"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <DockPanel Margin="7">
-            <GroupBox DockPanel.Dock="Top" Header="Критерии поиска" Padding="2">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5,0,0,0">
+            <StackPanel Orientation="Vertical">
+                <GroupBox Header="Критерии поиска" Padding="2" Grid.Column="0" Margin="5">
+                    <Grid Margin="5,0,0,0" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MaxWidth="120" MinWidth="125" />
+                            <ColumnDefinition MaxWidth="90" MinWidth="90"/>
+                            <ColumnDefinition Width="*"/>
+                          </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
 
-                <StackPanel
-                    Width="{Binding ElementName=col0, Path=ActualWidth}"
-                    Margin="0,0,0,0"
-                    Orientation="Vertical">
-                    <TextBlock HorizontalAlignment="Center" Text="GUID" />
-                        <ComboBox 
-                                Name="CBGUID"
-                                IsEditable="True"
-                                IsTextSearchEnabled="True">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" MaxWidth="200" ToolTip="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                                Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
-                        <TextBox Text="{Binding ElementName=CBGUID, Path=Text, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
-                    </StackPanel>
 
-                <StackPanel
-                    Width="{Binding ElementName=col1, Path=ActualWidth}"
-                    Margin="0,0,0,0"
-                    Orientation="Vertical">
-                    <TextBlock HorizontalAlignment="Center" Text="Класс IFC" />
-                        <ComboBox 
-                                Name="CBClassElement"
-                                TextBoxBase.TextChanged="OnComboboxTextChanged"
-                                IsEditable="True"
-                                IsTextSearchEnabled="True">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" MaxWidth="200" ToolTip="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                                Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
-                        <TextBox Text="{Binding ElementName=CBClassElement, Path=Text, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
-                    </StackPanel>
+                        <TextBlock Text="Свойство" HorizontalAlignment="Center" FontWeight="Bold" Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="Условие" HorizontalAlignment="Center" FontWeight="Bold" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="Значение" HorizontalAlignment="Center" FontWeight="Bold" Grid.Row="0" Grid.Column="2"/>
+                    
 
-                <StackPanel
-                    Width="{Binding ElementName=col2, Path=ActualWidth}"
-                    Margin="0,0,0,0"
-                    Orientation="Vertical">
-                    <TextBlock HorizontalAlignment="Center" Text="Имя Элемента" />
-                        <ComboBox 
-                                Name="CBNameElement"
-                                IsEditable="True"
-                                IsTextSearchEnabled="True">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" MaxWidth="200" ToolTip="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                                Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
-                        <TextBox Text="{Binding ElementName=CBNameElement, Path=Text, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
-                    </StackPanel>
-
-                <StackPanel
-                    Width="{Binding ElementName=col3, Path=ActualWidth}"
-                    Margin="0,0,0,0"
-                    Orientation="Vertical">
-                        <TextBlock HorizontalAlignment="Center" Text="Набор характкристик" />
-                        <ComboBox 
-                                    Name="CBPropertySet"
-                                    IsEditable="True"
-                                    IsTextSearchEnabled="True">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" MaxWidth="200" ToolTip="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                                Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
-                        <TextBox Text="{Binding ElementName=CBPropertySet, Path=Text, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel
-                    Width="{Binding ElementName=col4, Path=ActualWidth}"
-                    Margin="0,0,0,0"
-                    Orientation="Vertical">
-                        <TextBlock HorizontalAlignment="Center" Text="Параметр" />
-                        <ComboBox 
-                                    Name="CBPropertyName"
-                                    IsEditable="True"
-                                    IsTextSearchEnabled="True">
+                        <TextBlock HorizontalAlignment="Left" Text="GUID" Grid.Row="1" Grid.Column="0" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBGUIDFilter"/>
+                        <ComboBox Grid.Row="1" Grid.Column="2"
+                                    Name="CBGUIDValue"
+                                    IsEditable="True" IsTextSearchEnabled="False">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" MaxWidth="200" ToolTip="{Binding}"/>
+                                        <TextBlock Text="{Binding}"  ToolTip="{Binding}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                                Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
-                        <TextBox Text="{Binding ElementName=CBPropertyName, Path=Text, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
-                    </StackPanel>
+                            </ComboBox>
+                           
 
-                    <StackPanel
-                            Width="{Binding ElementName=col5, Path=ActualWidth}"
-                            Margin="0,0,0,0"
-                            Orientation="Vertical">
-                                <TextBlock HorizontalAlignment="Center" Text="Значение" />
-                                <ComboBox 
-                                        Name="CBPropertyValue"
-                                        IsEditable="True"
-                                        IsTextSearchEnabled="True">
+                        <TextBlock HorizontalAlignment="Left" Text="Класс IFC" Grid.Row="2" Grid.Column="0" />
+                        <ComboBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBClassElementFilter"/>
+                        <ComboBox Grid.Row="2" Grid.Column="2"
+                                    Name="CBClassElementValue"
+                                    IsEditable="True"  IsTextSearchEnabled="False">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                    <TextBlock Text="{Binding}" MaxWidth="200" ToolTip="{Binding}"/>
+                                        <TextBlock Text="{Binding}" ToolTip="{Binding}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                                Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
+                             </ComboBox>
+                          
+
+                        <TextBlock HorizontalAlignment="Left" Text="Имя Элемента" Grid.Row="3" Grid.Column="0"/>
+                        <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBNameElementFilter"/>
+                        <ComboBox Grid.Row="3" Grid.Column="2"
+                                    Name="CBNameElementValue"
+                                    IsEditable="True"  IsTextSearchEnabled="False">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" ToolTip="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <TextBox Text="{Binding ElementName=CBPropertyValue, Path=Text, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilteredElements}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
-                                                <Binding ElementName="CBGUID"/>
-                                                <Binding ElementName="CBClassElement"/>
-                                                <Binding ElementName="CBNameElement"/>
-                                                <Binding ElementName="CBPropertySet"/>
-                                                <Binding ElementName="CBPropertyName"/>
-                                                <Binding ElementName="CBPropertyValue"/>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
+                           
+
+                        <TextBlock HorizontalAlignment="Left" Text="Набор характкристик" Grid.Row="4" Grid.Column="0" Margin="0,0,3,0"/>
+                        <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBPropertySetFilter"/>
+                        <ComboBox Grid.Row="4" Grid.Column="2"
+                                        Name="CBPropertySetValue"
+                                        IsEditable="True" IsTextSearchEnabled="False">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" ToolTip="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                          
+
+                        <TextBlock HorizontalAlignment="Left" Text="Параметр" Grid.Row="5" Grid.Column="0"/>
+                        <ComboBox Grid.Row="5" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBPropertyNameFilter"/>
+                        <ComboBox Grid.Row="5" Grid.Column="2"
+                                        Name="CBPropertyNameValue"
+                                        IsEditable="True" IsTextSearchEnabled="False">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" ToolTip="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                           
+
+                        <TextBlock HorizontalAlignment="Left" Text="Значение" Grid.Row="6" Grid.Column="0"/>
+                        <ComboBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBPropertyValueFilter"/>
+                        <ComboBox Grid.Row="6" Grid.Column="2"
+                                            Name="CBPropertyValue"
+                                            IsEditable="True" IsTextSearchEnabled="False">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" ToolTip="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </GroupBox>
+
+                <DockPanel Margin="10,10,0,10" VerticalAlignment="Bottom">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                    <TextBlock Text="Найдено элементов:  " VerticalAlignment="Center" DockPanel.Dock="Left"/>
+                    <TextBlock Text="{Binding ElementName=dgSearchElements, Path=Items.Count}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
                     </StackPanel>
+                    <StackPanel>
+                    
+                    <Button Width="60" 
+                            Height="20" 
+                            HorizontalAlignment="Right" 
+                            Content="Найти" 
+                            DockPanel.Dock="Right" 
+                            Margin="5,0,5,5"
+                            Command="{Binding FilteredElements}">
+                        <Button.CommandParameter>
+                            <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
+                                <Binding ElementName="CBGUIDFilter"/>
+                                <Binding ElementName="CBGUIDValue"/>
+                                <Binding ElementName="CBClassElementFilter"/>
+                                <Binding ElementName="CBClassElementValue"/>
+                                <Binding ElementName="CBNameElementFilter"/>
+                                <Binding ElementName="CBNameElementValue"/>
+                                <Binding ElementName="CBPropertySetFilter"/>
+                                <Binding ElementName="CBPropertySetValue"/>
+                                <Binding ElementName="CBPropertyNameFilter"/>
+                                <Binding ElementName="CBPropertyNameValue"/>
+                                <Binding ElementName="CBPropertyValueFilter"/>
+                                <Binding ElementName="CBPropertyValue"/>
+                                <Binding ElementName="dgSearchElements"/>
+                            </MultiBinding>
+                        </Button.CommandParameter>
+                    </Button>
+
+
+                        <Button 
+                                Width="60" Height="20"  
+                                HorizontalAlignment="Right" 
+                                Content="Сбросить" 
+                                DockPanel.Dock="Right" 
+                                Margin="5,5,5,5"
+                                Command="{Binding ResetSeachСonditions}">
+                            <Button.CommandParameter>
+                                <MultiBinding Converter="{StaticResource ConvertParametersCombobox}">
+                                    <Binding ElementName="CBGUIDFilter"/>
+                                    <Binding ElementName="CBGUIDValue"/>
+                                    <Binding ElementName="CBClassElementFilter"/>
+                                    <Binding ElementName="CBClassElementValue"/>
+                                    <Binding ElementName="CBNameElementFilter"/>
+                                    <Binding ElementName="CBNameElementValue"/>
+                                    <Binding ElementName="CBPropertySetFilter"/>
+                                    <Binding ElementName="CBPropertySetValue"/>
+                                    <Binding ElementName="CBPropertyNameFilter"/>
+                                    <Binding ElementName="CBPropertyNameValue"/>
+                                    <Binding ElementName="CBPropertyValueFilter"/>
+                                    <Binding ElementName="CBPropertyValue"/>
+                                    <Binding ElementName="dgSearchElements"/>
+                                </MultiBinding>
+                            </Button.CommandParameter>
+                        </Button>
+
+                        <Button Width="auto" 
+                                Height="20" 
+                                HorizontalAlignment="Right" 
+                                Content="Выделить в дереве" 
+                                DockPanel.Dock="Right" 
+                                Margin="5,5,5,0"
+                                Command="{Binding PaintElements}"/>
+                    </StackPanel>
+                </DockPanel>
             </StackPanel>
 
-                
-            </GroupBox>
-            
-            
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,10,0,10">
-                <TextBlock Text="Найдено элементов:  " VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding Path=SearchItems.Count}" VerticalAlignment="Center"/>
-            </StackPanel>
-            
-            
-            <GroupBox DockPanel.Dock="Top" Header="Элементы" Padding="2">
+
+            <GridSplitter
+                    Grid.Column="1" Grid.Row="1" Margin="0,15,0,0"
+                    Width="20" HorizontalAlignment="Center" >
+            </GridSplitter>
+
+
+            <GroupBox DockPanel.Dock="Right" Header="Элементы" Padding="2" Grid.Column="2" Margin="5">
             <DataGrid
                 DockPanel.Dock="Top"
                 x:Name="dgSearchElements"
                 Width="auto"
+                Style="{StaticResource NoStyleDataGrid}"
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
                 ItemsSource="{Binding Path=FilteredSearchItems, UpdateSourceTrigger=PropertyChanged}">
@@ -372,7 +227,7 @@
 
                     <DataGridTextColumn
                         x:Name="col1"
-                        Width="*"
+                        Width="0.8*"
                         Binding="{Binding Path=IFCClass}"
                         Header="Класс IFC"
                         Visibility="Visible" />
@@ -389,7 +244,7 @@
                         Visibility="Visible">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox 
+                                <ComboBox
                                     ItemsSource="{Binding Path=PropertySetCollection}" 
                                     DisplayMemberPath ="Name" 
                                     SelectedIndex="0"/>
@@ -431,6 +286,6 @@
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        </DockPanel>
+        </Grid>
     </Grid>
 </Window>
