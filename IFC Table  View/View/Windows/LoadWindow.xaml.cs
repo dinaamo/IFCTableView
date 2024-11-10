@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IFC_Table_View.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace IFC_Table_View.View.Windows
         public LoadWindow(string message)
         {
             InitializeComponent();
-
+            DataContext = new LoadWindowViewModel(message);
         }
 
     }

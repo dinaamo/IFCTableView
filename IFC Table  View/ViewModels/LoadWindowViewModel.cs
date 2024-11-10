@@ -31,9 +31,9 @@ namespace IFC_Table_View.ViewModels
 
         }
 
-        //public LoadWindowViewModel(string message)
-        //{
-        //    Message = message;
-        //}
+        public LoadWindowViewModel(string message)
+        {
+            Message = message;
+        }
     }
 }

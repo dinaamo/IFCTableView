@@ -30,8 +30,8 @@
         <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
         <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
-        <Setter Property="EnableColumnVirtualization" Value="True"/>
-        <Setter Property="EnableRowVirtualization" Value="True"/>
+        <!--<Setter Property="EnableColumnVirtualization" Value="True"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>-->
         <Setter Property="ColumnHeaderStyle">
             <Setter.Value>
             <Style TargetType="DataGridColumnHeader">
@@ -51,8 +51,8 @@
         <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
         <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
-        <Setter Property="EnableColumnVirtualization" Value="True"/>
-        <Setter Property="EnableRowVirtualization" Value="True"/>
+        <!--<Setter Property="EnableColumnVirtualization" Value="True"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>-->
     </Style>
 
 
@@ -139,7 +139,7 @@
 
     <HierarchicalDataTemplate DataType="{x:Type mi:ModelItemIFCObject}" ItemsSource="{Binding Path=ModelItems}">
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" >
             
             <fa:ImageAwesome
                 x:Name="NotContainAnyReferencePropertyIMG"
@@ -165,7 +165,8 @@
                 Visibility="{Binding Path=IsContainPropertyReference, Converter={StaticResource ConvImageVisibility}, UpdateSourceTrigger=PropertyChanged}"
                 Icon="ExternalLinkSquare" />
 
-            <TextBlock Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" ToolTip="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
+            <TextBlock 
+                Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}" ToolTip="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
