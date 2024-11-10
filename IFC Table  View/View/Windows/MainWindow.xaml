@@ -44,9 +44,27 @@
                 </MenuItem>
             </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
-            <MenuItem Header="Таблицы" Visibility="Visible">
+            <MenuItem Header="Правка" Visibility="Visible">
                 <MenuItem 
-                    Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу" />
+                    Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="OrangeRed"
+                            Icon="Table" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                    Command="{Binding RemovePaintCommand}" Header="Снять все выделение">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Icon="Refresh" />     
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
             <MenuItem Header="Справка">
@@ -342,8 +360,7 @@
                         ItemsSource="{Binding ElementName=treeViewIFC, Path=SelectedItem, Converter={StaticResource ConvIFCTable}}"
                         SelectionMode="Extended"
                         SelectionUnit="FullRow"
-                        VerticalGridLinesBrush="#FFC9C9C9" LoadingRow="dgTable_LoadingRow" 
-                        />
+                        VerticalGridLinesBrush="#FFC9C9C9" LoadingRow="dgTable_LoadingRow"/>
                 </TabItem>
 
             </TabControl>

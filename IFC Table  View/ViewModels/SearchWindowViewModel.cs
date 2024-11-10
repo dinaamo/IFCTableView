@@ -91,7 +91,7 @@ namespace IFC_Table_View.ViewModels
         }
 
 
-        private bool CanResetSeachСonditionsCommandExecute(object o)
+        private bool CanResetSearchСonditionsCommandExecute(object o)
         {
             return true;
         }
@@ -192,6 +192,7 @@ namespace IFC_Table_View.ViewModels
             {
                 SearchItems.Add(new SearchItem(modelItem));
             }
+
             FilteredSearchItems = new ObservableCollection<SearchItem>(SearchItems);
             #region Комманды
 
@@ -205,7 +206,7 @@ namespace IFC_Table_View.ViewModels
 
             ResetSeachСonditions = new ActionCommand(
                 OnResetSeachСonditionsCommandExecuted,
-                CanResetSeachСonditionsCommandExecute);
+                CanResetSearchСonditionsCommandExecute);
 
 
             #endregion

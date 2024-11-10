@@ -40,6 +40,10 @@ namespace IFC_Table_View.IFC.ModelItem
 
             _IFCObjectDefinition = IFCObject;
 
+            PaintElementsCommand = new ActionCommand(
+                   OnPaintElementsCommandExecuted,
+                   CanPaintElementsCommandExecute);
+
             SearchElementsCommand = new ActionCommand(
                    OnSearchElementsCommandExecuted,
                    CanSearchElementsCommandExecute);
@@ -61,6 +65,21 @@ namespace IFC_Table_View.IFC.ModelItem
 
         #region Комманды
 
+        #region Выделить элемент
+        public ICommand PaintElementsCommand { get; }
+
+        private void OnPaintElementsCommandExecuted(object o)
+        {
+            IsPaint = true;
+        }
+
+
+        private bool CanPaintElementsCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
         #region Поиск элементов
         public ICommand SearchElementsCommand { get;}
 
@@ -68,7 +87,7 @@ namespace IFC_Table_View.IFC.ModelItem
         {
             if (o is ModelItemIFCObject modelItem)
             {
-                new SearchWindow(SelectionElements(modelItem)).Show();
+                SearchWindow.CreateWindowSearch(SelectionElements(modelItem));
             }
         }
 
@@ -106,7 +125,7 @@ namespace IFC_Table_View.IFC.ModelItem
             if (o is ModelItemIFCObject modelObject)
             {
 
-                List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems.
+                List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
                                                     OfType<ModelItemIFCTable>().
                                                     ToList();
 
@@ -136,7 +155,7 @@ namespace IFC_Table_View.IFC.ModelItem
 
             form_Delete_Reference_To_Table.ShowDialog();
 
-            List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems.
+            List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
                                                 OfType<ModelItemIFCTable>().
                                                 ToList();
 
@@ -150,9 +169,7 @@ namespace IFC_Table_View.IFC.ModelItem
         }
         #endregion
 
-
         #endregion
-
 
         #region Методы
         /// <summary>
@@ -198,9 +215,10 @@ namespace IFC_Table_View.IFC.ModelItem
             }
             else if (!e.IsContainPropertyDownTreeReference)
             {
-                bool searchResult = ModelItems.
-                        Cast<ModelItemIFCObject>().
-                        Select(mi => mi.IsContainPropertyReferenceValue()).Any(pr => pr == true);
+                //Проверка наличия ниже по дереву ссылок
+                bool searchResult = SelectionElements(this)
+                                        .Where(it => it != this)
+                                        .Any(it => it.IsContainPropertyReference);
 
                 if (searchResult)
                 {
@@ -265,6 +283,8 @@ namespace IFC_Table_View.IFC.ModelItem
             foreach (KeyValuePair<string, IfcPropertyReferenceValue> Pair in ifcPropertyReferenceValueDictionaryToDelete)
             {
                 ModelItemIFCTable findModelTable = collectionModelTable.FirstOrDefault(it => it.ItemTreeView == Pair.Value.PropertyReference);
+                if (findModelTable == null) {continue;}
+                
                 findModelTable.DeleteReferenceToTheElement(this);
                 PropSetTableReference.HasProperties.Remove(Pair.Key);
             }
@@ -335,33 +355,6 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-
-        /// <summary>
-        /// Проверка наличия ниже по дереву ссылок
-        /// </summary>
-        /// <returns></returns>
-        public bool IsContainPropertyReferenceValue()
-        {
-            if (IsContainPropertyReference)
-            {
-                return true;
-            }
-            else
-            {
-                foreach (ModelItemIFCObject modelItem in ModelItems.OfType<ModelItemIFCObject>())
-                {
-                    bool searchResult = modelItem.ModelItems.
-                        Cast<ModelItemIFCObject>().
-                        Select(mi => mi.IsContainPropertyReferenceValue()).Any(pr => pr == true);
-
-                    if (searchResult)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
 
         /// <summary>
         /// Ищем элемент в дереве по контексту

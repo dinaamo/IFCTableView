@@ -70,11 +70,25 @@ namespace IFC_Table_View.View.Windows
             }
         }
 
-
+        int countItems = 0;
         private void dgTable_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            SetColumnStyle();
-            ResizeColumns();
+            
+            DataGrid dataGrid = (DataGrid)sender;
+
+            if (countItems < dataGrid.Items.Count)
+            {
+                ++countItems;
+            }
+
+
+            if (countItems == dataGrid.Items.Count)
+            {
+                ResizeColumns();
+                SetColumnStyle();
+                countItems = 0;
+            }
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

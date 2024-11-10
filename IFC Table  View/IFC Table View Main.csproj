@@ -118,6 +118,7 @@
     <Compile Include="Infracrucrure\Exeption\FindObjectException.cs" />
     <Compile Include="Resourses\DictionaryClass.cs" />
     <Compile Include="ViewModels\SearchWindowViewModel.cs" />
+    <Compile Include="ViewModels\LoadWindowViewModel.cs" />
     <Compile Include="ViewModels\TableWindowViewModel.cs" />
     <Compile Include="View\Windows\SearchWindow.xaml.cs">
       <DependentUpon>SearchWindow.xaml</DependentUpon>
@@ -224,12 +225,6 @@
     <Resource Include="spreadsheet.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DLL Projects\GeometryGymIFCcore\GeometryGymIFCcore.csproj">
-      <Project>{dabc2c19-14a3-4aac-a77c-e27262ce3d09}</Project>
-      <Name>GeometryGymIFCcore</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.8 %28x86 и x64%29</ProductName>
@@ -245,6 +240,12 @@
     <Resource Include="Infracrucrure\Images\RZDP_Image.PNG" />
     <Resource Include="Infracrucrure\Images\Search_Image.png" />
     <Resource Include="Infracrucrure\Images\spreadsheet.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DLL Projects\GeometryGymIFCcore\GeometryGymIFCcore.csproj">
+      <Project>{dabc2c19-14a3-4aac-a77c-e27262ce3d09}</Project>
+      <Name>GeometryGymIFCcore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

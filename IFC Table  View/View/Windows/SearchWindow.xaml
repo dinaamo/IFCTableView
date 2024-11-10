@@ -12,7 +12,7 @@
     Width="1300"
     Height="auto"
     Icon="{StaticResource ResourceKey=Search_Image}"
-    mc:Ignorable="d" DataContext="vm:SearchWindowViewModel">
+    mc:Ignorable="d" DataContext="vm:SearchWindowViewModel" Closing="Window_Closing">
 
 
     <Grid>

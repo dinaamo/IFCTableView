@@ -23,12 +23,15 @@
     <cnv:ConverterImageVisibility x:Key="ConvImageVisibility" />
     <cnv:ConvertTest x:Key="ConvertTest" />
     <cnv:ConvertParametersCombobox x:Key="ConvertParametersCombobox" />
-
-
+   
 
     <Style TargetType="{x:Type DataGrid}">
         <Setter Property="ColumnWidth" Value="300"/>
-
+        <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
+        <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
+        <Setter Property="EnableColumnVirtualization" Value="True"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>
         <Setter Property="ColumnHeaderStyle">
             <Setter.Value>
             <Style TargetType="DataGridColumnHeader">
@@ -45,7 +48,11 @@
     </Style>
 
     <Style x:Key="NoStyleDataGrid" TargetType="{x:Type DataGrid}">
-
+        <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
+        <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
+        <Setter Property="EnableColumnVirtualization" Value="True"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>
     </Style>
 
 
@@ -180,7 +187,19 @@
                 </TextBlock.Style>
             </TextBlock>
             <StackPanel.ContextMenu>
-                        <ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                            Command="{Binding PaintElementsCommand}"
+                            CommandParameter="{Binding}"
+                            Header="Выделить">
+                        <MenuItem.Icon>
+                            <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="OrangeRed"
+                            Icon="PaintBrush" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem
                             Command="{Binding SearchElementsCommand}"
                             CommandParameter="{Binding}"
@@ -196,7 +215,7 @@
                     <MenuItem
                         Command="{Binding ResetSearchCommand}"
                         CommandParameter="{Binding}"
-                        Header="Сбросить">
+                        Header="Снять выделение">
                         <MenuItem.Icon>
                             <fa:ImageAwesome
                             Height="12"

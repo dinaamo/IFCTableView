@@ -177,12 +177,24 @@ namespace IFC_Table_View
             }
         }
 
-
+        int countItems = 0;
         //Событие загрузка датагрид
         private void dgTable_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            ResizeColumns();
-            SetColumnStyle();
+            DataGrid dataGrid = (DataGrid)sender;
+
+            if (countItems < dataGrid.Items.Count)
+            {
+                ++countItems;
+            }
+
+
+            if (countItems == dataGrid.Items.Count)
+            {
+                ResizeColumns();
+                SetColumnStyle();
+                countItems = 0;
+            }
         }
 
     }

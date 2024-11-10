@@ -57,16 +57,16 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-        #region Дерево элементов
-        private ObservableCollection<ModelItemIFCTable> _ModelItems;
+        //#region Дерево элементов
+        //private ObservableCollection<ModelItemIFCTable> _ModelItems;
 
-        ///<summary>Дерево элементов</summary>
-        public ObservableCollection<ModelItemIFCTable> ModelItems
-        {
-            get => _ModelItems;
-            set => Set(ref _ModelItems, value);
-        }
-        #endregion
+        /////<summary>Дерево элементов</summary>
+        //public ObservableCollection<ModelItemIFCTable> ModelItems
+        //{
+        //    get => _ModelItems;
+        //    set => Set(ref _ModelItems, value);
+        //}
+        //#endregion
 
         #endregion
 
@@ -157,10 +157,6 @@ namespace IFC_Table_View.ViewModels
             FormCreateTable tableForm = new FormCreateTable(modelIFC.CreateNewIFCTable);
             tableForm.ShowDialog();
         }
-
-
-
-
         private bool CanAddIFCTableCommandExecute(object o)
         {
             if (modelIFC != null)
@@ -171,6 +167,21 @@ namespace IFC_Table_View.ViewModels
             {
                 return false;
             }
+        }
+
+        #endregion
+
+        #region Убрать выделение
+        public ICommand RemovePaintCommand { get; }
+
+        private void OnRemovePaintCommandExecuted(object o)
+        {
+            ModelItemIFCObject ifcProject = modelIFC.ModelItems[0].ModelItems[0] as ModelItemIFCObject;
+            ifcProject.ResetSearchCommand.Execute(ifcProject);
+        }
+        private bool CanRemovePaintCommandExecute(object o)
+        {
+            return modelIFC is not null;
         }
 
         #endregion
@@ -294,10 +305,6 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
-
-
-
-
         #region Открыть справку
         public ICommand OpenHelp { get; }
 
@@ -375,12 +382,14 @@ namespace IFC_Table_View.ViewModels
             LoadApplicationCommand = new ActionCommand(
                 OnLoadApplicationCommandExecuted,
                 CanLoadApplicationCommandExecute);
-
+            
             AddIFCTableCommand = new ActionCommand(
                 OnAddIFCTableCommandExecuted,
                 CanAddIFCTableCommandExecute);
 
-
+            RemovePaintCommand = new ActionCommand(
+                OnRemovePaintCommandExecuted,
+                CanRemovePaintCommandExecute);
 
             SaveFileCommand = new ActionCommand(
                 OnSaveFileCommandExecuted,
@@ -393,8 +402,6 @@ namespace IFC_Table_View.ViewModels
             SaveAsIFCXMLFileCommand = new ActionCommand(
                 OnSaveAsIFCXMLFileCommandExecuted,
                 CanSaveAsIFCXMLFileCommandExecute);
-
-
 
             OpenHelp = new ActionCommand(
                 OnOpenHelpCommandExecuted,

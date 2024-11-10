@@ -16,7 +16,7 @@ License https://github.com/GeometryGym/GeometryGymIFC/blob/master/LICENSE</Descr
     <PackageTags>BIM, IFC, openBIM</PackageTags>
     <AssemblyVersion>24.03.22.0</AssemblyVersion>
     <FileVersion>24.03.22.0</FileVersion>
-    <BaseOutputPath>C:\Users\ZhukovDI\Documents\Visual Studio 2019\Project C#\IFC Table View\IFC Table View\bin\Debug</BaseOutputPath>
+    <BaseOutputPath>C:\Project CSharp\IFC Table\IFC-Table-View-master\IFC Table  View\bin\Release</BaseOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

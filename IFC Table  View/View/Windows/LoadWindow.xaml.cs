@@ -22,11 +22,9 @@ namespace IFC_Table_View.View.Windows
         public LoadWindow(string message)
         {
             InitializeComponent();
-            Message = message;
 
         }
 
-        string Message { get; set; }
     }
 
     
