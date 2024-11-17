@@ -48,7 +48,7 @@
                     
 
                         <TextBlock HorizontalAlignment="Left" Text="GUID" Grid.Row="1" Grid.Column="0" />
-                        <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBGUIDFilter"/>
+                        <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ConditionsSearch}" Name="CBGUIDFilter" Height="22" Grid.RowSpan="2" VerticalAlignment="Top"/>
                         <ComboBox Grid.Row="1" Grid.Column="2"
                                     Name="CBGUIDValue"
                                     IsEditable="True" IsTextSearchEnabled="False">

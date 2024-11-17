@@ -33,21 +33,30 @@
             this.ColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnSelect = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.labelName = new System.Windows.Forms.Label();
-            this.labelGUID = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.dataGridViewObjects = new System.Windows.Forms.DataGridView();
+            this.dataGridViewCheckBoxColumnGUID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumnIFCClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewTable)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewObjects)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // button_Add_Reference
             // 
             this.button_Add_Reference.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button_Add_Reference.Location = new System.Drawing.Point(16, 107);
-            this.button_Add_Reference.Margin = new System.Windows.Forms.Padding(4);
+            this.button_Add_Reference.Location = new System.Drawing.Point(16, 15);
+            this.button_Add_Reference.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Add_Reference.Name = "button_Add_Reference";
-            this.button_Add_Reference.Size = new System.Drawing.Size(161, 33);
+            this.button_Add_Reference.Size = new System.Drawing.Size(195, 33);
             this.button_Add_Reference.TabIndex = 2;
             this.button_Add_Reference.Text = "Задать ссылки";
             this.button_Add_Reference.UseVisualStyleBackColor = true;
@@ -64,11 +73,11 @@
             this.dataGridViewTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColumnName,
             this.ColumnSelect});
-            this.dataGridViewTable.Location = new System.Drawing.Point(8, 25);
-            this.dataGridViewTable.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGridViewTable.Location = new System.Drawing.Point(8, 23);
+            this.dataGridViewTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dataGridViewTable.Name = "dataGridViewTable";
             this.dataGridViewTable.RowHeadersWidth = 51;
-            this.dataGridViewTable.Size = new System.Drawing.Size(1002, 232);
+            this.dataGridViewTable.Size = new System.Drawing.Size(589, 620);
             this.dataGridViewTable.TabIndex = 3;
             // 
             // ColumnName
@@ -96,75 +105,129 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.dataGridViewTable);
-            this.groupBox1.Location = new System.Drawing.Point(16, 148);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox1.Location = new System.Drawing.Point(12, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(1018, 264);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Size = new System.Drawing.Size(605, 652);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Таблицы в текущем файле";
             // 
-            // label1
+            // groupBox2
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(13, 11);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(221, 20);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Наименование элемента";
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox2.Controls.Add(this.dataGridViewObjects);
+            this.groupBox2.Location = new System.Drawing.Point(12, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Size = new System.Drawing.Size(607, 652);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Целевые элементы";
             // 
-            // label2
+            // dataGridViewObjects
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(13, 57);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(51, 20);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "GUID";
+            this.dataGridViewObjects.AllowUserToAddRows = false;
+            this.dataGridViewObjects.AllowUserToDeleteRows = false;
+            this.dataGridViewObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewObjects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewObjects.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewCheckBoxColumnGUID,
+            this.dataGridViewTextBoxColumnName,
+            this.dataGridViewTextBoxColumnIFCClass});
+            this.dataGridViewObjects.Location = new System.Drawing.Point(8, 25);
+            this.dataGridViewObjects.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dataGridViewObjects.Name = "dataGridViewObjects";
+            this.dataGridViewObjects.RowHeadersWidth = 51;
+            this.dataGridViewObjects.Size = new System.Drawing.Size(591, 619);
+            this.dataGridViewObjects.TabIndex = 3;
             // 
-            // labelName
+            // dataGridViewCheckBoxColumnGUID
             // 
-            this.labelName.AutoSize = true;
-            this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelName.Location = new System.Drawing.Point(13, 35);
-            this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(221, 20);
-            this.labelName.TabIndex = 5;
-            this.labelName.Text = "Наименование элемента";
+            this.dataGridViewCheckBoxColumnGUID.FillWeight = 50.76142F;
+            this.dataGridViewCheckBoxColumnGUID.HeaderText = "GUID";
+            this.dataGridViewCheckBoxColumnGUID.MinimumWidth = 6;
+            this.dataGridViewCheckBoxColumnGUID.Name = "dataGridViewCheckBoxColumnGUID";
+            this.dataGridViewCheckBoxColumnGUID.ReadOnly = true;
+            this.dataGridViewCheckBoxColumnGUID.Width = 150;
             // 
-            // labelGUID
+            // dataGridViewTextBoxColumnName
             // 
-            this.labelGUID.AutoSize = true;
-            this.labelGUID.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelGUID.Location = new System.Drawing.Point(13, 80);
-            this.labelGUID.Name = "labelGUID";
-            this.labelGUID.Size = new System.Drawing.Size(51, 20);
-            this.labelGUID.TabIndex = 5;
-            this.labelGUID.Text = "GUID";
+            this.dataGridViewTextBoxColumnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewTextBoxColumnName.FillWeight = 149.2386F;
+            this.dataGridViewTextBoxColumnName.HeaderText = "Наименование элемента";
+            this.dataGridViewTextBoxColumnName.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumnName.Name = "dataGridViewTextBoxColumnName";
+            this.dataGridViewTextBoxColumnName.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumnIFCClass
+            // 
+            this.dataGridViewTextBoxColumnIFCClass.HeaderText = "Класс IFC";
+            this.dataGridViewTextBoxColumnIFCClass.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumnIFCClass.Name = "dataGridViewTextBoxColumnIFCClass";
+            this.dataGridViewTextBoxColumnIFCClass.ReadOnly = true;
+            this.dataGridViewTextBoxColumnIFCClass.Width = 125;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Location = new System.Drawing.Point(16, 55);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.splitter1);
+            this.splitContainer1.Panel1.Controls.Add(this.groupBox2);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
+            this.splitContainer1.Size = new System.Drawing.Size(1259, 659);
+            this.splitContainer1.SplitterDistance = 623;
+            this.splitContainer1.SplitterWidth = 13;
+            this.splitContainer1.TabIndex = 6;
+            // 
+            // splitter1
+            // 
+            this.splitter1.Location = new System.Drawing.Point(0, 0);
+            this.splitter1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(4, 659);
+            this.splitter1.TabIndex = 0;
+            this.splitter1.TabStop = false;
             // 
             // Form_Add_Reference_To_Table
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1050, 427);
-            this.Controls.Add(this.labelGUID);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.labelName);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(1282, 723);
+            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.button_Add_Reference);
-            this.Margin = new System.Windows.Forms.Padding(4);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form_Add_Reference_To_Table";
             this.ShowIcon = false;
             this.Text = "Задать ссылки на таблицы";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewTable)).EndInit();
             this.groupBox1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewObjects)).EndInit();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -174,9 +237,12 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnName;
         private System.Windows.Forms.DataGridViewCheckBoxColumn ColumnSelect;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label labelName;
-        private System.Windows.Forms.Label labelGUID;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.DataGridView dataGridViewObjects;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewCheckBoxColumnGUID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumnName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumnIFCClass;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Splitter splitter1;
     }
 }

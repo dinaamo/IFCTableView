@@ -116,7 +116,7 @@ namespace IFC_Table_View.IFC.Model
         ModelItemIFCFile FileItem;
 
 
-        ObservableCollection<ModelItemIFCTable> tempTableItemSet;
+        ObservableCollection<BaseModelReferenceIFC> tempreferenceObjectSet;
 
         /// <summary>
         /// Заполняем коллекцию элементов дерева модели
@@ -130,15 +130,16 @@ namespace IFC_Table_View.IFC.Model
             FileItem = new ModelItemIFCFile(DataBase, this);
             ModelItems.Add(FileItem);
 
-            //Ищем все таблицы в файле и заполняем временную коллекцию элементов дерева с таблицами
-            IEnumerable<IfcTable> tableSet = DataBase.Where(it => it.GetType() == typeof(IfcTable)).Cast<IfcTable>();
-            tempTableItemSet = AddIFCTables(tableSet);
+            //Ищем все ссылочные элементы в файле и заполняем временную коллекцию
+            IEnumerable<IfcObjectReferenceSelect> referenceObjectSet = DataBase.OfType<IfcObjectReferenceSelect>();
+            
+            tempreferenceObjectSet = new ObservableCollection<BaseModelReferenceIFC>(AddIFCObjectReference(referenceObjectSet));
 
             //Составляем дерево объектов модели
             CreationHierarchyIFCObjects(FileItem.Project, FileItem.ModelItems, null);
 
             //После того как составили дерево объектов к нему добавляем таблицы 
-            foreach (BaseModelItemIFC tableItem in tempTableItemSet)
+            foreach (BaseModelReferenceIFC tableItem in tempreferenceObjectSet)
             {
                 FileItem.ModelItems.Add(tableItem);
             }
@@ -156,7 +157,7 @@ namespace IFC_Table_View.IFC.Model
             ModelItemIFCObject nestItem = new ModelItemIFCObject(objDef, topElement, this);
 
             //Проверяем, что в элементе есть ссылки на таблицы. Если есть то добавляем к таблицам ссылку на элемент
-            nestItem.AddToTheTableReferenceElement(tempTableItemSet);
+            nestItem.AddReferenceToTheObjectReferenceToload(tempreferenceObjectSet);
 
             collection.Add(nestItem);
 
@@ -179,31 +180,30 @@ namespace IFC_Table_View.IFC.Model
         }
 
         /// <summary>
-        /// Добавляем к дереву элементов таблицы
+        /// Добавляем к дереву элементов ссылочные объекты
         /// </summary>
-        /// <param name="tableSet"></param>
+        /// <param name="referenceObjectSet"></param>
         /// <returns></returns>
-        private ObservableCollection<ModelItemIFCTable> AddIFCTables(IEnumerable<IfcTable> tableSet)
+        private IEnumerable<BaseModelReferenceIFC> AddIFCObjectReference(IEnumerable<IfcObjectReferenceSelect> referenceObjectSet)
         {
-            ObservableCollection<ModelItemIFCTable> tempTableItemSet = new ObservableCollection<ModelItemIFCTable>();
-            if (tableSet != null)
+            foreach (IfcObjectReferenceSelect referenceObject in referenceObjectSet)
             {
-                foreach (IfcTable table in tableSet)
+                if (referenceObject is IfcTable ifcTable)
                 {
-                    tempTableItemSet.Add(new ModelItemIFCTable(table, this));
+                    yield return new ModelItemIFCTable(ifcTable, this);
                 }
-
-                return tempTableItemSet;
-            }
-            return null;
-
+                else if (referenceObject is IfcDocumentReference ifcDocumentReference)
+                {
+                    yield return new ModelItemDocumentReference(ifcDocumentReference, this);
+                }
+            }           
         }
 
         /// <summary>
         /// Удаляем таблицу
         /// </summary>
         /// <param name="tableToDelete"></param>
-        public void DeleteTable(IfcTable tableToDelete)
+        public void DeleteIFCTable(IfcTable tableToDelete)
         {
             
             foreach (IfcTableRow row in tableToDelete.Rows)
@@ -214,14 +214,16 @@ namespace IFC_Table_View.IFC.Model
 
             DataBase.DeleteElement(tableToDelete);
 
-            bool res = ModelItems[0].ModelItems.Remove(ModelItems[0].ModelItems.OfType<ModelItemIFCTable>().FirstOrDefault(it =>
+            BaseModelReferenceIFC modelItemToDelete = ModelItems[0].ModelItems.OfType<BaseModelReferenceIFC>().FirstOrDefault(it =>
             {
-                if (it.IFCTable != null)
+                if (it.GetReferense() != null)
                 {
-                    return it.IFCTable.Equals(tableToDelete);
+                    return it.GetReferense().Equals(tableToDelete);
                 }
                 return false;
-            }));
+            });
+
+            bool res = ModelItems[0].ModelItems.Remove(modelItemToDelete);
 
             IEnumerable<IfcPropertySet> PropertySetCollection = DataBase.OfType<IfcObject>().
                 SelectMany(it => it.IsDefinedBy.
@@ -241,7 +243,38 @@ namespace IFC_Table_View.IFC.Model
             
         }
 
+        public void DeleteReferenceToDocument(IfcDocumentReference documentReference)
+        {
 
+
+            DataBase.DeleteElement(documentReference);
+
+            BaseModelReferenceIFC modelItemToDelete = ModelItems[0].ModelItems.Cast<BaseModelReferenceIFC>().FirstOrDefault(it =>
+            {
+                if (it.GetReferense() != null)
+                {
+                    return it.GetReferense().Equals(documentReference);
+                }
+                return false;
+            });
+
+            bool res = ModelItems[0].ModelItems.Remove(modelItemToDelete);
+                
+            IEnumerable<IfcPropertySet> PropertySetCollection = DataBase.OfType<IfcObject>().
+                SelectMany(it => it.IsDefinedBy.
+                SelectMany(obj => obj.RelatingPropertyDefinition).
+                OfType<IfcPropertySet>()).
+                Where(it => it.HasProperties.Select(pr => pr.Value.GetType() == typeof(IfcPropertyReferenceValue)) != null).
+                Where(it => it.HasProperties.Select(pr => ((IfcPropertyReferenceValue)pr.Value).PropertyReference == documentReference) != null);
+
+            foreach (IfcPropertySet PropertySet in PropertySetCollection)
+            {
+                IfcProperty deletedroperty = PropertySet.HasProperties.
+                    Where(it => it.Value.GetType() == typeof(IfcPropertyReferenceValue)).
+                    FirstOrDefault(pr => ((IfcPropertyReferenceValue)pr.Value).PropertyReference == documentReference).Value;
+                PropertySet.RemoveProperty(deletedroperty);
+            }
+        }
 
 
 
@@ -272,9 +305,40 @@ namespace IFC_Table_View.IFC.Model
                 }
             }
 
-            ObservableCollection<ModelItemIFCTable> tempTableItemSet = AddIFCTables(new List<IfcTable>() { ifcTable });
+            IEnumerable<BaseModelReferenceIFC> tempTableItemSet = AddIFCObjectReference(new List<IfcTable>() { ifcTable });
 
             foreach (BaseModelItemIFC tableItem in tempTableItemSet)
+            {
+                FileItem.ModelItems.Add(tableItem);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="location">Путь к документу</param>
+        /// <param name="referenseName">Имя ссылки</param>
+        /// <param name="positionInDocumente">Позиция в документе</param>
+        public void CreateNewIFCDocumentInformation(string location, string referenseName, string positionInDocument)
+        {
+            IfcDocumentInformation ifcDocumentInformation = new IfcDocumentInformation(DataBase, location, referenseName);
+            ifcDocumentInformation.Location = location;
+            ifcDocumentInformation.Purpose = ""; //Цель этого документа.
+            ifcDocumentInformation.IntendedUse = ""; //Предполагаемое использование этого документа.
+            //ifcDocumentInformation.CreationTime = ""; //Дата и время первоначального создания документа.
+            //ifcDocumentInformation.LastRevisionTime = ""; //Дата и время создания данной версии документа.
+            ifcDocumentInformation.ElectronicFormat = ""; // «application/pdf» обозначает тип подтипа pdf (Portable Document Format)
+
+
+            IfcDocumentReference ifcDocumentReference = new IfcDocumentReference(DataBase);
+            ifcDocumentReference.Name = referenseName;
+            ifcDocumentReference.ReferencedDocument = ifcDocumentInformation;
+            ifcDocumentReference.Identification = positionInDocument;
+
+
+            IEnumerable<BaseModelReferenceIFC> tempTableItemSet = AddIFCObjectReference(new List<IfcDocumentReference>() { ifcDocumentReference });
+
+            foreach (BaseModelReferenceIFC tableItem in tempTableItemSet)
             {
                 FileItem.ModelItems.Add(tableItem);
             }

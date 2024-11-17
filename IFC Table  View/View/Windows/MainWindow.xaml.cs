@@ -43,7 +43,7 @@ namespace IFC_Table_View
                         {
                             if (propertyRefVal.PropertyReference is IfcTable ifcTable)
                             {  
-                                new TableWindow(ifcTable).ShowDialog();
+                                new TableWindow(ModelItemIFCTable.FillDataTable(ifcTable)).ShowDialog();
                             }
                         }
                     }
@@ -56,6 +56,10 @@ namespace IFC_Table_View
 
                             foreach (ModelItemIFCObject modelObject in secondLevelCollection)
                             {
+                                if (modelObject == searchModelObject)
+                                {
+                                    throw new FindObjectException(modelObject);
+                                }
                                 modelObject.IsExpanded = true;
                                 ModelItemIFCObject.FindSingleTreeObject(modelObject, searchModelObject);
                             }
@@ -97,9 +101,9 @@ namespace IFC_Table_View
 
                     ObservableCollection<BaseModelItemIFC> collectionObjectModel = treeViewIFC.ItemsSource as ObservableCollection<BaseModelItemIFC>;
 
-                    ModelItemIFCTable targetModelTable = collectionObjectModel[0].ModelItems.
-                                                                    OfType<ModelItemIFCTable>().
-                                                                    FirstOrDefault(it => it.ItemTreeView == PropertyRefVa?.PropertyReference);
+                    BaseModelReferenceIFC targetModelTable = collectionObjectModel[0].ModelItems.
+                                                                    OfType<BaseModelReferenceIFC>().
+                                                                    FirstOrDefault(it => it.GetReferense() == PropertyRefVa?.PropertyReference);
 
                     if (targetModelTable != null)
                     {

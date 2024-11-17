@@ -3,6 +3,7 @@ using IFC_Table_View.IFC.ModelItem;
 using IFC_Table_View.Infracrucrure.Commands.Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -11,40 +12,75 @@ namespace IFC_Table_View.Data
     public partial class Form_Delete_Reference_To_Table : Form
     {
         
-        private ModelItemIFCObject modelItemObject;
-        public Dictionary<string, IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionaryToDelete;
-        Dictionary<string ,IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionary;
+        private List<ModelItemIFCObject> CollectionModelItemObject;
+        private List<BaseModelReferenceIFC> CollectionModelitemTable;
 
-        public Form_Delete_Reference_To_Table(ModelItemIFCObject modelItemObject)
+        public List<BaseModelReferenceIFC> CollectionModelitemTableToDelete;
+
+
+        public Form_Delete_Reference_To_Table(List<ModelItemIFCObject> CollectionModelItemObject, List<BaseModelReferenceIFC> CollectionModelitemTable)
         {
             InitializeComponent();
-            ifcPropertyReferenceValueDictionaryToDelete = new Dictionary<string, IfcPropertyReferenceValue>();
+            
+            this.CollectionModelItemObject = CollectionModelItemObject;   
+            this.CollectionModelitemTable = CollectionModelitemTable;
 
-            this.modelItemObject = modelItemObject;
+            CollectionModelitemTableToDelete = new List<BaseModelReferenceIFC>();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            labelName.Text = ((IfcObjectDefinition)modelItemObject.ItemTreeView).Name;
-            labelGUID.Text = ((IfcObjectDefinition)modelItemObject.ItemTreeView).Guid.ToString();
 
-            
-            //Получаем объект
-            IfcObject ifcObject = (IfcObject)modelItemObject.ItemTreeView;
+            FilterTable();
 
-            //Получаем все характеристики типа IfcPropertyReferenceValue
-            ifcPropertyReferenceValueDictionary = ifcObject.IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition)
-                                                                                    .OfType<IfcPropertySet>()
-                                                                                    .SelectMany(PropSet => PropSet.HasProperties)
-                                                                                    .Where(dict => dict.Value.GetType() == typeof(IfcPropertyReferenceValue))
-                                                                                    .ToDictionary(x => x.Key, y => (IfcPropertyReferenceValue)y.Value);
-                                                                                    
-            foreach (KeyValuePair<string, IfcPropertyReferenceValue> ifcPropertyReferenceValue in ifcPropertyReferenceValueDictionary)
+            FillDataGrid();
+        }
+
+        //Фильтрация таблиц
+        private void FilterTable()
+        {
+            List<IfcObjectReferenceSelect> ifcObjectReferenceSelect = new List<IfcObjectReferenceSelect>();
+            foreach (ModelItemIFCObject modelItemObject in CollectionModelItemObject)
             {
-                dataGridViewTable.Rows.Add([ifcPropertyReferenceValue.Key]);
+                GeometryGym.STEP.SET<IfcRelDefinesByProperties> RelDefCollection = null;
+
+                //Получаем объект
+                if (modelItemObject.GetIFCObject() is IfcObject ifcObject)
+                {
+                    RelDefCollection = ifcObject.IsDefinedBy;
+                }
+                else if (modelItemObject.GetIFCObject() is IfcContext ifcContext)
+                {
+                    RelDefCollection = ifcContext.IsDefinedBy;
+                }
+
+                //Получаем все ссылочные элементы на которые есть ссылки у элемента
+                ifcObjectReferenceSelect.AddRange(RelDefCollection?.SelectMany(it => it.RelatingPropertyDefinition)
+                                                                        .OfType<IfcPropertySet>()
+                                                                        .SelectMany(PropSet => PropSet.HasProperties)
+                                                                        .Select(dict => dict.Value)
+                                                                        .OfType<IfcPropertyReferenceValue>()
+                                                                        .Select(it => it.PropertyReference).ToList());
             }
-            
-            
+
+            //Оставляем в коллекции только ссылочные элементы ссылки на которые есть в элементе
+            CollectionModelitemTable = CollectionModelitemTable.Where(it => ifcObjectReferenceSelect.Any(oRef => it.GetReferense() == oRef)).ToList();
+        }
+
+        //Заполнение датагрид
+        private void FillDataGrid()
+        {
+            dataGridViewTable.AutoGenerateColumns = false;
+            dataGridViewObjects.AutoGenerateColumns = false;
+
+            dataGridViewTable.DataSource = new BindingList<BaseModelReferenceIFC>(CollectionModelitemTable);
+            dataGridViewTable.Columns[0].DataPropertyName = "NameReference";
+
+            dataGridViewObjects.DataSource = new BindingList<ModelItemIFCObject>(CollectionModelItemObject);
+            dataGridViewObjects.Columns[0].DataPropertyName = "IFCObjectGUID";
+            dataGridViewObjects.Columns[1].DataPropertyName = "IFCObjectName";
+            dataGridViewObjects.Columns[2].DataPropertyName = "IFCObjectClass";
+
         }
 
         private void button_Delete_Reference_Click(object sender, EventArgs e)
@@ -63,9 +99,7 @@ namespace IFC_Table_View.Data
                 object stateCell = row.Cells[1].Value;
                 if (stateCell != null && (bool)stateCell)
                 {
-                    KeyValuePair<string, IfcPropertyReferenceValue> findPair = ifcPropertyReferenceValueDictionary.First(it => it.Key == row.Cells[0].Value.ToString());
-
-                    ifcPropertyReferenceValueDictionaryToDelete.Add(findPair.Key, findPair.Value);
+                    CollectionModelitemTableToDelete.Add(((BindingList<BaseModelReferenceIFC>)dataGridViewTable.DataSource)[row.Index]);
                 }
             }
         }

@@ -42,10 +42,8 @@ namespace IFC_Table_View.Infracrucrure.Converter
     /// </summary>
     public class ConvertItemIFCValue : IValueConverter
         {
-
             public object Convert(object valueObject, Type targetType, object parameter, CultureInfo culture)
             {
-
                 object value = null;
 
                 if (valueObject is KeyValuePair<string, IfcProperty> ifcPairProperty)
@@ -150,18 +148,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                object element = ((BaseModelItemIFC)value)?.ItemTreeView;
-
-                if (element != null)
-                {
-                    return System.Convert.ToString(element.GetType().Name);
-                }
-                else
-                {
-                    return "";
-                }
-
-
+                return System.Convert.ToString(value?.GetType().Name);
             }
 
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -174,19 +161,13 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                object element = ((BaseModelItemIFC)value)?.ItemTreeView;
-
-                if (element is IfcObjectDefinition ifcObj)
+                if (value is ModelItemIFCObject modelObject)
                 {
-                    return System.Convert.ToString(ifcObj.Guid);
-                }
-                else if (element is IfcTable ifcTable)
-                {
-                    return "-";
+                    return System.Convert.ToString(modelObject.IFCObjectGUID);
                 }
                 else
                 {
-                    return "";
+                    return "-";
                 }
 
             }
@@ -201,15 +182,14 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                object element = ((BaseModelItemIFC)value)?.ItemTreeView;
 
-                if (element is IfcObjectDefinition ifcObjectDef)
+                if (value is ModelItemIFCObject modelItem)
                 {
-                    return System.Convert.ToString(ifcObjectDef.Name);
+                    return System.Convert.ToString(modelItem.IFCObjectName);
                 }
-                else if(element is IfcTable ifcTable)
+                else if(value is BaseModelReferenceIFC referenceObject)
                 {
-                    return System.Convert.ToString(ifcTable.Name);
+                    return System.Convert.ToString(referenceObject.NameReference);
                 }
                 else
                 {

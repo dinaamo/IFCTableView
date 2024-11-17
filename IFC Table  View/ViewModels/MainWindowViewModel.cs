@@ -171,6 +171,86 @@ namespace IFC_Table_View.ViewModels
 
         #endregion
 
+        #region Добавить к элементам связи с таблицами 
+        public ICommand AddReferenceToTheTable { get; }
+
+        private void OnAddReferenceToTheTableExecuted(object o)
+        {
+            ModelItemIFCObject ifcProject = modelIFC.ModelItems[0].ModelItems[0] as ModelItemIFCObject;
+
+            List<ModelItemIFCObject> collectionModelObject = ModelItemIFCObject.FindPaintObject(ifcProject);
+
+
+            List <BaseModelReferenceIFC> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
+                                                OfType<BaseModelReferenceIFC>().
+                                                ToList();
+
+
+            Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(collectionModelObject, collectionModelTable);
+
+            form_Add_Reference_To_Table.ShowDialog();
+
+            foreach (ModelItemIFCObject modelObject in collectionModelObject)
+            {
+                modelObject.AddReferenceToTheObjectReference(form_Add_Reference_To_Table.CollectionTableToAdd);
+            }
+
+
+          
+        }
+
+        private bool CanAddReferenceToTheTableExecute(object o)
+        {
+            if (modelIFC != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
+
+        #region Удалить от элементов связи с ссылочными элементами
+        public ICommand DeleteReferenceToTheTable { get; }
+
+        private void OnDeleteReferenceToTheTableExecuted(object o)
+        {
+            ModelItemIFCObject ifcProject = modelIFC.ModelItems[0].ModelItems[0] as ModelItemIFCObject;
+
+            List<ModelItemIFCObject> collectionModelObject = ModelItemIFCObject.FindPaintObject(ifcProject);
+
+
+            List<BaseModelReferenceIFC> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
+                                                OfType<BaseModelReferenceIFC>().
+                                                ToList();
+
+
+            Form_Delete_Reference_To_Table form_Delete_Reference_To_Table = new Form_Delete_Reference_To_Table(collectionModelObject, collectionModelTable);
+
+            form_Delete_Reference_To_Table.ShowDialog();
+
+            foreach (ModelItemIFCObject modelObject in collectionModelObject)
+            {
+                modelObject.DeleteReferenceToTheObjectReference(form_Delete_Reference_To_Table.CollectionModelitemTableToDelete);
+            }
+
+        }
+
+        private bool CanDeleteReferenceToTheTableExecute(object o)
+        {
+            if (modelIFC != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
+
         #region Убрать выделение
         public ICommand RemovePaintCommand { get; }
 
@@ -386,6 +466,14 @@ namespace IFC_Table_View.ViewModels
             AddIFCTableCommand = new ActionCommand(
                 OnAddIFCTableCommandExecuted,
                 CanAddIFCTableCommandExecute);
+
+            AddReferenceToTheTable = new ActionCommand(
+                OnAddReferenceToTheTableExecuted,
+                CanAddReferenceToTheTableExecute);
+
+            DeleteReferenceToTheTable = new ActionCommand(
+                OnDeleteReferenceToTheTableExecuted,
+                CanDeleteReferenceToTheTableExecute);
 
             RemovePaintCommand = new ActionCommand(
                 OnRemovePaintCommandExecuted,

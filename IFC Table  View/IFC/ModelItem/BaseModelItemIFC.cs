@@ -6,6 +6,9 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using IFC_Table_View.IFC.Model;
+using System.Windows.Input;
+using System.Runtime.Serialization;
+using GeometryGym.Ifc;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
@@ -15,18 +18,18 @@ namespace IFC_Table_View.IFC.ModelItem
     public abstract class BaseModelItemIFC : INotifyPropertyChanged
     {
         protected ModelIFC modelIFC { get; set; }
-
-        public BaseModelItemIFC(ModelIFC modelIFC)
+        public BaseModelItemIFC(ModelIFC modelIFC, IBaseClassIfc ItemTreeView = null)
         {
             this.modelIFC = modelIFC;
+            _ItemTreeView = ItemTreeView;
         }
 
+        public virtual ObservableCollection<BaseModelItemIFC> ModelItems { get; }
+        public virtual bool IsExpanded { get; set; }
 
-        public abstract object ItemTreeView { get; }
-
-        public abstract Dictionary<string, HashSet<object>> PropertyElement { get; }
-
-        public abstract ObservableCollection<BaseModelItemIFC> ModelItems { get; }
+        IBaseClassIfc _ItemTreeView;
+        public virtual object ItemTreeView => _ItemTreeView;
+        public abstract Dictionary<string, HashSet<object>> PropertyElement { get; protected set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -39,20 +42,6 @@ namespace IFC_Table_View.IFC.ModelItem
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-            }
-        }
-
-        private bool _IsExpanded { get; set; } = false;
-        /// <summary>
-        /// IsExpanded
-        /// </summary>
-        public bool IsExpanded
-        {
-            get { return _IsExpanded; }
-            set
-            {
-                _IsExpanded = value;
-                OnPropertyChanged("IsExpanded");
             }
         }
 

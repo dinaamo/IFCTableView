@@ -18,6 +18,9 @@ using System.Windows.Input;
 using System.Windows;
 using System.Data;
 using IFC_Table_View.HelperExcel;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace IFC_Table_View.ViewModels
 {
@@ -25,7 +28,9 @@ namespace IFC_Table_View.ViewModels
     {
 
         public DataTable dataTable {get; set;}
-            
+
+        public string[] СonditionsSearch { get; private set; } = { "Равно", "Не равно", "Содержит", "Не содержит" };
+
         #region Заголовок
         private string _Title;
 
@@ -107,6 +112,101 @@ namespace IFC_Table_View.ViewModels
         }
         #endregion
 
+        #region Поиск
+        public ICommand SearchCellsCommand { get; }
+
+        private void OnSearchCellsCommandExecuted(object o)
+        {
+            object[] ControlArray = (object[])o;
+
+            DataGrid dataGrid = ControlArray[0] as DataGrid;
+            bool isFullText = (bool)ControlArray[1];
+            bool isIgnorRegister = (bool)ControlArray[2];
+            string seachString = (string)ControlArray[3];
+
+
+            if (seachString.Equals(string.Empty)) { return; }
+
+            int CountFound = 0;
+
+            foreach (DataRowView rowView in dataGrid.Items)
+            {
+                DataGridRow row = dataGrid.ItemContainerGenerator.ContainerFromItem(rowView) as DataGridRow;
+                
+                foreach (var column in dataGrid.Columns)
+                {
+                    TextBlock cell = column.GetCellContent(row) as TextBlock;
+                    string cellstring = cell.Text;
+
+                    if (!isIgnorRegister)
+                    {
+                        cellstring = cellstring.ToLower();
+                        seachString = seachString.ToLower();
+                    }
+
+                    if (isFullText)
+                    {
+                        if(cellstring.Equals(seachString))
+                        {
+                            cell.Background = Brushes.Tomato;
+                            ++CountFound;
+                        }
+                    }
+                    else
+                    {
+                        if (cellstring.Contains(seachString))
+                        {
+                            cell.Background = Brushes.Tomato;
+                            ++CountFound;
+                        }
+                    }
+                }
+            }
+            ((TextBlock)ControlArray[4]).Text = $"Найдено ячеек: {CountFound}";
+        }
+
+
+        private bool CanSearchCellsCommandExecute(object o)
+        { 
+            return true;
+        }
+        #endregion
+
+        #region Сброс
+        public ICommand ResetSearchCommand { get; }
+
+        private void OnResetSearchCommandExecuted(object o)
+        {
+            object[] ControlArray = (object[])o;
+
+            DataGrid dataGrid = ControlArray[0] as DataGrid;
+            ((CheckBox)ControlArray[1]).IsChecked = false;
+            ((CheckBox)ControlArray[2]).IsChecked = false;
+            ((TextBox)ControlArray[3]).Text = string.Empty;
+
+            foreach (DataRowView rowView in dataGrid.Items)
+            {
+                DataGridRow row = dataGrid.ItemContainerGenerator.ContainerFromItem(rowView) as DataGridRow;
+
+                foreach (var column in dataGrid.Columns)
+                {
+                    TextBlock cell = column.GetCellContent(row) as TextBlock;
+                    
+                    cell.Background = null;
+                }
+
+            }
+
+            ((TextBlock)ControlArray[4]).Text = string.Empty;
+        }
+
+
+        private bool CanResetSearchCommandExecute(object o)
+        {
+            return true;
+        }
+        #endregion
+
         #region Экспорт в Excel
         public ICommand ExportToExcelCommand { get; }
 
@@ -141,11 +241,11 @@ namespace IFC_Table_View.ViewModels
         }
 
 
-        public TableWindowViewModel(IfcTable ifcTable)
+        public TableWindowViewModel(DataTable dataTable)
         {
-            dataTable = ModelItemIFCTable.FillDataTable(ifcTable);
+            this.dataTable = dataTable;
 
-            Title= dataTable.TableName;
+            Title = this.dataTable.TableName;
 
             #region Комманды
 
@@ -156,6 +256,14 @@ namespace IFC_Table_View.ViewModels
             LessSizeFontCommand = new ActionCommand(
                 OnLessSizeFontCommandExecuted,
                 CanLessSizeFontCommandExecute);
+
+            SearchCellsCommand = new ActionCommand(
+                OnSearchCellsCommandExecuted,
+                CanSearchCellsCommandExecute);
+
+            ResetSearchCommand = new ActionCommand(
+                OnResetSearchCommandExecuted,
+                CanResetSearchCommandExecute);
 
             ExportToExcelCommand = new ActionCommand(
                 OnExportToExcelCommandExecuted,

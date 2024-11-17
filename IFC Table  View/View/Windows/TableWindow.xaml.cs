@@ -21,11 +21,12 @@ namespace IFC_Table_View.View.Windows
     public partial class TableWindow : Window
     {
        
-        public TableWindow(IfcTable ifcTable)
+
+        public TableWindow(DataTable dataTable)
         {
             InitializeComponent();
 
-            DataContext = new TableWindowViewModel(ifcTable);
+            DataContext = new TableWindowViewModel(dataTable);
 
             MaxWidth = SystemParameters.PrimaryScreenWidth;
             MaxHeight = SystemParameters.PrimaryScreenHeight;

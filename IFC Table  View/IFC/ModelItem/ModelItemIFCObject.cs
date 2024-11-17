@@ -23,14 +23,11 @@ namespace IFC_Table_View.IFC.ModelItem
 {
     public class ModelItemIFCObject : BaseModelItemIFC
     {
-        private IfcObjectDefinition _IFCObjectDefinition;
-
-        public event EventHandler<PropertyReferenceChangedEventArg> PropertyReferenceChanged;
 
         /// <summary>
         /// Конструктор
         /// </summary>
-        public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement, ModelIFC modelIFC) : base(modelIFC)
+        public ModelItemIFCObject(IfcObjectDefinition IFCObject, ModelItemIFCObject TopElement, ModelIFC modelIFC) : base(modelIFC, IFCObject)
         {
             //Если есть элемент выше по дереву то подключаем к нему обработчик события изменения состояния элемента
             if (TopElement != null)
@@ -38,7 +35,7 @@ namespace IFC_Table_View.IFC.ModelItem
                 PropertyReferenceChanged += TopElement.ChangePropertyReference;
             }
 
-            _IFCObjectDefinition = IFCObject;
+            IFCObjectDefinition = IFCObject;
 
             PaintElementsCommand = new ActionCommand(
                    OnPaintElementsCommandExecuted,
@@ -116,7 +113,7 @@ namespace IFC_Table_View.IFC.ModelItem
         }
         #endregion
 
-        #region Добавить к элементу связь с таблицей 
+        #region Добавить к элементу связь с элементом 
         public ICommand AddReferenceToTheTable { get; }
 
         private void OnAddReferenceToTheTable(object o)
@@ -125,16 +122,17 @@ namespace IFC_Table_View.IFC.ModelItem
             if (o is ModelItemIFCObject modelObject)
             {
 
-                List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
-                                                    OfType<ModelItemIFCTable>().
+                List<BaseModelReferenceIFC> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
+                                                    OfType<BaseModelReferenceIFC>().
                                                     ToList();
 
 
-                Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(this, collectionModelTable);
+                Form_Add_Reference_To_Table form_Add_Reference_To_Table = new Form_Add_Reference_To_Table(new List<ModelItemIFCObject> { this } , collectionModelTable);
 
                 form_Add_Reference_To_Table.ShowDialog();
 
-                AddReferenceTable(form_Add_Reference_To_Table.TableNameCollection);
+
+                AddReferenceToTheObjectReference(form_Add_Reference_To_Table.CollectionTableToAdd);
 
             }
         }
@@ -145,22 +143,23 @@ namespace IFC_Table_View.IFC.ModelItem
         }
         #endregion
 
-        #region Удалить ссылку на таблицу
+        #region Удалить ссылки на документ или таблицу
         public ICommand DeleteReferenceToTheTable { get; }
 
         private void OnDeleteReferenceToTheTable(object o)
         {
+            List<BaseModelReferenceIFC> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
+                                                OfType<BaseModelReferenceIFC>().
+                                                ToList();
 
-            Form_Delete_Reference_To_Table form_Delete_Reference_To_Table = new Form_Delete_Reference_To_Table(this);
+            Form_Delete_Reference_To_Table form_Delete_Reference_To_Table = new Form_Delete_Reference_To_Table(new List<ModelItemIFCObject>() { this }, collectionModelTable);
 
             form_Delete_Reference_To_Table.ShowDialog();
 
-            List<ModelItemIFCTable> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
-                                                OfType<ModelItemIFCTable>().
-                                                ToList();
 
-            DeleteReferenceTable(form_Delete_Reference_To_Table.ifcPropertyReferenceValueDictionaryToDelete, collectionModelTable);
-  
+
+            DeleteReferenceToTheObjectReference(form_Delete_Reference_To_Table.CollectionModelitemTableToDelete);
+
         }
 
         private bool CanDeleteReferenceToTheTable(object o)
@@ -172,19 +171,25 @@ namespace IFC_Table_View.IFC.ModelItem
         #endregion
 
         #region Методы
+
+        public IfcObjectDefinition GetIFCObject()
+        {
+            return IFCObjectDefinition;
+        }
+
         /// <summary>
         /// Инициализация элементов объекта модели
         /// </summary>
         private void InitializationModelObject()
         {
 
-            modelHelper = new ModelObjectHelper(_IFCObjectDefinition);
+            modelHelper = new ModelObjectHelper(IFCObjectDefinition);
 
             CollectionPropertySet = new ObservableCollection<IfcPropertySetDefinition>();
 
             modelHelper.FillCollectionPropertySet(CollectionPropertySet);
 
-            _PropertyElement = modelHelper.GetPropertyObject();
+            PropertyElement = modelHelper.GetPropertyObject();
 
             int? countPropRef = CollectionPropertySet?.OfType<IfcPropertySet>().
                 SelectMany(it => it.HasProperties.Values).
@@ -202,6 +207,7 @@ namespace IFC_Table_View.IFC.ModelItem
             PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReference));
         }
 
+        public event EventHandler<PropertyReferenceChangedEventArg> PropertyReferenceChanged;
         /// <summary>
         /// Прокидываем по дереву вверх состояние элемента
         /// </summary>
@@ -241,35 +247,16 @@ namespace IFC_Table_View.IFC.ModelItem
         ModelObjectHelper modelHelper;
 
         /// <summary>
-        /// Добавить ссылку на таблицу
-        /// </summary>
-        /// <param name="tableItemSet"></param>
-        public void AddToTheTableReferenceElement(ObservableCollection<ModelItemIFCTable> tableItemSet)
-        {
-            IEnumerable<IfcPropertyReferenceValue> propertyReferenceSet = CollectionPropertySet?.OfType<IfcPropertySet>().
-                SelectMany(it => it.HasProperties.Values).
-                OfType<IfcPropertyReferenceValue>();
-
-            foreach (IfcPropertyReferenceValue propertyReference in propertyReferenceSet)
-            {
-                foreach (ModelItemIFCTable tableItem in tableItemSet)
-                {
-                    if (propertyReference.PropertyReference == tableItem.ItemTreeView as IfcTable)
-                    {
-                        tableItem.AddReferenceToTheElement(this);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Удаление ссылок на таблицы
         /// </summary>
-        /// <param name="ifcPropertyReferenceValueDictionaryToDelete"></param>
-        public void DeleteReferenceTable(Dictionary<string, IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionaryToDelete, List<ModelItemIFCTable> collectionModelTable)
+        /// <param name="CollectionModelitemTableToDelete"></param>
+        public void DeleteReferenceToTheObjectReference(List<BaseModelReferenceIFC> CollectionModelitemTableToDelete)
         {
+            List<BaseModelReferenceIFC> collectionModelTable = modelIFC.ModelItems[0].ModelItems.
+                                                OfType<BaseModelReferenceIFC>().
+                                                ToList();
 
-            if (ifcPropertyReferenceValueDictionaryToDelete.Count == 0)
+            if (CollectionModelitemTableToDelete.Count == 0)
             {
                 return;
             }
@@ -278,24 +265,44 @@ namespace IFC_Table_View.IFC.ModelItem
             IfcPropertySet PropSetTableReference = CollectionPropertySet.
                                                    OfType<IfcPropertySet>().
                                                    FirstOrDefault(it => it.Name == "RZDP_Ссылки");
+            if (PropSetTableReference == null)
+            {
+                return;
+            }
 
             //Удаляем ссылки
-            foreach (KeyValuePair<string, IfcPropertyReferenceValue> Pair in ifcPropertyReferenceValueDictionaryToDelete)
+            foreach (BaseModelReferenceIFC modelTable in CollectionModelitemTableToDelete)
             {
-                ModelItemIFCTable findModelTable = collectionModelTable.FirstOrDefault(it => it.ItemTreeView == Pair.Value.PropertyReference);
+                BaseModelReferenceIFC findModelTable = collectionModelTable.FirstOrDefault(it => it == modelTable);
                 if (findModelTable == null) {continue;}
                 
                 findModelTable.DeleteReferenceToTheElement(this);
-                PropSetTableReference.HasProperties.Remove(Pair.Key);
+
+
+                IfcPropertyReferenceValue propertyToDelete = CollectionPropertySet?.OfType<IfcPropertySet>()
+                                                                                    .SelectMany(it => it.HasProperties.Values)
+                                                                                    .OfType<IfcPropertyReferenceValue>()
+                                                                                    .FirstOrDefault(it => it.PropertyReference == modelTable.GetReferense());
+                
+                PropSetTableReference?.RemoveProperty(propertyToDelete);
             }
 
             //Проверяем, остались ли еще ссылки на другие таблицы
             if (PropSetTableReference.HasProperties.Count == 0)
             {
-                IfcObject ifcObject = ((IfcObject)_IFCObjectDefinition);
-                //Находим промежуточный класс 
-                IfcRelDefinesByProperties FindRelDef = ifcObject.IsDefinedBy
-                    .FirstOrDefault(it => it.RelatingPropertyDefinition.Contains(PropSetTableReference));
+                GeometryGym.STEP.SET<IfcRelDefinesByProperties> ifcRelDefinesByProperties = null;
+                if (IFCObjectDefinition is IfcObject ifcObject)
+                {
+                    ifcRelDefinesByProperties = ifcObject.IsDefinedBy;
+                }
+                else if (IFCObjectDefinition is IfcContext ifcContext)
+                {
+
+                    ifcRelDefinesByProperties = ifcContext.IsDefinedBy;
+                }
+
+                IfcRelDefinesByProperties FindRelDef = ifcRelDefinesByProperties
+                       .FirstOrDefault(it => it.RelatingPropertyDefinition.Contains(PropSetTableReference));
 
                 //Удаляем пустой набор свойств
                 FindRelDef.RelatingPropertyDefinition.Remove(PropSetTableReference);
@@ -303,7 +310,7 @@ namespace IFC_Table_View.IFC.ModelItem
                 //Удаляем пустой промежуточный класс
                 if (FindRelDef.RelatingPropertyDefinition.Count == 0)
                 {
-                    ifcObject.IsDefinedBy.Remove(FindRelDef);
+                    ifcRelDefinesByProperties.Remove(FindRelDef);
                 }
                 IsContainPropertyReference = false;
                 //Прокидываем наверх по дереву событие удаления ссылок
@@ -314,52 +321,81 @@ namespace IFC_Table_View.IFC.ModelItem
         }
 
         /// <summary>
-        /// Добавление ссылок на таблицы
+        /// При заполнении дерева, если в элементе есть ссылка на таблицу,
+        /// то добавляем к таблице обратную ссылку на элемент
         /// </summary>
-        /// <param name="RefTableSet"></param>
-        public void AddReferenceTable(List<ModelItemIFCTable> RefTableSet)
+        /// <param name="tableItemSet"></param>
+        public void AddReferenceToTheObjectReferenceToload(ObservableCollection<BaseModelReferenceIFC> ReferenceElementSet)
         {
-            if (_IFCObjectDefinition is IfcObject obj)
+            IEnumerable<IfcPropertyReferenceValue> propertyReferenceSet = CollectionPropertySet?.OfType<IfcPropertySet>().
+                SelectMany(it => it.HasProperties.Values).
+                OfType<IfcPropertyReferenceValue>();
+
+            foreach (IfcPropertyReferenceValue propertyReference in propertyReferenceSet)
             {
-                IfcPropertySet PropSetTableReference = CollectionPropertySet.
-                                                    OfType<IfcPropertySet>().
-                                                    FirstOrDefault(it => it.Name == "RZDP_Ссылки");
-
-                foreach (ModelItemIFCTable RefTable in RefTableSet)
+                foreach (ModelItemIFCTable tableItem in ReferenceElementSet)
                 {
-                    IfcPropertyReferenceValue pref = new IfcPropertyReferenceValue(_IFCObjectDefinition.Database, RefTable.IFCTable.Name);
-
-                    pref.PropertyReference = RefTable.IFCTable;
-                    pref.Name = RefTable.IFCTable.Name;
-
-                    if (PropSetTableReference == null)
+                    if (propertyReference.PropertyReference == tableItem.GetReferense())
                     {
-                        PropSetTableReference = new IfcPropertySet("RZDP_Ссылки", pref);
-                        IfcRelDefinesByProperties relDefProp = new IfcRelDefinesByProperties(_IFCObjectDefinition, PropSetTableReference);
+                        tableItem.AddReferenceToTheElement(this);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Добавление ссылок на таблицы от элемента
+        /// </summary>
+        /// <param name="modelReferenceSet"></param>
+        public void AddReferenceToTheObjectReference(List<BaseModelReferenceIFC> modelReferenceSet)
+        {
+            IfcPropertySet PropSetTableReference = CollectionPropertySet.
+                                                OfType<IfcPropertySet>().
+                                                FirstOrDefault(it => it.Name == "RZDP_Ссылки");
+
+            foreach (BaseModelReferenceIFC modelReference in modelReferenceSet)
+            {
+                IfcPropertyReferenceValue pref = new IfcPropertyReferenceValue(IFCObjectDefinition.Database, modelReference.NameReference);
+
+                pref.PropertyReference = modelReference.GetReferense();
+  
+                if (PropSetTableReference == null)
+                {
+                    PropSetTableReference = new IfcPropertySet("RZDP_Ссылки", pref);
+                    IfcRelDefinesByProperties relDefProp = new IfcRelDefinesByProperties(IFCObjectDefinition, PropSetTableReference);
+                    if (IFCObjectDefinition is IfcObject obj)
+                    {
                         obj.IsDefinedBy.Add(relDefProp);
                     }
-                    else
+                    else if (IFCObjectDefinition is IfcContext context)
                     {
-                        PropSetTableReference.AddProperty(pref);
+                        context.IsDefinedBy.Add(relDefProp);
                     }
-                    //Добавляем в таблицу ссылки
-                    RefTable.AddReferenceToTheElement(this);
-
-                    IsContainPropertyReference = true;
-                    //Прокидываем наверх по дереву событие добавления ссылки
-                    PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReference));
-
                 }
+                else
+                {
+                    PropSetTableReference.AddProperty(pref);
+                }
+                //Добавляем в таблицу ссылку на текущий элемент
+                modelReference.AddReferenceToTheElement(this);
 
-                modelHelper.FillCollectionPropertySet(CollectionPropertySet);
+                IsContainPropertyReference = true;
+                //Прокидываем наверх по дереву событие добавления ссылки
+                PropertyReferenceChanged?.Invoke(this, new PropertyReferenceChangedEventArg(IsContainPropertyReference));
+
             }
+
+            //Обновляем коллекцию характеристик
+            modelHelper.FillCollectionPropertySet(CollectionPropertySet);
+            
         }
 
 
         /// <summary>
-        /// Ищем элемент в дереве по контексту
+        /// Ищем все элементы в дереве по критериям
         /// </summary>
-
+        /// <param name="topElement"></param>
+        /// <param name="foundObjects"></param>
         public static void FindMultiplyTreeObject(ModelItemIFCObject topElement, IEnumerable<ModelItemIFCObject> foundObjects)
         {
             if (foundObjects.Any(it => it == topElement))
@@ -375,7 +411,19 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+        /// <summary>
+        /// Ищем все элементы в дереве по критериям
+        /// </summary>
+        /// <param name="topElement"></param>
+        /// <param name="foundObjects"></param>
+        public static List<ModelItemIFCObject> FindPaintObject(ModelItemIFCObject topElement)
+        {
+            return topElement.SelectionElements(topElement).Where(it => it.IsPaint).ToList();
+        }
 
+        /// <summary>
+        /// Ищем один элемент в дереве
+        /// </summary>
         public static void FindSingleTreeObject(ModelItemIFCObject topElement, ModelItemIFCObject foundObject)
         {
             foreach (ModelItemIFCObject item in topElement.ModelItems)
@@ -393,27 +441,53 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
-        #region Выборка элементов
+        /// <summary>
+        /// Выборка элементов ниже по дереву
+        /// </summary>
+        /// <param name="modelItem"></param>
+        /// <returns></returns>
         private List<ModelItemIFCObject> SelectionElements(ModelItemIFCObject modelItem)
         {
             List<ModelItemIFCObject> list = new List<ModelItemIFCObject>();
 
             list.Add(modelItem);
 
-            if (modelItem.ModelItems != null)
+            foreach (ModelItemIFCObject nestModelItem in modelItem.ModelItems)
             {
-                foreach (ModelItemIFCObject nestModelItem in modelItem.ModelItems)
-                {
-                    list.AddRange(SelectionElements(nestModelItem));
-                }
+                list.AddRange(SelectionElements(nestModelItem));
             }
+
             return list;
 
         }
-        #endregion
+
         #endregion
 
         #region Свойства
+
+        private IfcObjectDefinition IFCObjectDefinition;
+
+        public string IFCObjectGUID => IFCObjectDefinition.Guid.ToString();
+
+        public string IFCObjectName => IFCObjectDefinition.Name;
+
+        public string IFCObjectClass => IFCObjectDefinition.StepClassName;
+
+
+        
+        /// <summary>
+        /// IsExpanded
+        /// </summary>
+        private bool _IsExpanded { get; set; } = false;
+        public override bool IsExpanded
+        {
+            get { return _IsExpanded; }
+            set
+            {
+                _IsExpanded = value;
+                OnPropertyChanged("IsExpanded");
+            }
+        }
 
         private bool _IsContainPropertyReference { get; set; } = false;
         /// <summary>
@@ -476,11 +550,10 @@ namespace IFC_Table_View.IFC.ModelItem
         }
 
 
-
-        private bool _IsPaint { get; set; }
         /// <summary>
-        /// Покрасить элементы
+        /// Покрасить элемент
         /// </summary>
+        private bool _IsPaint { get; set; }
         public bool IsPaint
         {
             get { return _IsPaint; }
@@ -492,24 +565,6 @@ namespace IFC_Table_View.IFC.ModelItem
         }
 
 
-        /// <summary>
-        /// Получение элемента вложенного дерева
-        /// </summary>
-        public override object ItemTreeView
-        {
-            get
-            {
-                if (_IFCObjectDefinition != null)
-                {
-                    return _IFCObjectDefinition;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
         private Dictionary<string, HashSet<object>> _PropertyElement;
         /// <summary>
         /// Свойства элемента
@@ -519,6 +574,10 @@ namespace IFC_Table_View.IFC.ModelItem
             get
             {
                 return _PropertyElement;
+            }
+            protected set 
+            {
+                _PropertyElement = value;
             }
         }
 
@@ -558,10 +617,6 @@ namespace IFC_Table_View.IFC.ModelItem
 
 
         #endregion 
-
-
-
-
 
     }
 
@@ -811,11 +866,10 @@ namespace IFC_Table_View.IFC.ModelItem
                 return false;
             }
 
+            CollectionPropertySet.Clear();
             if (ifcObjectDefinition is IfcObject obj)
             {
-                CollectionPropertySet.Clear();
-
-                IEnumerable<IfcPropertySetDefinition> collectionProperty = obj.IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition).OfType<IfcPropertySetDefinition>();
+                 IEnumerable<IfcPropertySetDefinition> collectionProperty = obj.IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition).OfType<IfcPropertySetDefinition>();
 
                 foreach (IfcPropertySetDefinition propSetIsObj in collectionProperty)
                 {
@@ -831,6 +885,15 @@ namespace IFC_Table_View.IFC.ModelItem
                         CollectionPropertySet.Add(propSetIsType);
                     }
                 }
+            }
+            else if (ifcObjectDefinition is IfcContext context)
+            {
+                IEnumerable<IfcPropertySetDefinition> collectionProperty = context.IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition).OfType<IfcPropertySetDefinition>();
+                
+                foreach (IfcPropertySetDefinition propSetIsObj in collectionProperty)
+                {
+                    CollectionPropertySet.Add(propSetIsObj);
+                }           
             }
 
             return true;

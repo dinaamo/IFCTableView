@@ -17,7 +17,7 @@
         <DockPanel>
             <TextBlock  DockPanel.Dock="Left"
                        x:Name="txtStateRunning"
-                       Text="{Binding Path=Message}" 
+                       Text="   Загрузка" 
                        VerticalAlignment="Center" 
                        HorizontalAlignment="Left"
                        FontSize="50" 

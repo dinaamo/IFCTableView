@@ -2,6 +2,7 @@
 using IFC_Table_View.IFC.ModelItem;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -9,33 +10,47 @@ namespace IFC_Table_View.Data
 {
     public partial class Form_Add_Reference_To_Table : Form
     {
-        private List<ModelItemIFCTable> CollectionModelitemTable;
-        private ModelItemIFCObject modelItemObject;
-        public List<ModelItemIFCTable> TableNameCollection;
+        private List<BaseModelReferenceIFC> CollectionModelitemTable;
+        private List<ModelItemIFCObject> CollectionModelItemObject;
+        public List<BaseModelReferenceIFC> CollectionTableToAdd;
 
-        public Form_Add_Reference_To_Table(ModelItemIFCObject modelItemObject, List<ModelItemIFCTable> CollectionModelitemTable)
+        public Form_Add_Reference_To_Table(List<ModelItemIFCObject> CollectionModelItemObject, List<BaseModelReferenceIFC> CollectionModelitemTable)
         {
             InitializeComponent();
-            TableNameCollection = new List<ModelItemIFCTable>();
+            CollectionTableToAdd = new List<BaseModelReferenceIFC>();
             this.CollectionModelitemTable = CollectionModelitemTable;
-            this.modelItemObject = modelItemObject;
-        }
+            this.CollectionModelItemObject = CollectionModelItemObject;
 
+            CollectionTableToAdd = new List<BaseModelReferenceIFC>();
+        }
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         private void Form1_Load(object sender, EventArgs e)
         {
-            labelName.Text = ((IfcObjectDefinition)modelItemObject.ItemTreeView).Name;
-            labelGUID.Text = ((IfcObjectDefinition)modelItemObject.ItemTreeView).Guid.ToString();
-
-            foreach (ModelItemIFCTable modelItem in CollectionModelitemTable)
-            {
-                dataGridViewTable.Rows.Add(new object[] { modelItem.IFCTable.Name });
-            }
+            FillDataGrid();
         }
+
+
+        //Заполнение датагрид
+        private void FillDataGrid()
+        {
+            dataGridViewTable.AutoGenerateColumns = false;
+            dataGridViewObjects.AutoGenerateColumns = false;
+
+            dataGridViewTable.DataSource = new BindingList<BaseModelReferenceIFC>(CollectionModelitemTable);
+            dataGridViewTable.Columns[0].DataPropertyName = "NameReference";
+
+            dataGridViewObjects.DataSource = new BindingList<ModelItemIFCObject>(CollectionModelItemObject);
+            dataGridViewObjects.Columns[0].DataPropertyName = "IFCObjectGUID";
+            dataGridViewObjects.Columns[1].DataPropertyName = "IFCObjectName";
+            dataGridViewObjects.Columns[2].DataPropertyName = "IFCObjectClass";
+
+        }
+
 
         private void button_Add_Reference_Click(object sender, EventArgs e)
         {
             GetNameSelectTable();
-            this.Hide();
+            this.Close();
         }
 
         //Получаем имена таблиц которые выбрал пользователь
@@ -48,9 +63,10 @@ namespace IFC_Table_View.Data
                 object stateCell = row.Cells[1].Value;
                 if (stateCell != null && (bool)stateCell)
                 {
-                    TableNameCollection.Add(CollectionModelitemTable.First(it => it.IFCTable.Name == row.Cells[0].Value.ToString()));
+                    CollectionTableToAdd.Add(((BindingList<BaseModelReferenceIFC>)dataGridViewTable.DataSource)[row.Index]);
                 }
             }
         }
+
     }
 }

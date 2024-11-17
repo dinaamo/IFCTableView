@@ -56,7 +56,7 @@ namespace IFC_Table_View.ViewModels
 
         private bool CanPaintElementCommandExecute(object o)
         {
-            return FilteredSearchItems != null && FilteredSearchItems.Count() > 0 && FilteredSearchItems.Count() != SearchItems.Count();
+            return FilteredSearchItems != null && FilteredSearchItems.Count() > 0;
         }
         #endregion
 

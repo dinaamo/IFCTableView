@@ -17,7 +17,7 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             if (value is BaseModelItemIFC elementFile)
             {
-                return elementFile?.PropertyElement;
+                return elementFile.PropertyElement;
             }
             else
             {
@@ -49,11 +49,9 @@ namespace IFC_Table_View.Infracrucrure.Converter
         {
             if (value is ModelItemIFCObject elementObject)
             {
-                IfcObjectDefinition ifcObject = (IfcObjectDefinition)elementObject.ItemTreeView;
-
-                return $"Guid:{ifcObject.Guid} " +
-                        $"\nКласс: {ifcObject.StepClassName} " +
-                        $"\nИмя: {ifcObject.Name}";
+                return $"Guid:{elementObject.IFCObjectGUID} " +
+                        $"\nКласс: {elementObject.IFCObjectClass} " +
+                        $"\nИмя: {elementObject.IFCObjectName}";
             }
             else
             {

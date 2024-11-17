@@ -109,6 +109,8 @@
       <DependentUpon>Form_Delete_Reference_To_Table.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperExcel\HelperExcel.cs" />
+    <Compile Include="IFC\ModelItem\BaseModelReferenceIFC.cs" />
+    <Compile Include="IFC\ModelItem\ModelItemDocumentReference.cs" />
     <Compile Include="IFC\ModelItem\ModelItemIFCTable.cs" />
     <Compile Include="Infracrucrure\Converter\ConverterTest.cs" />
     <Compile Include="Infracrucrure\Converter\ConverterImageVisibility.cs" />

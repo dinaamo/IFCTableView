@@ -17,7 +17,7 @@ namespace IFC_Table_View.Resourses
                 {
                     if (textBlock.DataContext is ModelItemIFCTable table)
                     {
-                        new TableWindow(table.IFCTable).ShowDialog();
+                        new TableWindow(table.dataTable).ShowDialog();
                     }
                 }
             }

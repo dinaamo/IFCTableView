@@ -22,37 +22,100 @@
         <!--Верхняя панель-->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Файл">
-                <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть"/>
+                <MenuItem Command="{Binding LoadApplicationCommand}" Header="Открыть">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                                Height="12"
+                                Margin="0,0,3,0"
+                                Foreground="DarkOrange"
+                                Icon="FolderOpen" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <!--kKKKKKKKKKKKKKKKKKKKK-->
                 <MenuItem
                     Command="{Binding SaveFileCommand}"
                     Header="Сохранить"
-                    Visibility="Visible" />
+                    Visibility="Visible" >
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Icon="Save" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem
                     Command="{Binding SaveAsFileCommand}"
                     Header="Сохранить как"
-                    Visibility="Visible" />
+                    Visibility="Visible" >
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Icon="Save" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem
                     Command="{Binding SaveAsIFCXMLFileCommand}"
                     Header="Сохранить как(.ifcxml)"
-                    Visibility="Collapsed" />
+                    Visibility="Collapsed"/>
                 <!--kKKKKKKKKKKKKKKKKKKKK-->
                 <MenuItem Header="Выход">
                     <MenuItem.Command>
                         <cmnd:CloseApplicationCommand />
                     </MenuItem.Command>
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkRed"
+                            Icon="Close" />
+                    </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
-            <MenuItem Header="Правка" Visibility="Visible">
+            <MenuItem Header="Инструменты" Visibility="Visible">
                 <MenuItem 
-                    Command="{Binding AddIFCTableCommand}" Header="Добавить таблицу">
+                    Command="{Binding AddIFCTableCommand}" Header="Добавить в файл таблицу">
                     <MenuItem.Icon>
                         <fa:ImageAwesome
                             Height="12"
                             Margin="0,0,3,0"
                             Foreground="OrangeRed"
                             Icon="Table" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                    Command="{Binding AddIFCTableCommand}" Header="Добавить в файл ссылку на документ">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="SteelBlue"
+                            Icon="FileText" />     
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                        Command="{Binding AddReferenceToTheTable}"
+                        Header="Задать ссылки" ToolTip="Групповое задание ссылок">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkGreen"
+                            Icon="ExternalLinkSquare" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                        Command="{Binding DeleteReferenceToTheTable}"
+                        Header="Удалить ссылки" ToolTip="Групповое удаление ссылок">
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkRed"
+                            Icon="Remove" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem 
@@ -67,8 +130,16 @@
                 </MenuItem>
             </MenuItem>
             <!--kKKKKKKKKKKKKKKKKKKKK-->
-            <MenuItem Header="Справка">
-                <MenuItem Command="{Binding OpenHelp}" Header="Справка по программе" />
+            <MenuItem Header="Справка" IsEnabled="False">
+                <MenuItem Command="{Binding OpenHelp}" Header="Справка по программе" >
+                    <MenuItem.Icon>
+                        <fa:ImageAwesome
+                            Height="12"
+                            Margin="0,0,3,0"
+                            Foreground="DarkBlue"
+                            Icon="Search" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

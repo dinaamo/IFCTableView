@@ -9,9 +9,9 @@ namespace IFC_Table_View.Infracrucrure.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ModelItemIFCTable element)
+            if (value is ModelItemIFCTable modelTable)
             {
-                return ((ModelItemIFCTable)value).dataTable;
+                return modelTable.dataTable;
             }
             else
             {

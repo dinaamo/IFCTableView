@@ -30,8 +30,7 @@
         <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
         <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
-        <!--<Setter Property="EnableColumnVirtualization" Value="True"/>
-        <Setter Property="EnableRowVirtualization" Value="True"/>-->
+
         <Setter Property="ColumnHeaderStyle">
             <Setter.Value>
             <Style TargetType="DataGridColumnHeader">
@@ -51,8 +50,6 @@
         <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
         <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
-        <!--<Setter Property="EnableColumnVirtualization" Value="True"/>
-        <Setter Property="EnableRowVirtualization" Value="True"/>-->
     </Style>
 
 
@@ -202,6 +199,18 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem
+                             Command="{Binding ResetSearchCommand}"
+                             CommandParameter="{Binding}"
+                             Header="Снять выделение">
+                        <MenuItem.Icon>
+                            <fa:ImageAwesome
+                             Height="12"
+                             Margin="0,0,3,0"
+                             Foreground="DarkBlue"
+                             Icon="Refresh" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem
                             Command="{Binding SearchElementsCommand}"
                             CommandParameter="{Binding}"
                             Header="Найти элементы">        
@@ -213,18 +222,7 @@
                             Icon="Search" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem
-                        Command="{Binding ResetSearchCommand}"
-                        CommandParameter="{Binding}"
-                        Header="Снять выделение">
-                        <MenuItem.Icon>
-                            <fa:ImageAwesome
-                            Height="12"
-                            Margin="0,0,3,0"
-                            Foreground="DarkBlue"
-                            Icon="Refresh" />
-                        </MenuItem.Icon>
-                    </MenuItem>
+                    <!--ooooooooooooooooooooooooooooooooooooooo-->
                     <MenuItem
                             Command="{Binding AddReferenceToTheTable}"
                             CommandParameter="{Binding}"
@@ -249,6 +247,7 @@
                             Icon="Remove" />
                         </MenuItem.Icon>
                     </MenuItem>
+                    <!--oooooooooooooooooooooooooooooooooooooooo-->
                 </ContextMenu>
             </StackPanel.ContextMenu>
         </StackPanel>
@@ -287,11 +286,61 @@
             </TextBlock>
             <StackPanel.ContextMenu>
                 <ContextMenu>
+                    <!--ooooooooooooooooooooooooooooooooooooooooooo-->
                     <MenuItem
-                                Command="{Binding DeleteTableCommand}"
+                                Command="{Binding DeleteReferenceCommand}"
                                 CommandParameter="{Binding}"
                                 Header="Удалить таблицу" >
                     <MenuItem.Icon>
+                            <fa:ImageAwesome
+                                Height="12"
+                                Margin="0,0,3,0"
+                                Foreground="DarkRed"
+                                Icon="Close" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <!--ooooooooooooooooooooooooooooooooooooooooooooooooo-->
+                </ContextMenu>
+            </StackPanel.ContextMenu>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type mi:ModelItemDocumentReference}">
+        <StackPanel Orientation="Horizontal">
+            <fa:ImageAwesome
+                Height="10"
+                Margin="0,0,3,0"
+                Foreground="SteelBlue"
+                Icon="FileText" />
+            <TextBlock
+                MouseDown="TextBlock_MouseDown"
+                Text="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}"
+                ToolTip="{Binding ItemTreeView, Converter={StaticResource ConvTreeItem}}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=IsFocusReference}" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue" />
+                                <Setter Property="Background" Value="SkyBlue" />
+                                <Setter Property="FontSize" Value="12" />
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue" />
+                                <Setter Property="Background" Value="SkyBlue" />
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <StackPanel.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                                Command="{Binding DeleteReferenceCommand}"
+                                CommandParameter="{Binding}"
+                                Header="Удалить ссылку на документ" >
+                        <MenuItem.Icon>
                             <fa:ImageAwesome
                                 Height="12"
                                 Margin="0,0,3,0"
@@ -303,7 +352,6 @@
             </StackPanel.ContextMenu>
         </StackPanel>
     </DataTemplate>
-
 
     <Style TargetType="TabControl">
         <Style.Triggers>

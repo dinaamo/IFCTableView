@@ -23,129 +23,40 @@ using IFC_Table_View.Infracrucrure.Commands;
 
 namespace IFC_Table_View.IFC.ModelItem
 {
-    public class ModelItemIFCTable : BaseModelItemIFC
+    public class ModelItemIFCTable : BaseModelReferenceIFC
     {
-        public IfcTable IFCTable { get; private set; }
 
 
-
-        public ModelItemIFCTable(IfcTable IFCTable, ModelIFC modelIFC) : base(modelIFC)
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="IFCTable"></param>
+        /// <param name="modelIFC"></param>
+        public ModelItemIFCTable(IfcTable IFCTable, ModelIFC modelIFC) : base(IFCTable, modelIFC)
         {
             this.IFCTable = ReplaceSymbols(IFCTable);
             dataTable = FillDataTable(this.IFCTable);
-
-            DeleteTableCommand = new ActionCommand(
-                        OnDeleteTableCommandExecuted,
-                        CanDeleteTableCommandExecute);
-        }
-
-        #region Удалить_таблицу
-        public ICommand DeleteTableCommand { get; }
-
-        private void OnDeleteTableCommandExecuted(object o)
-        {
-            var referenceToDelete = PropertyElement
-                                        .SelectMany(it => it.Value)
-                                        .Cast<ModelItemIFCObject>()
-                                        .Where(it => it.ItemTreeView is IfcObject);
-
-
-            foreach (ModelItemIFCObject modelObject in referenceToDelete.ToArray())
-            {
-                // Получаем все характеристики типа IfcPropertyReferenceValue
-                Dictionary<string, IfcPropertyReferenceValue> ifcPropertyReferenceValueDictionary = ((IfcObject)modelObject.ItemTreeView).IsDefinedBy.SelectMany(it => it.RelatingPropertyDefinition)
-                                                                                    .OfType<IfcPropertySet>()
-                                                                                    .SelectMany(PropSet => PropSet.HasProperties)
-                                                                                    .Where(dict => dict.Value.GetType() == typeof(IfcPropertyReferenceValue))
-                                                                                    .Where(dict => ((IfcPropertyReferenceValue)dict.Value).PropertyReference == IFCTable)
-                                                                                    .ToDictionary(x => x.Key, y => (IfcPropertyReferenceValue)y.Value);
-
-
-                modelObject.DeleteReferenceTable(ifcPropertyReferenceValueDictionary, new List<ModelItemIFCTable>() { this});
-                DeleteReferenceToTheElement(modelObject);
-            }
-
-            modelIFC.DeleteTable(IFCTable);
-            
-        }
-
-        private bool CanDeleteTableCommandExecute(object o)
-        {
-            if (modelIFC == null)
-            {
-                return false;
-            }
-            else if (((BaseModelItemIFC)o)?.ItemTreeView is IfcTable Table)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        #endregion
-
-        /// <summary>
-        /// Коллекция ссылок на объекты
-        /// </summary>
-        public override Dictionary<string, HashSet<object>> PropertyElement
-        {
-            get
-            {
-                return _PropertyElement;
-            }
-        }
-        private Dictionary<string, HashSet<object>> _PropertyElement;
-
-        HashSet<object> referenceObjectCollection;
-
-        public void AddReferenceToTheElement(ModelItemIFCObject referenceObject)
-        {
-            if (_PropertyElement == null)
-            {
-                _PropertyElement = new Dictionary<string, HashSet<object>>();
-                referenceObjectCollection = new HashSet<object>();
-                _PropertyElement.Add("Ссылки на объекты", referenceObjectCollection);
-            }
-            
-            referenceObjectCollection.Add(referenceObject);
-        }
-
-        public void DeleteReferenceToTheElement(ModelItemIFCObject deleteReferenceObject)
-        {
-            _PropertyElement["Ссылки на объекты"].Remove(deleteReferenceObject);
-        }
-
-        public override object ItemTreeView
-        {
-            get
-            {
-                if (dataTable != null)
-                {
-                    return IFCTable;
-                }
-                else
-                {
-                    return null;
-                }
-            }
         }
 
 
-        void PropertyObject() 
-        {
-            _PropertyElement = new Dictionary<string, HashSet<object>>();
+        #region Свойства
+        private IfcTable IFCTable { get; set; }
 
-        }
+        public string IFCTableName => IFCTable.Name; 
 
         public DataTable dataTable { get; private set; }
 
-        public override ObservableCollection<BaseModelItemIFC> ModelItems => null;
-
-        //public bool t => throw new NotImplementedException();
 
 
+
+
+        public override string NameReference => IFCTable.Name;
+
+
+        #endregion
+
+
+        #region Методы
         /// <summary>
         /// Заполнение DataTable
         /// </summary>
@@ -182,6 +93,13 @@ namespace IFC_Table_View.IFC.ModelItem
             return dataTable;
         }
 
+        public IfcTable GetIFCTable()
+        {
+            return IFCTable;
+        }
+
+
+
         /// <summary>
         /// Замена запрещенных символов
         /// </summary>
@@ -200,7 +118,11 @@ namespace IFC_Table_View.IFC.ModelItem
 
                     newValueString = newValueString.Trim((char)32);
 
+                    newValueString = newValueString.Replace("\0", "");
+
                     newValueString = newValueString.Replace("измере-ния", "измерения");
+
+                    newValueString = newValueString.Replace("изме- рения", "измерения");
 
                     newValueString = newValueString.Replace("оли-чество", "оличество");
 
@@ -214,5 +136,29 @@ namespace IFC_Table_View.IFC.ModelItem
 
             return ifcTable;
         }
+        #endregion
+
+
+        #region Комманды
+
+        #region Удалить_таблицу
+        protected override void OnDeleteReferenceCommandExecuted(object o)
+        {
+            MessageBoxResult result = MessageBox.Show("Удалить таблицу?", "Внимание!", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.OK) { return; }
+
+            base.OnDeleteReferenceCommandExecuted(o);
+
+            modelIFC.DeleteIFCTable(IFCTable);
+            
+        }
+
+        #endregion
+
+
+        #endregion
+
+
     }
 }

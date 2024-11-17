@@ -28,11 +28,29 @@ namespace IFC_Table_View.IFC.ModelItem
             }
         }
 
+        /// <summary>
+        /// IsExpanded
+        /// </summary>
+        private bool _IsExpanded { get; set; } = false;
+        public override bool IsExpanded
+        {
+            get { return _IsExpanded; }
+            set
+            {
+                _IsExpanded = value;
+                OnPropertyChanged("IsExpanded");
+            }
+        }
+
         public override Dictionary<string, HashSet<object>> PropertyElement
         {
             get
             {
                 return _PropertyElement;
+            }
+            protected set
+            {
+                _PropertyElement = value;
             }
         }
 
